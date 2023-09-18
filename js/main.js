@@ -7,11 +7,11 @@ import { SoundManager } from "./sound_manager.js";
 
 // リソースの読み込み
 new MCSoundHashResource(
-  await new NetworkFileLoader('../resource/1.20.1.json').FetchData()
+  await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/1.20.1.json').FetchData()
 ).ParseResource();
 
 new MCPlaysoundCommandParamResource(
-  await new NetworkFileLoader('../resource/sounds.json').FetchData()
+  await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/sounds.json').FetchData()
 ).ParseResource();
 
 new SoundManager();
