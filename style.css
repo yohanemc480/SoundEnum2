@@ -1,0 +1,82 @@
+body {
+  background-color: #272727;
+  display: flex;
+  flex-flow:row;
+  margin:0;
+}
+.main {
+  width:60%;
+  height:100vh;
+  display:flex;
+  flex-flow: column;
+}
+.sub {
+  background-color: blue;
+  width:40%;
+  flex-grow: 1;
+  display:flex;
+  flex-flow: column;
+}
+.params {
+  background-color:#21331D;
+  margin:10px;
+}
+.param {
+  background-color: #272727;
+  border: 1px solid #6b6b6b;
+  color:white;
+  margin:5px;
+  border-radius: 3px;
+  padding:5px;
+  display:flex;
+  align-items:center;
+}
+.sound-genres-list {
+  background-color:#272727;
+  display:flex;
+  flex-flow:row;
+  flex-grow:1;
+  margin-top:10px;
+}
+.sound-genres {
+  background-color:#21331D;
+  flex-grow:1;
+  margin:10px;
+  display:flex;
+  flex-flow:column;
+  width:20%;
+  border-radius: 3px;
+  padding:5px;
+  overflow-y:hidden;
+}
+.history {
+  background-color: aquamarine;
+  flex-grow: 1;
+  margin:5px;
+}
+.output {
+  background-color:blueviolet;
+  height:100px;
+  margin:5px;
+}
+.genre-button {
+  display:flex;
+  background-color: #272727;
+  border: 1px solid #6b6b6b;
+  color:white;
+  border-color: #6b6b6b;
+  border-radius: 3px;
+  text-align: left;
+  height:25px;
+  font-size:x-small;
+  cursor:pointer;
+  margin:2px;
+  overflow: hidden;
+  align-items: center;
+  padding-left:5px;
+}
+.genre-button:hover {
+  box-shadow    : none;        /* カーソル時の影消去 */
+  color         : #000066;     /* 背景色     */
+  background    : #ffffff;     /* 文字色     */
+}
