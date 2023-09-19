@@ -13,7 +13,7 @@ const Genre = Object.freeze({
 class GenreButton {
   constructor(appendTarget, displayName, linkingNode, outputArea) {
     $(document).ready(function() {
-            let name;
+      let name;
       if (linkingNode.IsTreeEnd()) {
         name = "[📣] " + displayName;
       }
