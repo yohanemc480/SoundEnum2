@@ -4,6 +4,7 @@ import {MCSoundHashResource ,MCPlaysoundCommandParamResource, NetworkFileLoader}
 import { GenreButton, GenreButtonGenerator} from "./button.js";
 import {test} from "./test.js";
 import { SoundManager } from "./sound_manager.js";
+import { OutputArea } from "./output_area.js";
 
 // リソースの読み込み
 new MCSoundHashResource(
@@ -16,9 +17,10 @@ new MCPlaysoundCommandParamResource(
 
 new SoundManager();
 // test();
+let outputArea = new OutputArea(".output","コマンド出力エリア");
 
 let soundNames = MCPlaysoundCommandParamResource.GetAllCommandSoundName();
 let tree = new SoundGenreTree(soundNames);
 let root = tree.GetRoot();
 
-GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren());
+GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);

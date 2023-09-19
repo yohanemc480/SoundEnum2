@@ -11,7 +11,7 @@ const Genre = Object.freeze({
 })
 
 class GenreButton {
-  constructor(appendTarget, displayName, linkingNode) {
+  constructor(appendTarget, displayName, linkingNode, outputArea) {
     $(document).ready(function() {
       let name;
       if (linkingNode.IsTreeEnd()) {
@@ -29,7 +29,7 @@ class GenreButton {
         let depth = linkingNode.GetDepth();
         GenreButtonGenerator.ClearGenreButtons(depth + 1);
         GenreButtonGenerator.ClearGenreButtons(depth + 2);
-        GenreButtonGenerator.GenerateButtonsFromNodes(linkingNode.GetChildren());
+        GenreButtonGenerator.GenerateButtonsFromNodes(linkingNode.GetChildren(), outputArea);
   
         if (linkingNode.IsTreeEnd()) {
           let commandSound = new MCCommandSound(
@@ -41,6 +41,8 @@ class GenreButton {
             SoundManager.GetMinVolume()
             )
           SoundManager.Play(commandSound);
+          // 出力エリアにコマンドを代入する。
+          outputArea.SetText(commandSound.ToString());
         }
       });
     });
@@ -75,7 +77,7 @@ class GenreButtonGenerator {
         console.log("定義されていないGenreが渡されました。");
     }
   }
-  static GenerateButtonsFromNodes(nodes) {
+  static GenerateButtonsFromNodes(nodes, outputArea) {
     for (let i = 0; i < nodes.length; i++) {
       let node = nodes[i];
       // ノードの深さを参照して
@@ -83,7 +85,7 @@ class GenreButtonGenerator {
       if (genre > Genre.Max) {
         continue;
       }
-      new GenreButton(this.GenreToID(genre), node.GetValue(), node);
+      new GenreButton(this.GenreToID(genre), node.GetValue(), node, outputArea);
     }
   }
 }
