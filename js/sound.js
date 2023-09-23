@@ -34,6 +34,9 @@ const MCCommandSelector = Object.freeze({
 class MCCommandSound {
   static MinVolume = 0;
   static DefaultVolume = 1;
+  static MinPitch = 0.5;
+  static MaxPitch = 2;
+  static DefaultPitch = 1;
   _soundName = "";
   _source = MCCommandSoundSource.master;
   _volume = 1;
