@@ -6,6 +6,7 @@ import {test} from "./test.js";
 import { SoundManager } from "./sound_manager.js";
 import { OutputArea } from "./output_area.js";
 import { SelectSourceArea } from "./select_source_area.js";
+import { SelectSoundVolumeArea } from "./select_volume_area.js";
 
 // リソースの読み込み
 new MCSoundHashResource(
@@ -26,5 +27,6 @@ let root = tree.GetRoot();
 
 // ソース選択ドロップダウンの追加
 new SelectSourceArea("#select-source");
+new SelectSoundVolumeArea("#select-sound-volume")
 
 GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);
