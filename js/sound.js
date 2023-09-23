@@ -32,6 +32,8 @@ const MCCommandSelector = Object.freeze({
  * ambient.crimson_forest.mood
  */
 class MCCommandSound {
+  static MinVolume = 0;
+  static DefaultVolume = 1;
   _soundName = "";
   _source = MCCommandSoundSource.master;
   _volume = 1;
