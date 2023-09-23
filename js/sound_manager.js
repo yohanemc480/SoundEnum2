@@ -1,3 +1,5 @@
+import { MCCommandSoundSource } from "./sound.js";
+
 class SoundManager {
   static Instance = null;
   _audio = null;
@@ -6,6 +8,7 @@ class SoundManager {
       return SoundManager.Instance;
     }
     SoundManager.Instance = this;
+    this._source = MCCommandSoundSource.Master;
     this._pitch = 2;
     this._volume = 3;
     this._minVolume = 4;
@@ -27,6 +30,12 @@ class SoundManager {
   }
   static GetPitch() {
     return this.Instance._pitch;
+  }
+  static SetSource(source) {
+    this.Instance._source = source;
+  }
+  static GetSource() {
+    return this.Instance._source;
   }
   static GetVolume() {
     return this.Instance._volume;
