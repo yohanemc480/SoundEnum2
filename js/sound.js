@@ -37,6 +37,9 @@ class MCCommandSound {
   static MinPitch = 0.5;
   static MaxPitch = 2;
   static DefaultPitch = 1;
+  static MinMinVolume = 0;
+  static MaxMinVolume = 1;
+  static DefaultMinVolume = 0;
   _soundName = "";
   _source = MCCommandSoundSource.master;
   _volume = 1;

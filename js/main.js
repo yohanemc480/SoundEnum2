@@ -8,6 +8,7 @@ import { OutputArea } from "./output_area.js";
 import { SelectSourceArea } from "./select_source_area.js";
 import { SelectSoundVolumeArea } from "./select_volume_area.js";
 import { SelectPitchArea } from "./select_pitch_area.js";
+import { SelectMinVolumeArea } from "./select_min_volume_area.js";
 
 // リソースの読み込み
 new MCSoundHashResource(
@@ -30,5 +31,6 @@ let root = tree.GetRoot();
 new SelectSourceArea("#select-source");
 new SelectSoundVolumeArea("#select-sound-volume");
 new SelectPitchArea("#select-pitch");
+new SelectMinVolumeArea("#select-min-volume");
 
 GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);
