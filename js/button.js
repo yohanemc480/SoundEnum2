@@ -35,7 +35,7 @@ class GenreButton {
           let commandSound = new MCCommandSound(
             linkingNode.GetPath(),
             MCCommandSelector.Random,
-            MCCommandSoundSource.Hostile,
+            SoundManager.GetSource(),
             SoundManager.GetVolume(),
             SoundManager.GetPitch(),
             SoundManager.GetMinVolume()
