@@ -10,9 +10,9 @@ class SoundManager {
     }
     SoundManager.Instance = this;
     this._source = MCCommandSoundSource.Master;
-    this._pitch = 2;
+    this._pitch = MCCommandSound.DefaultPitch;
     this._volume = MCCommandSound.DefaultVolume;
-    this._minVolume = 4;
+    this._minVolume = MCCommandSound.DefaultMinVolume;
   }
   static Play(commandSound) {
     if (this._audio != null) {
@@ -44,6 +44,9 @@ class SoundManager {
   }
   static GetVolume() {
     return this.Instance._volume;
+  }
+  static SetMinVolume(minVolume) {
+    this.Instance._minVolume = minVolume;
   }
   static GetMinVolume() {
     return this.Instance._minVolume;
