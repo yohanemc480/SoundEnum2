@@ -2,13 +2,13 @@ console.log("main.jsの読み込みを始めました");
 import { SoundGenreNode, SoundGenreTree} from "./genre.js";
 import {MCSoundHashResource ,MCPlaysoundCommandParamResource, NetworkFileLoader} from "./resource.js";
 import { GenreButton, GenreButtonGenerator} from "./button.js";
-import {test} from "./test.js";
 import { SoundManager } from "./sound_manager.js";
 import { OutputArea } from "./output_area.js";
 import { SelectSourceArea } from "./select_source_area.js";
 import { SelectSoundVolumeArea } from "./select_volume_area.js";
 import { SelectPitchArea } from "./select_pitch_area.js";
 import { SelectMinVolumeArea } from "./select_min_volume_area.js";
+import { HistoryManager } from "./history.js";
 
 // リソースの読み込み
 new MCSoundHashResource(
@@ -20,7 +20,8 @@ new MCPlaysoundCommandParamResource(
 ).ParseResource();
 
 new SoundManager();
-// test();
+new HistoryManager();
+
 let outputArea = new OutputArea(".output","コマンド出力エリア");
 
 let soundNames = MCPlaysoundCommandParamResource.GetAllCommandSoundName();

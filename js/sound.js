@@ -77,10 +77,19 @@ class MCCommandSound {
 
   /**
    * コマンド用の文字列に変換する。
-   * playsound ambient.cave master @p ~ ~ ~ 1 1 1
+   * playsound minecraft:ambient.cave master @p ~ ~ ~ 1 1 1
    */
   ToString() {
-    return `playsound ${this._soundName} ${this._source} ${this._selector} ${this._position} ${this._volume} ${this._pitch} ${this._minVolume}`;
+    return `playsound minecraft:${this._soundName} ${this._source} ${this._selector} ${this._position} ${this._volume} ${this._pitch} ${this._minVolume}`;
+  }
+
+  /**
+   * 他のコマンドサウンドと同一かを判定する。
+   * @param {*} other 
+   * @returns 
+   */
+  Equals(other) {
+    return this.ToString() == other.ToString();
   }
 }
 

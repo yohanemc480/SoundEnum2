@@ -21,7 +21,7 @@ class SoundManager {
     let rawSound = commandSound.GetRawSoundRandomly();
     this._audio = new Audio(rawSound.CreateLink());
     this._audio.preservesPitch = false;
-    this._audio.playbackRate = this.GetPitch() * commandSound.GetPitch() * rawSound.GetPitch();
+    this._audio.playbackRate = commandSound.GetPitch() * rawSound.GetPitch();
     // メディアの読み込みが完了した時に流さないとエラーが出る。
     this._audio.addEventListener("canplay",() => {
       this._audio.play();

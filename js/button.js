@@ -1,6 +1,6 @@
 import { MCCommandSound , MCCommandSelector,MCCommandSoundSource} from "./sound.js";
-
 import {SoundManager} from "./sound_manager.js";
+import { HistoryManager } from "./history.js";
 
 
 const Genre = Object.freeze({
@@ -43,6 +43,7 @@ class GenreButton {
           SoundManager.Play(commandSound);
           // 出力エリアにコマンドを代入する。
           outputArea.SetText(commandSound.ToString());
+          HistoryManager.Register(commandSound);
         }
       });
     });
