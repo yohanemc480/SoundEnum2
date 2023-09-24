@@ -55,9 +55,18 @@ body {
   margin:5px;
 }
 .output {
-  background-color:blueviolet;
+  background-color: #272727;
+  border: 1px solid #6b6b6b;
+  color:white;
+  border-color: #6b6b6b;
+  border-radius: 3px;
+  text-align: left;
   height:100px;
   margin:5px;
+  font-size:small;
+  cursor:pointer;
+  align-items: center;
+  padding-left:5px;
 }
 .genre-button {
   display:flex;
