@@ -17,6 +17,16 @@ body {
   display:flex;
   flex-flow: column;
 }
+.title {
+  background-color: #6b6b6b;
+  color:white;
+  width:auto;
+  height:auto;
+  padding:10px;
+  padding-left:20px;
+  font-size:large;
+  font-weight: bold;
+}
 .params {
   background-color:#21331D;
   margin:10px;
