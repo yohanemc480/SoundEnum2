@@ -66,6 +66,9 @@ class MCCommandSound {
   GetPitch() {
     return this._pitch;
   }
+  GetVolume() {
+    return this._volume;
+  }
 
   /**
    * マイクラ内で提供されるように、複数の音のなかからランダムで抽選した音を返す。
@@ -123,6 +126,9 @@ class MCRawSound {
 
   GetPitch() {
     return this._pitch;
+  }
+  GetVolume() {
+    return this._volume;
   }
 
   /**

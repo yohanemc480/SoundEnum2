@@ -9,6 +9,7 @@ import { SelectSoundVolumeArea } from "./select_volume_area.js";
 import { SelectPitchArea } from "./select_pitch_area.js";
 import { SelectMinVolumeArea } from "./select_min_volume_area.js";
 import { HistoryManager } from "./history.js";
+import { SelectMasterVolumeArea } from "./select_master_volume_area.js";
 
 // リソースの読み込み
 new MCSoundHashResource(
@@ -35,3 +36,5 @@ new SelectPitchArea("#select-pitch");
 new SelectMinVolumeArea("#select-min-volume");
 
 GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);
+
+new SelectMasterVolumeArea("#select-master-volume");

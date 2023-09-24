@@ -4,6 +4,10 @@ import { MCCommandSound } from "./sound.js";
 class SoundManager {
   static Instance = null;
   _audio = null;
+  static DefaultMasterVolume = 0.1;
+  static MinMasterVolume = 0;
+  static MaxMasterVolume = 1;
+  _masterVolume = 0.1;
   constructor() {
     if (SoundManager.Instance) {
       return SoundManager.Instance;
@@ -22,10 +26,14 @@ class SoundManager {
     this._audio = new Audio(rawSound.CreateLink());
     this._audio.preservesPitch = false;
     this._audio.playbackRate = commandSound.GetPitch() * rawSound.GetPitch();
+    this._audio.volume = this.Instance._masterVolume * commandSound.GetVolume() * rawSound.GetVolume();
     // メディアの読み込みが完了した時に流さないとエラーが出る。
     this._audio.addEventListener("canplay",() => {
       this._audio.play();
     });
+  }
+  static SetMasterVolume(volume) {
+    this.Instance._masterVolume = volume;
   }
   static SetPitch(pitch) {
     this.Instance._pitch = pitch;
