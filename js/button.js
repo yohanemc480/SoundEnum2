@@ -11,6 +11,7 @@ const Genre = Object.freeze({
 })
 
 class GenreButton {
+  static className = 'genre-button';
   constructor(appendTarget, displayName, linkingNode, outputArea) {
     $(document).ready(function() {
       let name;
@@ -22,11 +23,13 @@ class GenreButton {
       }
       // div要素を生成して追加する
       let button = $('<div>').text(name).appendTo(appendTarget);
-      button.addClass('genre-button');
+      button.addClass(GenreButton.className);
 
       // クリックイベントを設定
       button.click(function() {
         let depth = linkingNode.GetDepth();
+        GenreButtonGenerator.RemoveClassFromGenreButtons(depth, 'selected');
+        button.addClass('selected');
         GenreButtonGenerator.ClearGenreButtons(depth + 1);
         GenreButtonGenerator.ClearGenreButtons(depth + 2);
         GenreButtonGenerator.GenerateButtonsFromNodes(linkingNode.GetChildren(), outputArea);
@@ -63,6 +66,9 @@ class GenreButtonGenerator {
     }
     const $element = $(this.GenreToID(genre));
     $element.empty();
+  }
+  static RemoveClassFromGenreButtons(genre, _class) {
+    $(this.GenreToID(genre)).find(`.${GenreButton.className}, ${_class}`).removeClass(_class);
   }
   static GenreToID(genre) {
     switch(genre) {
