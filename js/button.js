@@ -47,6 +47,7 @@ class GenreButton {
           // 出力エリアにコマンドを代入する。
           outputArea.SetText(commandSound.ToString());
           HistoryManager.Register(commandSound);
+          HistoryManager.ScrollToBottom();
         }
       });
     });

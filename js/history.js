@@ -23,6 +23,16 @@ class HistoryManager {
       this.Instance.latestSound = commandSound;
     }
   }
+
+  /**
+   * 一番下までスクロールを進める。
+   */
+  static ScrollToBottom() {
+    $(document).ready(() => {
+      let $container = $(".history");
+      $container.scrollTop($container[0].scrollHeight);
+    })
+  }
 }
 
 /**
