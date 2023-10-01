@@ -64,6 +64,8 @@ body {
   flex-grow: 1;
   margin:5px;
   padding:5px;
+  overflow-y:auto;
+  height:500px;
 }
 .history-log {
   background-color: #272727;
