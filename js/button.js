@@ -1,101 +1,101 @@
-import { MCCommandSound , MCCommandSelector,MCCommandSoundSource} from "./sound.js";
-import {SoundManager} from "./sound_manager.js";
+import { MCCommandSound, MCCommandSelector, MCCommandSoundSource } from "./sound.js";
+import { SoundManager } from "./sound_manager.js";
 import { HistoryManager } from "./history.js";
 
 
 const Genre = Object.freeze({
-  First:1,
-  Second:2,
-  Third:3,
-  Max:3,
+    First: 1,
+    Second: 2,
+    Third: 3,
+    Max: 3,
 })
 
 class GenreButton {
-  static className = 'genre-button';
-  constructor(appendTarget, displayName, linkingNode, outputArea) {
-    $(document).ready(function() {
-      let name;
-      if (linkingNode.IsTreeEnd()) {
-        name = "[📣] " + displayName;
-      }
-      else {
-        name = displayName;
-      }
-      // div要素を生成して追加する
-      let button = $('<div>').text(name).appendTo(appendTarget);
-      button.addClass(GenreButton.className);
+    static className = 'genre-button';
+    constructor(appendTarget, displayName, linkingNode, outputArea) {
+        $(document).ready(function () {
+            let name;
+            if (linkingNode.IsTreeEnd()) {
+                name = "[📣] " + displayName;
+            }
+            else {
+                name = displayName;
+            }
+            // div要素を生成して追加する
+            let button = $('<div>').text(name).appendTo(appendTarget);
+            button.addClass(GenreButton.className);
 
-      // クリックイベントを設定
-      button.click(function() {
-        let depth = linkingNode.GetDepth();
-        GenreButtonGenerator.RemoveClassFromGenreButtons(depth, 'selected');
-        button.addClass('selected');
-        GenreButtonGenerator.ClearGenreButtons(depth + 1);
-        GenreButtonGenerator.ClearGenreButtons(depth + 2);
-        GenreButtonGenerator.GenerateButtonsFromNodes(linkingNode.GetChildren(), outputArea);
-  
-        if (linkingNode.IsTreeEnd()) {
-          let commandSound = new MCCommandSound(
-            linkingNode.GetPath(),
-            SoundManager.GetSource(),
-            MCCommandSelector.All,
-            SoundManager.GetVolume(),
-            SoundManager.GetPitch(),
-            SoundManager.GetMinVolume()
-            )
-          SoundManager.Play(commandSound);
-          // 出力エリアにコマンドを代入する。
-          outputArea.SetText(commandSound.ToString());
-          HistoryManager.Register(commandSound);
-          HistoryManager.ScrollToBottom();
-        }
-      });
-    });
-  }
+            // クリックイベントを設定
+            button.click(function () {
+                let depth = linkingNode.GetDepth();
+                GenreButtonGenerator.RemoveClassFromGenreButtons(depth, 'selected');
+                button.addClass('selected');
+                GenreButtonGenerator.ClearGenreButtons(depth + 1);
+                GenreButtonGenerator.ClearGenreButtons(depth + 2);
+                GenreButtonGenerator.GenerateButtonsFromNodes(linkingNode.GetChildren(), outputArea);
+
+                if (linkingNode.IsTreeEnd()) {
+                    let commandSound = new MCCommandSound(
+                        linkingNode.GetPath(),
+                        SoundManager.GetSource(),
+                        MCCommandSelector.All,
+                        SoundManager.GetVolume(),
+                        SoundManager.GetPitch(),
+                        SoundManager.GetMinVolume()
+                    )
+                    SoundManager.Play(commandSound);
+                    // 出力エリアにコマンドを代入する。
+                    outputArea.SetText(commandSound.ToString());
+                    HistoryManager.Register(commandSound);
+                    HistoryManager.ScrollToBottom();
+                }
+            });
+        });
+    }
 }
 class GenreButtonGenerator {
-  Instance = null
-  constructor() {
-    if (GenreButtonGenerator.Instance) {
-      return GenreButtonGenerator.Instance;
+    Instance = null
+    constructor() {
+        if (GenreButtonGenerator.Instance) {
+            return GenreButtonGenerator.Instance;
+        }
+        GenreButtonGenerator.Instance = this;
     }
-    GenreButtonGenerator.Instance = this;
-  }
-  static ClearGenreButtons(genre) {
-    if (genre > Genre.Max) {
-      return;
+    static ClearGenreButtons(genre) {
+        if (genre > Genre.Max) {
+            return;
+        }
+        const $element = $(this.GenreToID(genre));
+        $element.empty();
     }
-    const $element = $(this.GenreToID(genre));
-    $element.empty();
-  }
-  static RemoveClassFromGenreButtons(genre, _class) {
-    $(this.GenreToID(genre)).find(`.${GenreButton.className}, ${_class}`).removeClass(_class);
-  }
-  static GenreToID(genre) {
-    switch(genre) {
-      case Genre.First:
-        return "#sound-genres-first";
-      case Genre.Second:
-        return "#sound-genres-second";
-      case Genre.Third:
-        return "#sound-genres-third";
-      case Genre.Forth:
-        return "#sound-genres-forth";
-      default:
-        console.log("定義されていないGenreが渡されました。");
+    static RemoveClassFromGenreButtons(genre, _class) {
+        $(this.GenreToID(genre)).find(`.${GenreButton.className}, ${_class}`).removeClass(_class);
     }
-  }
-  static GenerateButtonsFromNodes(nodes, outputArea) {
-    for (let i = 0; i < nodes.length; i++) {
-      let node = nodes[i];
-      // ノードの深さを参照して
-      let genre = node.GetDepth();
-      if (genre > Genre.Max) {
-        continue;
-      }
-      new GenreButton(this.GenreToID(genre), node.GetValue(), node, outputArea);
+    static GenreToID(genre) {
+        switch (genre) {
+            case Genre.First:
+                return "#sound-genres-first";
+            case Genre.Second:
+                return "#sound-genres-second";
+            case Genre.Third:
+                return "#sound-genres-third";
+            case Genre.Forth:
+                return "#sound-genres-forth";
+            default:
+                console.log("定義されていないGenreが渡されました。");
+        }
     }
-  }
+    static GenerateButtonsFromNodes(nodes, outputArea) {
+        for (let i = 0; i < nodes.length; i++) {
+            let node = nodes[i];
+            // ノードの深さを参照して
+            let genre = node.GetDepth();
+            if (genre > Genre.Max) {
+                continue;
+            }
+            new GenreButton(this.GenreToID(genre), node.GetValue(), node, outputArea);
+        }
+    }
 }
 
-export {GenreButton, GenreButtonGenerator, Genre};
+export { GenreButton, GenreButtonGenerator, Genre };
