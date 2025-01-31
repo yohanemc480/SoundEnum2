@@ -11,11 +11,21 @@ body {
   flex-flow: column;
 }
 .sub {
-  background-color: blue;
+  background-color: #272727;
   width:40%;
   flex-grow: 1;
   display:flex;
   flex-flow: column;
+}
+.title {
+  background-color: #6b6b6b;
+  color:white;
+  width:auto;
+  height:auto;
+  padding:10px;
+  padding-left:20px;
+  font-size:large;
+  font-weight: bold;
 }
 .params {
   background-color:#21331D;
@@ -42,22 +52,49 @@ body {
   background-color:#21331D;
   flex-grow:1;
   margin:10px;
-  display:flex;
   flex-flow:column;
   width:20%;
   border-radius: 3px;
   padding:5px;
-  overflow-y:hidden;
+  overflow-y:auto;
+  height:500px;
 }
 .history {
-  background-color: aquamarine;
+  background-color: #21331D;
   flex-grow: 1;
   margin:5px;
+  padding:5px;
+  overflow-y:auto;
+  height:500px;
+}
+.history-log {
+  background-color: #272727;
+  border: 1px solid #6b6b6b;
+  color:white;
+  border-color: #6b6b6b;
+  border-radius: 3px;
+  text-align: left;
+  height:25px;
+  font-size:x-small;
+  cursor:pointer;
+  margin:2px;
+  overflow: hidden;
+  align-items: center;
+  padding-left:5px;
 }
 .output {
-  background-color:blueviolet;
+  background-color: #272727;
+  border: 1px solid #6b6b6b;
+  color:white;
+  border-color: #6b6b6b;
+  border-radius: 3px;
+  text-align: left;
   height:100px;
   margin:5px;
+  font-size:small;
+  cursor:pointer;
+  align-items: center;
+  padding-left:5px;
 }
 .genre-button {
   display:flex;
@@ -77,6 +114,10 @@ body {
 }
 .genre-button:hover {
   box-shadow    : none;        /* カーソル時の影消去 */
-  color         : #000066;     /* 背景色     */
-  background    : #ffffff;     /* 文字色     */
+  color         : #272727;     /* 背景色     */
+  background    : #6b6b6b;     /* 文字色     */
+}
+.genre-button.selected {
+  color:#272727;
+  background:#ffffff;
 }

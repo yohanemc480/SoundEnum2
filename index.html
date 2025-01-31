@@ -10,17 +10,12 @@
 </head>
 <body>
   <div class="main">
+    <div class="title">MCPlaySoundGenerator</div>
     <div class="params">
-      <div class="param">ソース</div>
-      <div class="param">音量
-        <input type="range">
-      </div>
-      <div class="param">ピッチ
-        <input type="range">
-      </div>
-      <div class="param">最低音量
-        <input type="range">
-      </div>
+      <div class="param" id="select-source">ソース</div>
+      <div class="param" id="select-sound-volume">音量</div>
+      <div class="param" id="select-pitch">ピッチ</div>
+      <div class="param" id ="select-min-volume">最低音量</div>
     </div>
     <div class="sound-genres-list">
       <div class="sound-genres" id="sound-genres-first"></div>
@@ -29,10 +24,10 @@
     </div>
   </div>
   <div class="sub">
-    sub
-    <div class="history">history</div>
-    <div class="output">output</div>
+    <div class="param" id="select-master-volume">全体音量</div>
+    <div class="history"></div>
+    <div class="output"></div>
   </div>
-  <script src="js/main.js" type="module"></script>
+  <script src="Scripts/Main.js" type="module"></script>
 </body>
 </html>
