@@ -1,4 +1,4 @@
-import { SoundManager } from "./SoundManager.js";
+import { SoundManager } from "./Singletons/SoundManager.js";
 import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
 
 /**

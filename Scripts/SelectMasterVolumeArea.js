@@ -1,4 +1,4 @@
-import { SoundManager } from "./SoundManager.js";
+import { SoundManager } from "./Singletons/SoundManager.js";
 
 /**
  * マスター音量調整エリアを表すクラス

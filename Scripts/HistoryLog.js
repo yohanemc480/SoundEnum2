@@ -1,4 +1,4 @@
-import { SoundManager } from "./SoundManager.js";
+import { SoundManager } from "./Singletons/SoundManager.js";
 
 /**
  * 再生履歴一つを表すクラス

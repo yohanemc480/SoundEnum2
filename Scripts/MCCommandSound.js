@@ -1,7 +1,7 @@
 import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
 import { MCCommandSelector } from "./Constants/MCCommandSelector.js";
-import { MCPlaysoundCommandParamResource } from "./MCPlaySoundCommandParamResource.js";
 import { MCRawSound } from "./MCRawSound.js";
+import { ResourceManager } from "./Singletons/ResourceManager.js";
 
 /**
  * playsoundコマンドを打つときに指定する音を表すクラス
@@ -28,7 +28,7 @@ export class MCCommandSound
 
     constructor(soundName, source, selector, volume, pitch, minVolume, position = "~ ~ ~")
     {
-        let rawSounds = MCPlaysoundCommandParamResource.Instance.GetSoundParameters(soundName);
+        let rawSounds = ResourceManager.Instance.GetPlaysoundComandParamResource().GetSoundParameters(soundName);// GetSoundParameters(soundName);
         for (let i = 0; i < rawSounds.length; i++) {
             this._rawSounds.push(new MCRawSound(rawSounds[i]))
         }

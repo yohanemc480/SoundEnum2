@@ -1,4 +1,4 @@
-import { HistoryLog } from "./HistoryLog.js";
+import { HistoryLog } from "../HistoryLog.js";
 import { SingletonBase } from "./SingletonBase.js";
 
 /**

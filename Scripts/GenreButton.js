@@ -1,5 +1,5 @@
-import { SoundManager } from "./SoundManager.js";
-import { HistoryManager } from "./HistoryManager.js";
+import { SoundManager } from "./Singletons/SoundManager.js";
+import { HistoryManager } from "./Singletons/HistoryManager.js";
 import { MCCommandSelector } from "./Constants/MCCommandSelector.js";
 import { GenreButtonGenerator } from "./GenreButtonGenerator.js";
 import { MCCommandSound } from "./MCCommandSound.js";

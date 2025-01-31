@@ -1,5 +1,6 @@
-import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
-import { MCCommandSound } from "./MCCommandSound.js";
+import { MCCommandSoundSource } from "../Constants/MCCommandSoundSource.js";
+import { MCCommandSound } from "../MCCommandSound.js";
+import { ResourceManager } from "./ResourceManager.js";
 import { SingletonBase } from "./SingletonBase.js";
 
 export class SoundManager extends SingletonBase
@@ -32,8 +33,9 @@ export class SoundManager extends SingletonBase
             this._audio.pause();
         }
 
-        let rawSound = commandSound.GetRawSoundRandomly();
-        this._audio = new Audio(rawSound.CreateLink());
+        var soundHashResource = ResourceManager.Instance.GetSoundHashResouce();
+        var rawSound = commandSound.GetRawSoundRandomly();
+        this._audio = new Audio(rawSound.CreateLink(soundHashResource));
         this._audio.preservesPitch = false;
         this._audio.playbackRate = commandSound.GetPitch() * rawSound.GetPitch();
         this._audio.volume = this._masterVolume * commandSound.GetVolume() * rawSound.GetVolume();
