@@ -7,15 +7,9 @@ import { ResourceBase } from "./ResourceBase.js";
  */
 export class MCPlaysoundCommandParamResource extends ResourceBase
 {
-    static Instance = null;
     constructor(rawResource)
     {
-        if (MCPlaysoundCommandParamResource.Instance)
-        {
-            return MCPlaysoundCommandParamResource.Instance;
-        }
         super(rawResource);
-        MCPlaysoundCommandParamResource.Instance = this;
     }
 
     /**
@@ -96,13 +90,13 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
      * @param {*} soundCommandName "ambient.warped_forest.mood"みたいな形式
      * @returns [{"name":"~","type":"sounds",,},{},{},,,]
      */
-    static GetSoundParameters(soundCommandName)
+    GetSoundParameters(soundCommandName)
     {
         if (!this.IsSoundCommandExist(soundCommandName))
         {
             Error(`${soundCommandName}という名前のサウンドは存在していません。`);
         }
-        let sounds = this.Instance._jsonData[soundCommandName]["sounds"];
+        let sounds = this._jsonData[soundCommandName]["sounds"];
         return sounds;
     }
 
@@ -110,9 +104,9 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
      * 指定した名前のplaysoundコマンドが存在しているかを調べる。
      * @param {*} soundCommandName "ambient.warped_forest.mood"みたいな形式
      */
-    static IsSoundCommandExist(soundCommandName)
+    IsSoundCommandExist(soundCommandName)
     {
-        let keys = Object.keys(MCPlaysoundCommandParamResource.Instance._jsonData);
+        let keys = Object.keys(this._jsonData);
         if (!keys.includes(soundCommandName))
         {
             return false;
@@ -124,8 +118,8 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
      * playsoundの全サウンド名を取得する。
      * @returns
      */
-    static GetAllCommandSoundName()
+    GetAllCommandSoundName()
     {
-        return Object.keys(this.Instance._jsonData);
+        return Object.keys(this._jsonData);
     }
 }

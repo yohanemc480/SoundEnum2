@@ -42,17 +42,17 @@ export class GenreButton
                 {
                     let commandSound = new MCCommandSound(
                         linkingNode.GetPath(),
-                        SoundManager.GetSource(),
+                        SoundManager.Instance.GetSource(),
                         MCCommandSelector.All,
-                        SoundManager.GetVolume(),
-                        SoundManager.GetPitch(),
-                        SoundManager.GetMinVolume()
+                        SoundManager.Instance.GetVolume(),
+                        SoundManager.Instance.GetPitch(),
+                        SoundManager.Instance.GetMinVolume()
                     );
-                    SoundManager.Play(commandSound);
+                    SoundManager.Instance.Play(commandSound);
                     // 出力エリアにコマンドを代入する。
                     outputArea.SetText(commandSound.ToString());
-                    HistoryManager.Register(commandSound);
-                    HistoryManager.ScrollToBottom();
+                    HistoryManager.Instance.Register(commandSound);
+                    HistoryManager.Instance.ScrollToBottom();
                 }
             });
         });

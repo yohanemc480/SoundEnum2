@@ -48,7 +48,7 @@ export class MCRawSound
      * @returns https://resources.download.minecraft.net/1f/1feb74db490a786a656387fc2ac8d682730228e2みたいな形式
      */
     CreateLink() {
-        let hash = MCSoundHashResource.NameToHash(this._rawSoundName);
+        let hash = MCSoundHashResource.Instance.NameToHash(this._rawSoundName);
         return `https://resources.download.minecraft.net/${hash.slice(0, 2)}/${hash}`;
     }
 }

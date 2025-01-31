@@ -26,7 +26,7 @@ export class SelectSourceArea
             {
                 // 選択されたオプションの値を取得
                 var selectedKey = $(this).val();
-                SoundManager.SetSource(MCCommandSoundSource[selectedKey]);
+                SoundManager.Instance.SetSource(MCCommandSoundSource[selectedKey]);
             });
         });
     }

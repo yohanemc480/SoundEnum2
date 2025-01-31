@@ -1,7 +1,8 @@
 import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
 import { MCCommandSound } from "./MCCommandSound.js";
+import { SingletonBase } from "./SingletonBase.js";
 
-export class SoundManager
+export class SoundManager extends SingletonBase
 {
     static Instance = null;
     _audio = null;
@@ -10,21 +11,21 @@ export class SoundManager
     static MaxMasterVolume = 1;
     _masterVolume = 0.1;
 
+    _source;
+    _pitch;
+    _volume;
+    _minVolume;
+
     constructor()
     {
-        if (SoundManager.Instance)
-        {
-            return SoundManager.Instance;
-        }
-
-        SoundManager.Instance = this;
+        super();
         this._source = MCCommandSoundSource.Master;
         this._pitch = MCCommandSound.DefaultPitch;
         this._volume = MCCommandSound.DefaultVolume;
         this._minVolume = MCCommandSound.DefaultMinVolume;
     }
 
-    static Play(commandSound)
+    Play(commandSound)
     {
         if (this._audio != null)
         {
@@ -35,7 +36,7 @@ export class SoundManager
         this._audio = new Audio(rawSound.CreateLink());
         this._audio.preservesPitch = false;
         this._audio.playbackRate = commandSound.GetPitch() * rawSound.GetPitch();
-        this._audio.volume = this.Instance._masterVolume * commandSound.GetVolume() * rawSound.GetVolume();
+        this._audio.volume = this._masterVolume * commandSound.GetVolume() * rawSound.GetVolume();
         // メディアの読み込みが完了した時に流さないとエラーが出る。
         this._audio.addEventListener("canplay", () =>
         {
@@ -43,48 +44,48 @@ export class SoundManager
         });
     }
 
-    static SetMasterVolume(volume)
+    SetMasterVolume(volume)
     {
-        this.Instance._masterVolume = volume;
+        this._masterVolume = volume;
     }
 
-    static SetPitch(pitch)
+    SetPitch(pitch)
     {
-        this.Instance._pitch = pitch;
+        this._pitch = pitch;
     }
 
-    static GetPitch()
+    GetPitch()
     {
-        return this.Instance._pitch;
+        return this._pitch;
     }
 
-    static SetSource(source)
+    SetSource(source)
     {
-        this.Instance._source = source;
+        this._source = source;
     }
 
-    static GetSource()
+    GetSource()
     {
-        return this.Instance._source;
+        return this._source;
     }
 
-    static SetVolume(volume)
+    SetVolume(volume)
     {
-        this.Instance._volume = volume;
+        this._volume = volume;
     }
 
-    static GetVolume()
+    GetVolume()
     {
-        return this.Instance._volume;
+        return this._volume;
     }
 
-    static SetMinVolume(minVolume)
+    SetMinVolume(minVolume)
     {
-        this.Instance._minVolume = minVolume;
+        this._minVolume = minVolume;
     }
 
-    static GetMinVolume()
+    GetMinVolume()
     {
-        return this.Instance._minVolume;
+        return this._minVolume;
     }
 }

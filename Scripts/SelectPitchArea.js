@@ -67,7 +67,7 @@ export class SelectPitchArea
         }
 
         var floatValue = parseFloat(numericPart);
-        SoundManager.SetPitch(floatValue);
+        SoundManager.Instance.SetPitch(floatValue);
         this._textInputHolder.val(floatValue);
         this._slider.val(floatValue);
     }

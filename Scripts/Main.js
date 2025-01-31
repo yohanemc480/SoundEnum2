@@ -16,24 +16,23 @@ import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.js";
 
 
 // リソースの読み込み
-const soundHashResource = await new MCSoundHashResource(
+await new MCSoundHashResource(
     await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/1.20.1.json').FetchData()
 )
 
-
-const playsoundResource = await new MCPlaysoundCommandParamResource(
+await new MCPlaysoundCommandParamResource(
     await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/sounds.json').FetchData()
 )
 
-soundHashResource.ParseResource();
-playsoundResource.ParseResource();
+MCSoundHashResource.Instance.ParseResource();
+MCPlaysoundCommandParamResource.Instance.ParseResource();
 
 new SoundManager();
 new HistoryManager();
 
 let outputArea = new OutputArea(".output", "コマンド出力エリア");
 
-let soundNames = MCPlaysoundCommandParamResource.GetAllCommandSoundName();
+let soundNames = MCPlaysoundCommandParamResource.Instance.GetAllCommandSoundName();
 let tree = new SoundGenreTree(soundNames);
 let root = tree.GetRoot();
 

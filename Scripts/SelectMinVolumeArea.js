@@ -65,7 +65,7 @@ export class SelectMinVolumeArea
         }
 
         var floatValue = parseFloat(numericPart);
-        SoundManager.SetMinVolume(floatValue);
+        SoundManager.Instance.SetMinVolume(floatValue);
         this._textInputHolder.val(floatValue);
         this._slider.val(floatValue);
     }

@@ -28,7 +28,7 @@ export class MCCommandSound
 
     constructor(soundName, source, selector, volume, pitch, minVolume, position = "~ ~ ~")
     {
-        let rawSounds = MCPlaysoundCommandParamResource.GetSoundParameters(soundName);
+        let rawSounds = MCPlaysoundCommandParamResource.Instance.GetSoundParameters(soundName);
         for (let i = 0; i < rawSounds.length; i++) {
             this._rawSounds.push(new MCRawSound(rawSounds[i]))
         }

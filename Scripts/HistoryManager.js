@@ -1,38 +1,34 @@
 import { HistoryLog } from "./HistoryLog.js";
+import { SingletonBase } from "./SingletonBase.js";
 
 /**
  * 再生履歴のマネージャークラス
  */
-export class HistoryManager
+export class HistoryManager extends SingletonBase
 {
-    static Instance = null;
-    latestSound = null;
+    _latestSound = null;
 
     constructor()
     {
-        if (HistoryManager.Instance)
-        {
-            return HistoryManager.Instance;
-        }
-        HistoryManager.Instance = this;
+        super();
     }
 
     /**
      * 再生履歴を登録する。
      */
-    static Register(commandSound)
+    Register(commandSound)
     {
-        if (this.Instance.latestSound == null || !this.Instance.latestSound.Equals(commandSound))
+        if (this._latestSound == null || !this._latestSound.Equals(commandSound))
         {
             new HistoryLog(".history", commandSound);
-            this.Instance.latestSound = commandSound;
+            this.latestSound = commandSound;
         }
     }
 
     /**
      * 一番下までスクロールを進める。
      */
-    static ScrollToBottom()
+    ScrollToBottom()
     {
         $(document).ready(() =>
         {

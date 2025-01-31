@@ -7,15 +7,9 @@ import { ResourceBase } from "./ResourceBase.js";
  */
 export class MCSoundHashResource extends ResourceBase
 {
-    static Instance = null;
     constructor(rawResource)
     {
-        if (MCSoundHashResource.Instance)
-        {
-            return MCSoundHashResource.Instance;
-        }
         super(rawResource);
-        MCSoundHashResource.Instance = this;
     }
 
     /**
@@ -32,7 +26,7 @@ export class MCSoundHashResource extends ResourceBase
      * @param {*} rawSoundResourceName "ambient/nether/warped_forest/here1" のような形式
      * @returns "abb0ffaa8df2bc05ba4b95457afa42ec67d785e8"
      */
-    static NameToHash(rawSoundResourceName)
+    NameToHash(rawSoundResourceName)
     {
         // 存在しないリソースを渡されたらnullを返す。
         if (!this.IsSoundResourceExist(rawSoundResourceName))
@@ -40,7 +34,7 @@ export class MCSoundHashResource extends ResourceBase
             Error(`${rawSoundResourceName}は存在しないリソースのためハッシュ値の取得に失敗しました。`)
         }
         let soundPath = this.NameToFullPath(rawSoundResourceName);
-        return MCSoundHashResource.Instance._jsonData["objects"][soundPath]["hash"];
+        return this._jsonData["objects"][soundPath]["hash"];
     }
 
     /**
@@ -48,8 +42,8 @@ export class MCSoundHashResource extends ResourceBase
      * @param {*} rawSoundResourceName "ambient/nether/warped_forest/here1" のような形式
      * @returns bool
      */
-    static IsSoundResourceExist(rawSoundResourceName) {
-        let keys = Object.keys(MCSoundHashResource.Instance._jsonData["objects"]);
+    IsSoundResourceExist(rawSoundResourceName) {
+        let keys = Object.keys(this._jsonData["objects"]);
         if (!keys.includes(this.NameToFullPath(rawSoundResourceName)))
         {
             return false;
@@ -62,7 +56,7 @@ export class MCSoundHashResource extends ResourceBase
      * @param {*} rawSoundResourceName "ambient/nether/warped_forest/here1" のような形式
      * @returns "minecraft/sounds/ambient/nether/warped_forest/here1.ogg"のような形式
      */
-    static NameToFullPath(rawSoundResourceName)
+    NameToFullPath(rawSoundResourceName)
     {
         return `minecraft/sounds/${rawSoundResourceName}.ogg`
     }

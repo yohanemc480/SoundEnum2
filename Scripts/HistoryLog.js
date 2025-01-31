@@ -18,7 +18,7 @@ export class HistoryLog
             $button.click(() =>
             {
                 navigator.clipboard.writeText(commandSound.ToString());
-                SoundManager.Play(commandSound);
+                SoundManager.Instance.Play(commandSound);
             });
         });
     }

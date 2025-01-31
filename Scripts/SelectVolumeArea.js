@@ -40,7 +40,7 @@ export class SelectVolumeArea
         }
 
         var floatValue = parseFloat(numericPart);
-        SoundManager.SetVolume(floatValue);
+        SoundManager.Instance.SetVolume(floatValue);
         this._textInputHolder.val(floatValue);
     }
 }

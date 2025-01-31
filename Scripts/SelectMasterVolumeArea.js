@@ -13,16 +13,16 @@ export class SelectMasterVolumeArea
         {
             let $textHolder = $("<div>",
             {
-                text: SoundManager.DefaultMasterVolume
+                text: SoundManager.Instance.DefaultMasterVolume
             })
 
             let $slider = $("<input>",
             {
                 type: "range",
-                min: SoundManager.MinMasterVolume,
-                max: SoundManager.MaxMasterVolume,
+                min: SoundManager.Instance.MinMasterVolume,
+                max: SoundManager.Instance.MaxMasterVolume,
                 step: "0.01",
-                value: SoundManager.DefaultMasterVolume
+                value: SoundManager.Instance.DefaultMasterVolume
             }).appendTo(appendTarget);
 
             $slider.on("input", () =>
@@ -41,7 +41,7 @@ export class SelectMasterVolumeArea
 
     OnUpdateValue(value)
     {
-        SoundManager.SetMasterVolume(value);
+        SoundManager.Instance.SetMasterVolume(value);
         this._textHolder.text(value);
         this._slider.val(value);
     }
