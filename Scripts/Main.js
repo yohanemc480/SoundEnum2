@@ -18,11 +18,11 @@ import { ResourceManager } from "./Singletons/ResourceManager.js";
 
 // リソースの読み込み
 const soundHashResource = await new MCSoundHashResource(
-    await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/1.20.1.json').FetchData()
+    await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/1.21.4hash.json').FetchData()
 )
 
 const playsoundCommandParamResouce = await new MCPlaysoundCommandParamResource(
-    await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/sounds.json').FetchData()
+    await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/1.21.4sounds.json').FetchData()
 )
 
 soundHashResource.ParseResource();
