@@ -1,33 +1,44 @@
-import { SoundManager } from "./sound_manager.js";
-import { MCCommandSound } from "./sound.js";
+import { SoundManager } from "./SoundManager.js";
+import { MCCommandSound } from "./MCCommandSound.js";
 
 /**
  * ピッチ調整エリアを表すクラス
  */
-class SelectPitchArea {
+export class SelectPitchArea
+{
     _textInputHolder;
     _slider;
-    constructor(appendTarget) {
-        $(document).ready(() => {
-            let $textInputHolder = $("<input>", {
+
+    constructor(appendTarget)
+    {
+        $(document).ready(() =>
+        {
+            let $textInputHolder = $("<input>",
+            {
                 value: MCCommandSound.DefaultPitch
             })
-            $textInputHolder.on("blur", () => {
+
+            $textInputHolder.on("blur", () =>
+            {
                 var value = $textInputHolder.val();
                 this.OnUpdateValue(value);
             });
 
-            let $slider = $("<input>", {
+            let $slider = $("<input>",
+            {
                 type: "range",
                 min: MCCommandSound.MinPitch,
                 max: MCCommandSound.MaxPitch,
                 step: "0.01",
                 value: MCCommandSound.DefaultPitch
             }).appendTo(appendTarget);
-            $slider.on("input", () => {
+
+            $slider.on("input", () =>
+            {
                 var value = $slider.val();
                 this.OnUpdateValue(value);
             });
+
             $slider.appendTo(appendTarget);
             $textInputHolder.appendTo(appendTarget);
 
@@ -35,22 +46,29 @@ class SelectPitchArea {
             this._slider = $slider;
         });
     }
-    OnUpdateValue(value) {
+
+    OnUpdateValue(value)
+    {
         let numericPart = value.match(/-?\d+(\.\d+)?/)[0];
-        if (numericPart == null) {
+
+        if (numericPart == null)
+        {
             numericPart = MCCommandSound.DefaultPitch;
         }
-        if (numericPart < MCCommandSound.MinPitch) {
+
+        if (numericPart < MCCommandSound.MinPitch)
+        {
             numericPart = MCCommandSound.MinPitch;
         }
-        if (numericPart > MCCommandSound.MaxPitch) {
+
+        if (numericPart > MCCommandSound.MaxPitch)
+        {
             numericPart = MCCommandSound.MaxPitch;
         }
+
         var floatValue = parseFloat(numericPart);
         SoundManager.SetPitch(floatValue);
         this._textInputHolder.val(floatValue);
         this._slider.val(floatValue);
     }
 }
-
-export { SelectPitchArea };
