@@ -1,4 +1,5 @@
 import { SoundManager } from "./Singletons/SoundManager.js";
+import { SettingDefine } from "./Constants/SettingDefine.js";
 
 /**
  * マスター音量調整エリアを表すクラス
@@ -13,16 +14,16 @@ export class SelectMasterVolumeArea
         {
             let $textHolder = $("<div>",
             {
-                text: SoundManager.Instance.DefaultMasterVolume
+                text: SettingDefine.DefaultMasterVolume
             })
 
             let $slider = $("<input>",
             {
                 type: "range",
-                min: SoundManager.Instance.MinMasterVolume,
-                max: SoundManager.Instance.MaxMasterVolume,
-                step: "0.01",
-                value: SoundManager.Instance.DefaultMasterVolume
+                min: SettingDefine.MinMasterVolume,
+                max: SettingDefine.MaxMasterVolume,
+                step: "0.01", 
+                value: SettingDefine.DefaultMasterVolume
             }).appendTo(appendTarget);
 
             $slider.on("input", () =>

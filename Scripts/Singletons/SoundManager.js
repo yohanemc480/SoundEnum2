@@ -1,29 +1,21 @@
 import { MCCommandSoundSource } from "../Constants/MCCommandSoundSource.js";
+import { SettingDefine } from "../Constants/SettingDefine.js";
 import { MCCommandSound } from "../MCCommandSound.js";
 import { ResourceManager } from "./ResourceManager.js";
 import { SingletonBase } from "./SingletonBase.js";
 
 export class SoundManager extends SingletonBase
 {
-    static Instance = null;
-    _audio = null;
-    static DefaultMasterVolume = 0.1;
-    static MinMasterVolume = 0;
-    static MaxMasterVolume = 1;
-    _masterVolume = 0.1;
-
-    _source;
-    _pitch;
-    _volume;
-    _minVolume;
+    _audio;
+    _masterVolume = SettingDefine.DefaultMasterVolume;
+    _source = MCCommandSoundSource.Master;
+    _pitch = MCCommandSound.DefaultPitch;
+    _volume = MCCommandSound.DefaultVolume;
+    _minVolume = MCCommandSound.DefaultMinVolume;
 
     constructor()
     {
         super();
-        this._source = MCCommandSoundSource.Master;
-        this._pitch = MCCommandSound.DefaultPitch;
-        this._volume = MCCommandSound.DefaultVolume;
-        this._minVolume = MCCommandSound.DefaultMinVolume;
     }
 
     Play(commandSound)
