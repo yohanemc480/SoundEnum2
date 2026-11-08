@@ -7,6 +7,7 @@ export class PreviewPlayer
         const seek = document.querySelector('#preview-seek');
         const time = document.querySelector('#preview-time');
         const status = document.querySelector('#preview-status');
+        const loading = document.querySelector('#preview-loading');
         let dragging = false;
         let frame = null;
         const format = seconds => {
@@ -79,7 +80,11 @@ export class PreviewPlayer
         for (const event of ['loadedmetadata', 'durationchange', 'timeupdate', 'play', 'pause', 'ended', 'emptied', 'seeking', 'seeked']) {
             audio.addEventListener(event, update);
         }
-        audio.addEventListener('loadstart', () => { status.textContent = '読み込み中…'; update(); });
+        audio.addEventListener('loadstart', () => { status.textContent = ''; loading.hidden = false; update(); });
+        audio.addEventListener('waiting', () => { loading.hidden = false; });
+        for (const event of ['canplay', 'playing', 'error', 'previewerror', 'ended']) {
+            audio.addEventListener(event, () => { loading.hidden = true; });
+        }
         audio.addEventListener('canplay', () => { status.textContent = ''; update(); });
         audio.addEventListener('error', () => { status.textContent = '音声を読み込めませんでした。'; update(); });
         audio.addEventListener('previewerror', () => { status.textContent = '再生できませんでした。再生ボタンで再試行してください。'; update(); });
