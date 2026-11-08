@@ -147,5 +147,7 @@ h3 > span:first-child { margin-right: 8px; color: var(--accent); font-family: mo
 .version-selector > span { flex: 0 0 auto; white-space: nowrap; }
 .version-selector select { flex: 0 0 auto; width: auto; min-width: 7rem; max-width: 12rem; }
 
-.search-option { display: flex; align-items: center; gap: 6px; margin: 12px 0; font-size: 12px; }
+.search-options-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0; }
+.search-options-row #search-clear { margin-left: auto; padding: 6px 10px; }
+.search-option { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; }
 .search-option input[type="checkbox"] { height: auto; padding: 0; flex: 0 0 auto; }
