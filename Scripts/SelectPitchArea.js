@@ -15,7 +15,7 @@ export class SelectPitchArea
         {
             let $textInputHolder = $("<input>",
             {
-                value: MCCommandSound.DefaultPitch
+                value: SoundManager.Instance.GetPitch()
             })
 
             $textInputHolder.on("blur", () =>
@@ -30,7 +30,7 @@ export class SelectPitchArea
                 min: MCCommandSound.MinPitch,
                 max: MCCommandSound.MaxPitch,
                 step: "0.1",
-                value: MCCommandSound.DefaultPitch
+                value: SoundManager.Instance.GetPitch()
             }).appendTo(appendTarget);
 
             $slider.on("input", () =>

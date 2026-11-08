@@ -15,7 +15,7 @@ export class SelectMinVolumeArea
         {
             let $textInputHolder = $("<input>",
             {
-                value: MCCommandSound.DefaultMinVolume
+                value: SoundManager.Instance.GetMinVolume()
             })
 
             $textInputHolder.on("blur", () =>
@@ -30,7 +30,7 @@ export class SelectMinVolumeArea
                 min: MCCommandSound.MinMinVolume,
                 max: MCCommandSound.MaxMinVolume,
                 step: "0.1",
-                value: MCCommandSound.DefaultMinVolume
+                value: SoundManager.Instance.GetMinVolume()
             }).appendTo(appendTarget);
 
             $slider.on("input", () =>

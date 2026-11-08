@@ -17,13 +17,13 @@ export class SelectVolumeArea
                 min: MCCommandSound.MinVolume,
                 max: 1,
                 step: "0.1",
-                value: MCCommandSound.DefaultVolume
+                value: SoundManager.Instance.GetVolume()
             }).appendTo(appendTarget);
             $slider.on("input", () => this.OnUpdateValue($slider.val()));
 
             let $textInputHolder = $("<input>",
             {
-                value: MCCommandSound.DefaultVolume
+                value: SoundManager.Instance.GetVolume()
             }).appendTo(appendTarget);
 
             $textInputHolder.on("blur", () =>

@@ -1,3 +1,5 @@
+import { localStorageStore } from '../LocalStorage.js';
+import { LocalStorageSchema, normalizeCommandSettings } from '../LocalStorageSchema.js';
 import { MCCommandSoundSource } from "../Constants/MCCommandSoundSource.js";
 import { SettingDefine } from "../Constants/SettingDefine.js";
 import { MCCommandSound } from "../MCCommandSound.js";
@@ -19,8 +21,24 @@ export class SoundManager extends SingletonBase
     constructor()
     {
         super();
+        try {
+            const saved = localStorageStore.readEntry(LocalStorageSchema.CommandSettings);
+            this._source = saved.source;
+            this._volume = saved.volume;
+            this._pitch = saved.pitch;
+            this._minVolume = saved.minVolume;
+        } catch (error) { console.warn('Cannot read command settings', error); }
         this._audio = new Audio();
         this._audio.preservesPitch = false;
+    }
+
+    SaveCommandSettings()
+    {
+        try {
+            localStorageStore.writeEntry(LocalStorageSchema.CommandSettings, {
+                source: this._source, volume: this._volume, pitch: this._pitch, minVolume: this._minVolume,
+            });
+        } catch (error) { console.warn('Cannot save command settings', error); }
     }
 
     GetAudio()
@@ -77,7 +95,8 @@ export class SoundManager extends SingletonBase
 
     SetPitch(pitch)
     {
-        this._pitch = pitch;
+        this._pitch = normalizeCommandSettings({ pitch }).pitch;
+        this.SaveCommandSettings();
     }
 
     GetPitch()
@@ -87,7 +106,8 @@ export class SoundManager extends SingletonBase
 
     SetSource(source)
     {
-        this._source = source;
+        this._source = normalizeCommandSettings({ source }).source;
+        this.SaveCommandSettings();
     }
 
     GetSource()
@@ -97,7 +117,8 @@ export class SoundManager extends SingletonBase
 
     SetVolume(volume)
     {
-        this._volume = volume;
+        this._volume = normalizeCommandSettings({ volume }).volume;
+        this.SaveCommandSettings();
     }
 
     GetVolume()
@@ -107,7 +128,8 @@ export class SoundManager extends SingletonBase
 
     SetMinVolume(minVolume)
     {
-        this._minVolume = minVolume;
+        this._minVolume = normalizeCommandSettings({ minVolume }).minVolume;
+        this.SaveCommandSettings();
     }
 
     GetMinVolume()

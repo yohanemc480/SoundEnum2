@@ -22,6 +22,9 @@ export class SelectSourceArea
                 );
             }
 
+            $selectPullDown.val(Object.keys(MCCommandSoundSource).find(key =>
+                MCCommandSoundSource[key] === SoundManager.Instance.GetSource()));
+
             $selectPullDown.change(function ()
             {
                 // 選択されたオプションの値を取得

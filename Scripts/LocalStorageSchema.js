@@ -1,3 +1,5 @@
+import { MCCommandSound } from './MCCommandSound.js';
+import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.js';
 import { LocalStorageKey } from './Constants/LocalStorageKey.js';
 
 /** @typedef {string[]} FavoriteSoundIds サウンドIDのみ。バージョンやピッチは保存しない。 */
@@ -25,6 +27,26 @@ export function normalizePreferences(value = {}) {
     };
 }
 
+/**
+ * @typedef {Object} CommandSettingsValue
+ * @property {string} source playsoundのソース名
+ * @property {number} volume 音量（0以上、1超も保存する）
+ * @property {number} pitch ピッチ（0.5〜2）
+ * @property {number} minVolume 最低音量（0〜1）
+ */
+/** @returns {CommandSettingsValue} */
+export function normalizeCommandSettings(value = {}) {
+    value = value && typeof value === 'object' ? value : {};
+    const number = (input, fallback, min, max = Infinity) =>
+        Number.isFinite(input) ? Math.min(max, Math.max(min, input)) : fallback;
+    return {
+        source: Object.values(MCCommandSoundSource).includes(value.source) ? value.source : MCCommandSoundSource.Master,
+        volume: number(value.volume, MCCommandSound.DefaultVolume, MCCommandSound.MinVolume),
+        pitch: number(value.pitch, MCCommandSound.DefaultPitch, MCCommandSound.MinPitch, MCCommandSound.MaxPitch),
+        minVolume: number(value.minVolume, MCCommandSound.DefaultMinVolume, MCCommandSound.MinMinVolume, MCCommandSound.MaxMinVolume),
+    };
+}
+
 /** @returns {FavoriteSoundIds} */
 function normalizeFavorites(value) {
     if (!Array.isArray(value) || value.some(name => typeof name !== 'string')) throw new Error('Invalid favorites');
@@ -36,6 +58,11 @@ function normalizeFavorites(value) {
  * normalizeは読み書きの両方で使用する。既存キーとJSON構造は維持する。
  */
 export const LocalStorageSchema = Object.freeze({
+    CommandSettings: Object.freeze({
+        key: LocalStorageKey.CommandSettings,
+        createDefault: () => normalizeCommandSettings(),
+        normalize: normalizeCommandSettings,
+    }),
     Favorites: Object.freeze({
         key: LocalStorageKey.Favorites,
         createDefault: () => [],
