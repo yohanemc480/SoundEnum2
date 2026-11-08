@@ -27,7 +27,7 @@ export class SoundComposition {
         try { this.rows = localStorageStore.readEntry(LocalStorageSchema.Composition); }
         catch (error) { console.error(error); this.writable = false; showToast(Text.compositionFailure); }
         this.element = id => document.getElementById(`composition-${id}`);
-        this.output = new OutputArea('#composition-output', Text.commandOutput);
+        this.output = new OutputArea('#composition-output');
         this.waveform = new CompositionWaveform(this.element('waveform'), this.element('time'));
         this.volume = SoundManager.Instance.GetMasterVolume();
         new SelectMasterVolumeArea('#composition-volume', { value: this.volume, onChange: value => {

@@ -3,12 +3,11 @@ import { createCopyButton } from "./CopyButton.js";
 
 export class OutputArea
 {
-    constructor(appendTarget, displayName)
+    constructor(appendTarget)
     {
         this.value = '';
         this.text = document.createElement('div');
         this.text.className = 'output-text';
-        this.text.textContent = displayName;
         this.copyButton = createCopyButton(() => this.value);
         this.copyButton.disabled = true;
         this.text.addEventListener('click', () => {
