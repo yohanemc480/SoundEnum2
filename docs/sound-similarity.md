@@ -40,12 +40,11 @@ pipが`No matching distribution found`を表示した場合、それだけでは
 入力は`resource/{version}/sounds.json`、`resource/{version}/hash.json`、`resource/{version}/durations.json`、`resource/audio/`です。
 
 - `.cache/clap/`：モデルと音声ベクトル。モデルrevision・前処理・ライブラリバージョン・実行デバイスで識別。破損したベクトルは再生成。
-- `resource/{version}/search/{generation}/index.json`：イベント、音声、タグ、生成条件。
+- `resource/{version}/index.json`：イベント、音声、タグ、生成条件。
 - 同じディレクトリの`vectors.bin`：little-endian Float32の正規化ベクトル。
-- `resource/{version}/search.json`：公開対象世代のマニフェスト。全出力の保存後、最後に切り替える。
-- `--limit`では`resource/{version}/search.sample.json`だけを更新。少数サンプルを通常画面で全件データとして使わない。
+- `--limit`では`resource/{version}/index.sample.json`と`vectors.sample.bin`だけを更新。少数サンプルを通常画面で全件データとして使わない。
 
-モデルの既定revisionは動作確認済みの`8fa0f1c6d0433df6e97c127f64b2a1d6c0dcda8a`に固定しています。別の版を使う場合は`--revision`で指定します。取得済みモデルだけで実行する場合は`--offline`を追加してください。依存バージョンもmetadataに記録されます。中断後は同じ条件で再実行すると生成済み音声ベクトルを再利用します。Web公開時はマニフェストと参照先の世代ディレクトリを一緒に配信してください。
+モデルの既定revisionは動作確認済みの`8fa0f1c6d0433df6e97c127f64b2a1d6c0dcda8a`に固定しています。別の版を使う場合は`--revision`で指定します。取得済みモデルだけで実行する場合は`--offline`を追加してください。依存バージョンもmetadataに記録されます。中断後は同じ条件で再実行すると生成済み音声ベクトルを再利用します。Web公開時は`index.json`と`vectors.bin`を一緒に更新してください。ベクトルのSHA-256が索引と一致しない場合は読み込みを拒否します。切り替え用マニフェストと世代フォルダは使用しません。
 
 ベクトルは4,941音声×512次元なら約9.65MiBです。検索タブで遅延ロードし、検索計算をWeb Workerに分離します。上位20件の事前リストを絞り込む方式ではなく、条件に一致するすべての候補を採点します。
 

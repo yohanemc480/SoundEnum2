@@ -20,8 +20,12 @@ export class SoundResourcePaths
         return `resource/${this.Version}/sounds.json`;
     }
 
-    static get Search()
+    static get SearchIndex()
     {
-        return `resource/${this.Version}/search.json`;
+        return `resource/${this.Version}/index.json`;
+    }
+    static get SearchVectors()
+    {
+        return `resource/${this.Version}/vectors.bin`;
     }
 }

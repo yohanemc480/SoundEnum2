@@ -32,9 +32,9 @@ export function searchSounds(index, vectors, { query = '', tags = [], min = 0, m
     return result.sort((a, b) => (baseline ? b.score - a.score : 0) || a.name.localeCompare(b.name));
 }
 
-export function validateSearchData(index, vectors, version, generation)
+export function validateSearchData(index, vectors, version)
 {
-    if (index.schemaVersion !== 1 || index.version !== version || index.generation !== generation || index.sample ||
+    if (index.schemaVersion !== 1 || index.version !== version || index.sample ||
         !Number.isInteger(index.dimensions) || index.dimensions < 1 || !Array.isArray(index.hashes) ||
         vectors.length !== index.hashes.length * index.dimensions || index.audioTags.length !== index.hashes.length) throw new Error('Invalid search data');
     const tagIds = new Set(index.tags.map(tag => tag.id));

@@ -7,7 +7,7 @@ self.onmessage = ({ data }) => {
             vectors = new Float32Array(data.binary.byteLength / 4);
             for (let i = 0; i < vectors.length; i++) vectors[i] = view.getFloat32(i * 4, true);
             index = data.index;
-            validateSearchData(index, vectors, data.version, data.generation);
+            validateSearchData(index, vectors, data.version);
             self.postMessage({ id: data.id, ready: true });
         } else {
             const results = searchSounds(index, vectors, data.options);

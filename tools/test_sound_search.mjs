@@ -48,12 +48,12 @@ test('tag filtering still finds a result beyond the first twenty neighbors', () 
     for (let i = 0; i < 30; i++) index.events.push({ name: `extra${i}`, candidates: [index.events[0].candidates[0]] });
     assert.equal(searchSounds(index, vectors, { base: 'base', tags: ['water', 'metal'] })[0].name, 'both');
 });
-test('data validation rejects mixed generations, invalid vectors and references', () => {
-    validateSearchData(fixture(), vectors, 'test', 'test');
-    assert.throws(() => validateSearchData(fixture(), vectors, 'test', 'other'));
-    assert.throws(() => validateSearchData(fixture(), new Float32Array(6), 'test', 'test'));
+test('data validation rejects wrong versions, invalid vectors and references', () => {
+    validateSearchData(fixture(), vectors, 'test');
+    assert.throws(() => validateSearchData(fixture(), vectors, 'other'));
+    assert.throws(() => validateSearchData(fixture(), new Float32Array(6), 'test'));
     const broken = fixture(); broken.events[0].candidates[0].row = 99;
-    assert.throws(() => validateSearchData(broken, vectors, 'test', 'test'));
+    assert.throws(() => validateSearchData(broken, vectors, 'test'));
 });
 test('UI text keys are ordered and HTML/tag labels exist', () => {
     assert.deepEqual(Object.keys(Text), Object.keys(Text).sort());
@@ -71,7 +71,7 @@ test('worker initializes little-endian vectors, searches and reports errors', as
         const binary = new ArrayBuffer(vectors.length * 4);
         const view = new DataView(binary);
         vectors.forEach((value, i) => view.setFloat32(i * 4, value, true));
-        self.onmessage({ data: { type: 'init', id: 1, index: fixture(), binary, version: 'test', generation: 'test' } });
+        self.onmessage({ data: { type: 'init', id: 1, index: fixture(), binary, version: 'test' } });
         assert.equal(messages.pop().ready, true);
         self.onmessage({ data: { type: 'search', id: 2, options: { base: 'base', tags: ['metal'] } } });
         const result = messages.pop();

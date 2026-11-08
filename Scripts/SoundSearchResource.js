@@ -13,14 +13,9 @@ export class SoundSearchResource
             if (!response.ok) throw new Error(response.status === 404 ? 'missing' : `HTTP ${response.status}`);
             return response;
         };
-        const manifestUrl = new URL(SoundResourcePaths.Search, location.href);
-        const manifest = await (await read(manifestUrl)).json();
-        if (manifest.schemaVersion !== 1 || manifest.version !== SoundResourcePaths.Version || !/^[a-f0-9]{64}$/.test(manifest.generation)) throw new Error('Invalid manifest');
-        const prefix = `search/${manifest.generation}/`;
-        if (manifest.index !== prefix + 'index.json' || manifest.vectors !== prefix + 'vectors.bin') throw new Error('Invalid paths');
         const [index, binary] = await Promise.all([
-            read(new URL(manifest.index, manifestUrl)).then(r => r.json()),
-            read(new URL(manifest.vectors, manifestUrl)).then(r => r.arrayBuffer())
+            read(new URL(SoundResourcePaths.SearchIndex, location.href)).then(r => r.json()),
+            read(new URL(SoundResourcePaths.SearchVectors, location.href)).then(r => r.arrayBuffer())
         ]);
         const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', binary))].map(b => b.toString(16).padStart(2, '0')).join('');
         if (hash !== index.vectorHash) throw new Error('Vector checksum mismatch');
@@ -32,7 +27,7 @@ export class SoundSearchResource
             if (data.error) task.reject(new Error(data.error)); else task.resolve(data);
         };
         this.worker.onerror = () => this.dispose();
-        await this.request({ type: 'init', index, binary, version: manifest.version, generation: manifest.generation }, [binary]);
+        await this.request({ type: 'init', index, binary, version: SoundResourcePaths.Version }, [binary]);
         return index;
     }
 

@@ -18,7 +18,7 @@ PREPROCESS = 'mono-resample-10s-weighted-v2'
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('version')
-    parser.add_argument('--limit', type=int, help='検証用。公開マニフェストを更新しない')
+    parser.add_argument('--limit', type=int, help='検証用。通常の検索データを更新しない')
     parser.add_argument('--revision', default=REVISION, help='CLAPモデルのcommit')
     parser.add_argument('--offline', action='store_true', help='取得済みモデルのみ使用する')
     parser.add_argument('--validate-only', action='store_true', help='モデル不要で参照整合性を検証')
@@ -131,15 +131,12 @@ def main():
              'events': entries, 'vectorHash': vector_hash, 'sample': bool(args.limit)}
     generation = digest(index)
     index['generation'] = generation
-    directory = resource / args.version / 'search' / generation
+    directory = resource / args.version
     directory.mkdir(parents=True, exist_ok=True)
-    write_binary(directory / 'vectors.bin', binary)
-    write_json(directory / 'index.json', index)
-    manifest = {'schemaVersion': 1, 'version': args.version, 'generation': generation,
-                'index': f'search/{generation}/index.json',
-                'vectors': f'search/{generation}/vectors.bin'}
-    suffix = 'search.sample.json' if args.limit else 'search.json'
-    write_json(resource / args.version / suffix, manifest)
+    vector_name = 'vectors.sample.bin' if args.limit else 'vectors.bin'
+    index_name = 'index.sample.json' if args.limit else 'index.json'
+    write_binary(directory / vector_name, binary)
+    write_json(directory / index_name, index)
     print(f'Saved {len(entries)} events; vectors={len(binary)} bytes; generation={generation}', flush=True)
 
 
