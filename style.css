@@ -63,6 +63,7 @@ h2 { font-size: 14px; font-weight: 650; }
 input, select { font: inherit; color: var(--text); }
 input:not([type="range"]), select { min-width: 0; height: 38px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 select { width: 100%; }
+select { appearance: none; padding-right: 34px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='m3 4.5 3 3 3-3' fill='none' stroke='%2394a6a1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 12px 12px; }
 .param input:not([type="range"]) { width: 64px; text-align: right; }
 input[type="range"] { flex: 1; width: 80px; min-width: 50px; margin: 0; accent-color: var(--accent); cursor: pointer; }
 input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
@@ -110,6 +111,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 #command-settings .param-label { font-size: 12px; }
 #command-settings input[type="range"] { width: 100%; min-width: 0; }
 #command-settings input:not([type="range"]), #command-settings select { height: 32px; padding: 5px 8px; }
+#command-settings select { padding-right: 34px; }
 #command-settings #select-source select { grid-column: 2 / -1; }
 .app-settings-popover { inset: 72px 24px auto auto; }
 .app-settings-popover > button { width: 100%; text-align: left; }
