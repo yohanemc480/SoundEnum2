@@ -28,7 +28,7 @@ export class SoundManager extends SingletonBase
         return this._audio;
     }
 
-    async Play(commandSound)
+    async Play(commandSound, selectedRawSound = null)
     {
         this._loadController?.abort();
         const controller = new AbortController();
@@ -39,7 +39,7 @@ export class SoundManager extends SingletonBase
         }
 
         var soundHashResource = ResourceManager.Instance.GetSoundHashResouce();
-        var rawSound = commandSound.GetRawSoundRandomly();
+        var rawSound = selectedRawSound ?? commandSound.GetRawSoundRandomly();
         this._audio.removeAttribute('src');
         this._audio.load();
         if (this._audioUrl) URL.revokeObjectURL(this._audioUrl);

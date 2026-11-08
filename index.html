@@ -20,6 +20,7 @@
         <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
           <button type="button" id="category-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="category-panel" data-i18n="category"></button>
           <button type="button" id="duration-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="duration-panel" tabindex="-1" data-i18n="duration"></button>
+          <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="search-panel" tabindex="-1" data-i18n="searchTitle"></button>
         </div>
         <div id="category-panel" role="tabpanel" aria-labelledby="category-tab">
         <div class="sound-genres-list">
@@ -43,6 +44,27 @@
             <button id="duration-previous" type="button" data-i18n="previous"></button>
             <select id="duration-page" data-i18n-aria-label="selectPage"></select>
             <button id="duration-next" type="button" data-i18n="next"></button>
+          </nav>
+        </div>
+        <div id="search-panel" role="tabpanel" aria-labelledby="search-tab" hidden>
+          <form id="search-form-container">
+            <fieldset id="search-form" disabled>
+              <div class="duration-filters search-filters">
+                <label><span data-i18n="searchBase"></span><input id="search-base" list="search-choices" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><datalist id="search-choices"></datalist></label>
+                <label><span data-i18n="soundName"></span><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"></label>
+                <label><span data-i18n="durationMin"></span><input id="search-min" type="number" min="0" step="any" placeholder="0"></label>
+                <label><span data-i18n="durationMax"></span><input id="search-max" type="number" min="0" step="any" data-i18n-placeholder="noLimit"></label>
+              </div>
+              <label class="search-tag-query"><span data-i18n="searchTags"></span><input id="search-tag-query" type="search" data-i18n-placeholder="searchTagQuery" data-i18n-aria-label="searchTagQuery"></label><div id="search-tags" class="search-tags"></div>
+              <button id="search-clear" type="button" data-i18n="searchClear"></button>
+            </fieldset>
+          </form>
+          <p class="section-note" data-i18n="searchNote"></p>
+          <p id="search-status" role="status"></p>
+          <button id="search-retry" type="button" hidden data-i18n="retry"></button>
+          <div id="search-list" class="duration-list"></div>
+          <nav id="search-pagination" class="duration-pagination" hidden data-i18n-aria-label="selectPage">
+            <button id="search-previous" type="button" data-i18n="previous"></button><span id="search-page"></span><button id="search-next" type="button" data-i18n="next"></button>
           </nav>
         </div>
       </section>

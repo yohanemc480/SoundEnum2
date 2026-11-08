@@ -2,6 +2,8 @@ import { applyText } from "./ApplyText.js";
 import { Text } from "./Text.js";
 import { DurationBrowser } from "./DurationBrowser.js";
 import { PreviewPlayer } from "./PreviewPlayer.js";
+import { initializeBrowserTabs } from "./BrowserTabs.js";
+import { SoundSearchBrowser } from "./SoundSearchBrowser.js";
 console.log("main.jsの読み込みを始めました");
 import { SoundGenreTree } from "./SoundGenreTree.js";
 import { MCSoundHashResource } from "./MCSoundHashResource.js";
@@ -55,4 +57,6 @@ new SelectMinVolumeArea("#select-min-volume");
 GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);
 
 new SelectMasterVolumeArea("#select-master-volume");
+initializeBrowserTabs();
 new DurationBrowser(playsoundCommandParamResouce, soundHashResource, outputArea);
+new SoundSearchBrowser(outputArea);

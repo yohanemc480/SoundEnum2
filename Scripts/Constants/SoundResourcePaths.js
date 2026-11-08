@@ -24,4 +24,9 @@ export class SoundResourcePaths
     {
         return `resource/${this.Version}durations.json`;
     }
+
+    static get Search()
+    {
+        return `resource/${this.Version}search.json`;
+    }
 }

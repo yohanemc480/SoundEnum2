@@ -48,24 +48,7 @@ export class DurationBrowser
         this.next.addEventListener('click', () => { this.page++; this.renderPage(); });
         this.pageSelect.addEventListener('change', () => { this.page = Number(this.pageSelect.value); this.renderPage(); });
         document.querySelector('#duration-retry').addEventListener('click', () => this.load());
-        const tabs = [...document.querySelectorAll('[data-browser-tab]')];
-        tabs.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(other => {
-                    const selected = other === tab;
-                    other.setAttribute('aria-selected', selected);
-                    other.tabIndex = selected ? 0 : -1;
-                    document.getElementById(other.getAttribute('aria-controls')).hidden = !selected;
-                });
-                if (tab.id === 'duration-tab') this.load();
-            });
-            tab.addEventListener('keydown', event => {
-                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-                event.preventDefault();
-                const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
-                tabs[next].focus(); tabs[next].click();
-            });
-        });
+        document.querySelector('#duration-tab').addEventListener('click', () => this.load());
     }
 
     async load()
