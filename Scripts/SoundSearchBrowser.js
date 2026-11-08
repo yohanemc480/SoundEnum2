@@ -37,16 +37,14 @@ export class SoundSearchBrowser
         this.element = id => document.getElementById(`search-${id}`);
         this.form = this.element('form');
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
-        this.form.addEventListener('input', event => {
-            this.filterTags();
-            if (event.target === this.element('tag-query')) return;
+        this.form.addEventListener('input', () => {
             ++this.requestId;
             clearTimeout(this.timer);
             this.timer = setTimeout(() => this.search(), 120);
         });
         document.getElementById('search-tab').addEventListener('click', () => this.load());
         this.element('retry').addEventListener('click', () => { this.index = null; this.load(); });
-        this.element('clear').addEventListener('click', () => { this.element('form-container').reset(); this.filterTags(); this.search(); });
+        this.element('clear').addEventListener('click', () => { this.element('form-container').reset(); this.search(); });
         this.element('previous').addEventListener('click', () => { this.page--; this.render(); });
         this.element('next').addEventListener('click', () => { this.page++; this.render(); });
     }
@@ -72,14 +70,12 @@ export class SoundSearchBrowser
             tags.replaceChildren();
             for (const tag of index.tags) {
                 const label = document.createElement('label');
-                label.dataset.tag = tag.id;
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox'; checkbox.value = tag.id;
                 label.append(checkbox, document.createTextNode(Text[tag.textKey]));
                 tags.append(label);
             }
             this.form.disabled = false;
-            this.filterTags();
             await this.search();
         } catch (error) {
             this.index = null;
@@ -88,18 +84,6 @@ export class SoundSearchBrowser
             this.element('retry').hidden = false;
             console.error(error);
         } finally { this.loading = false; }
-    }
-
-    filterTags()
-    {
-        if (!this.index) return;
-        const query = this.element('tag-query').value.trim().toLowerCase();
-        for (const label of this.element('tags').querySelectorAll('label')) {
-            const tag = this.index.tags.find(tag => tag.id === label.dataset.tag);
-            const keywords = `${Text[tag.textKey]} ${Text[`${tag.textKey}Aliases`] ?? ''} ${tag.id}`.toLowerCase();
-            // 選択済みタグは検索語に一致しなくても残し、隠れた絞り込み条件を作らない。
-            label.hidden = !label.querySelector('input').checked && !keywords.includes(query);
-        }
     }
 
     async search()
