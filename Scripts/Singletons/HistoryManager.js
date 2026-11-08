@@ -21,7 +21,7 @@ export class HistoryManager extends SingletonBase
         if (this._latestSound == null || !this._latestSound.Equals(commandSound))
         {
             new HistoryLog(".history", commandSound);
-            this.latestSound = commandSound;
+            this._latestSound = commandSound;
         }
     }
 
