@@ -1,0 +1,5 @@
+numpy>=2.0,<3
+scipy>=1.14,<2
+soundfile>=0.13,<1
+torch>=2.6,<3
+transformers>=4.46,<5
