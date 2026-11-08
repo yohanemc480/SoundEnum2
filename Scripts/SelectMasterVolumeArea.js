@@ -8,17 +8,18 @@ import { SettingDefine } from "./Constants/SettingDefine.js";
 export class SelectMasterVolumeArea
 {
     _slider;
-    constructor(appendTarget)
+    constructor(appendTarget, { value = SoundManager.Instance.GetMasterVolume(), onChange = value => SoundManager.Instance.SetMasterVolume(value) } = {})
     {
+        this.onChange = onChange;
         const panel = document.querySelector(appendTarget);
         const slider = document.createElement('input');
         slider.type = 'range';
-        slider.id = 'preview-volume';
+        slider.className = 'preview-volume-slider';
         slider.setAttribute('aria-label', Text.previewVolume);
         slider.min = SettingDefine.MinMasterVolume;
         slider.max = SettingDefine.MaxMasterVolume;
         slider.step = '0.01';
-        slider.value = SettingDefine.DefaultMasterVolume;
+        slider.value = value;
         slider.addEventListener('input', () => this.OnUpdateValue(slider.value));
         panel.replaceChildren(slider);
         this._slider = slider;
@@ -55,7 +56,7 @@ export class SelectMasterVolumeArea
 
     OnUpdateValue(value)
     {
-        SoundManager.Instance.SetMasterVolume(value);
+        this.onChange(Number(value));
         this._slider.value = value;
     }
 }

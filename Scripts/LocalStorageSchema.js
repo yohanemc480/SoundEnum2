@@ -23,7 +23,7 @@ export function normalizePreferences(value = {}) {
         base: typeof value.base === 'string' ? value.base : '',
         tags: Array.isArray(value.tags) ? [...new Set(value.tags.filter(tag => typeof tag === 'string'))] : [],
         excludeMultiple: value.excludeMultiple === true,
-        tab: value.tab === 'favorites-tab' ? 'favorites-tab' : 'search-tab',
+        tab: value.tab === 'favorites-tab' ? value.tab : 'search-tab',
     };
 }
 
@@ -47,6 +47,21 @@ export function normalizeCommandSettings(value = {}) {
     };
 }
 
+/** @typedef {{name: string, source: string, volume: number, pitch: number, minVolume: number}[]} CompositionValue 音ごとのコマンド設定。同じIDも複数保持する。 */
+export function normalizeComposition(value) {
+    if (!Array.isArray(value)) throw new Error('Invalid composition');
+    return value.map(row => {
+        if (!row || typeof row.name !== 'string' || !row.name ||
+            !Number.isFinite(row.volume) || row.volume < 0 ||
+            !Number.isFinite(row.pitch) || row.pitch < .5 || row.pitch > 2) throw new Error('Invalid composition row');
+        const source = row.source === undefined ? MCCommandSoundSource.Master : row.source;
+        const minVolume = row.minVolume === undefined ? MCCommandSound.DefaultMinVolume : row.minVolume;
+        if (!Object.values(MCCommandSoundSource).includes(source) ||
+            !Number.isFinite(minVolume) || minVolume < 0 || minVolume > 1) throw new Error('Invalid composition command settings');
+        return { name: row.name, source, volume: row.volume, pitch: row.pitch, minVolume };
+    });
+}
+
 /** @returns {FavoriteSoundIds} */
 function normalizeFavorites(value) {
     if (!Array.isArray(value) || value.some(name => typeof name !== 'string')) throw new Error('Invalid favorites');
@@ -62,6 +77,11 @@ export const LocalStorageSchema = Object.freeze({
         key: LocalStorageKey.CommandSettings,
         createDefault: () => normalizeCommandSettings(),
         normalize: normalizeCommandSettings,
+    }),
+    Composition: Object.freeze({
+        key: LocalStorageKey.Composition,
+        createDefault: () => [],
+        normalize: normalizeComposition,
     }),
     Favorites: Object.freeze({
         key: LocalStorageKey.Favorites,

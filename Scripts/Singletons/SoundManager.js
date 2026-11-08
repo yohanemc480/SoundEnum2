@@ -87,6 +87,8 @@ export class SoundManager extends SingletonBase
         });
     }
 
+    GetMasterVolume() { return this._masterVolume; }
+
     SetMasterVolume(volume)
     {
         this._masterVolume = volume;

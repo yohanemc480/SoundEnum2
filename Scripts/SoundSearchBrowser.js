@@ -7,16 +7,16 @@ import { Text } from './Text.js';
 import { SearchWaveforms } from './SearchWaveforms.js';
 import { SoundSearchResource } from './SoundSearchResource.js';
 import { SoundManager } from './Singletons/SoundManager.js';
-import { HistoryManager } from './Singletons/HistoryManager.js';
 import { MCCommandSound } from './MCCommandSound.js';
 import { MCCommandSelector } from './Constants/MCCommandSelector.js';
 import { MCRawSound } from './MCRawSound.js';
 
 export class SoundSearchBrowser
 {
-    constructor(outputArea, paths)
+    constructor(outputArea, paths, composition)
     {
         this.outputArea = outputArea;
+        this.composition = composition;
         try { this.favorites = new Favorites(); }
         catch (error) { console.error(error); this.favorites = null; }
 
@@ -95,6 +95,7 @@ export class SoundSearchBrowser
             const index = await this.resource.load();
             if (index.tags.some(tag => typeof Text[tag.textKey] !== 'string')) throw new Error('Unknown tag label');
             this.index = index;
+            this.composition.setEvents(index.events);
             this.autocomplete.setNames(index.events.map(event => event.name));
             const tags = this.element('tags');
             tags.replaceChildren();
@@ -234,6 +235,25 @@ export class SoundSearchBrowser
         }
     }
 
+    searchSimilar(name) {
+        clearTimeout(this.timer);
+        this.element('form-container').reset();
+        this.element('base').value = name;
+        document.getElementById('search-tab').click();
+        this.search();
+    }
+
+    previewSound(name, candidate, button, settings = null) {
+                this.composition.stop();
+                const manager = SoundManager.Instance;
+                const command = new MCCommandSound(name, settings?.source ?? manager.GetSource(), MCCommandSelector.All, settings?.volume ?? manager.GetVolume(), settings?.pitch ?? manager.GetPitch(), settings?.minVolume ?? manager.GetMinVolume());
+                manager.Play(command, candidate ? new MCRawSound(candidate) : null);
+                this.outputArea.SetText(command.ToString());
+                document.querySelectorAll('.browser-panel .selected, .composition-row .selected').forEach(element => element.classList.remove('selected'));
+                this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
+                button.classList.add('selected');
+    }
+
     appendRow(entry, container) {
             const candidates = this.index.events.find(event => event.name === entry.name)?.candidates ?? [];
             const row = document.createElement('div'); row.className = 'search-row';
@@ -250,26 +270,14 @@ export class SoundSearchBrowser
             preview.append(name);
             preview.disabled = !candidates.length;
             const playCandidate = (candidate, button) => {
-                const manager = SoundManager.Instance;
-                const command = new MCCommandSound(entry.name, manager.GetSource(), MCCommandSelector.All, manager.GetVolume(), manager.GetPitch(), manager.GetMinVolume());
-                manager.Play(command, candidate ? new MCRawSound(candidate) : null);
-                this.outputArea.SetText(command.ToString());
-                HistoryManager.Instance.Register(command);
-                HistoryManager.Instance.ScrollToBottom();
-                document.querySelector('.browser-panel').querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
-                this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
-                button.classList.add('selected');
+                this.previewSound(entry.name, candidate, button);
             };
             preview.addEventListener('click', () => playCandidate(null, preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;
             similar.disabled = !candidates.length;
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
             similar.addEventListener('click', () => {
-                clearTimeout(this.timer);
-                this.element('form-container').reset();
-                this.element('base').value = entry.name;
-                document.getElementById('search-tab').click();
-                this.search();
+                this.searchSimilar(entry.name);
             });
             const main = document.createElement('div'); main.className = 'search-row-main';
             main.classList.toggle('search-row-base', entry.name === this.resultBase && !document.getElementById('favorites-panel').contains(container));
@@ -293,7 +301,12 @@ export class SoundSearchBrowser
                     this.renderFavorites();
                 } catch (error) { console.error(error); showToast(Text.favoritesFailure); }
             });
-            actions.append(favorite, similar);
+            const add = document.createElement('button'); add.type = 'button'; add.textContent = '+';
+            add.className = 'composition-add'; add.title = Text.compositionAdd;
+            add.setAttribute('aria-label', `${Text.compositionAdd}: ${entry.name}`);
+            add.disabled = !candidates.length;
+            add.addEventListener('click', () => this.composition.add(entry.name));
+            actions.append(favorite, add, similar);
             const waveform = document.createElement('canvas');
             waveform.className = 'search-row-waveform';
             waveform.setAttribute('aria-hidden', 'true');

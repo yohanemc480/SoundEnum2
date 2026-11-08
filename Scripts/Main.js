@@ -1,4 +1,5 @@
-import { LocalStorageSchema } from './LocalStorageSchema.js';
+import { SoundComposition } from './SoundComposition.js';
+import { mountSoundSettings } from './SoundSettings.js';
 import { confirmAction } from './ConfirmDialog.js';
 import { localStorageStore } from './LocalStorage.js';
 import { initializeVersionSelector } from './VersionSelector.js';
@@ -14,11 +15,6 @@ import { NetworkFileLoader } from "./NetworkFileLoader.js";
 import { ResourcePathProvider } from "./ResourcePathProvider.js";
 import { SoundManager } from "./Singletons/SoundManager.js";
 import { OutputArea } from "./OutputArea.js";
-import { SelectSourceArea } from "./SelectSourceArea.js";
-import { SelectVolumeArea } from "./SelectVolumeArea.js";
-import { SelectPitchArea } from "./SelectPitchArea.js";
-import { SelectMinVolumeArea } from "./SelectMinVolumeArea.js";
-import { HistoryManager } from "./Singletons/HistoryManager.js";
 import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.js";
 import { ResourceManager } from "./Singletons/ResourceManager.js";
 
@@ -50,26 +46,29 @@ playsoundCommandParamResouce.ParseResource();
 new ResourceManager(playsoundCommandParamResouce, soundHashResource);
 new SoundManager();
 new PreviewPlayer(SoundManager.Instance.GetAudio());
-new HistoryManager();
 
 let outputArea = new OutputArea(".output", Text.commandOutput);
 
 // 各パラメータ選択エリアの追加
-const sourceArea = new SelectSourceArea("#select-source");
-const volumeArea = new SelectVolumeArea("#select-sound-volume");
-const pitchArea = new SelectPitchArea("#select-pitch");
-const minVolumeArea = new SelectMinVolumeArea("#select-min-volume");
-$(document).ready(() => {
-    document.getElementById('reset-command-settings').addEventListener('click', () => {
-        const defaults = LocalStorageSchema.CommandSettings.createDefault();
-        sourceArea.OnUpdateValue(defaults.source);
-        volumeArea.OnUpdateValue(String(defaults.volume));
-        pitchArea.OnUpdateValue(String(defaults.pitch));
-        minVolumeArea.OnUpdateValue(String(defaults.minVolume));
-    });
+mountSoundSettings(document.getElementById('command-settings'), {
+    read: () => {
+        const manager = SoundManager.Instance;
+        return { source: manager.GetSource(), volume: manager.GetVolume(), pitch: manager.GetPitch(), minVolume: manager.GetMinVolume() };
+    },
+    save: value => {
+        const manager = SoundManager.Instance;
+        manager.SetSource(value.source);
+        manager.SetVolume(value.volume);
+        manager.SetPitch(value.pitch);
+        manager.SetMinVolume(value.minVolume);
+    },
 });
 
 new SelectMasterVolumeArea("#select-master-volume");
 initializeBrowserTabs();
-const searchBrowser = new SoundSearchBrowser(outputArea, paths);
+const composition = new SoundComposition({
+    onPreview: (row, button) => searchBrowser.previewSound(row.name, null, button, row),
+    onSimilar: name => searchBrowser.searchSimilar(name),
+});
+const searchBrowser = new SoundSearchBrowser(outputArea, paths, composition);
 searchBrowser.load();
