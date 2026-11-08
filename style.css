@@ -85,13 +85,12 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 [hidden] { display: none !important; }
-.browser-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.browser-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; border-bottom: 2px solid var(--line); }
 .browser-header .version-selector { align-self: center; padding-bottom: 6px; }
 .browser-tabs { display: flex; gap: 4px; padding: 0 4px; }
-.browser-tabs [role="tab"] { position: relative; margin-bottom: -1px; padding: 11px 20px; color: var(--muted); background: var(--surface); border: 1px solid transparent; border-bottom-color: var(--line); border-radius: 8px 8px 0 0; font: inherit; cursor: pointer; transition: color .15s, background .15s; }
+.browser-tabs [role="tab"] { position: relative; padding: 10px 19px; color: var(--muted); background: var(--surface); border: 2px solid transparent; border-radius: 8px 8px 0 0; font: inherit; cursor: pointer; transition: color .15s, background .15s; }
 .browser-tabs [role="tab"]:hover { color: var(--text); background: #22312b; }
-.browser-tabs [role="tab"][aria-selected="true"] { color: var(--accent); background: var(--panel); border-color: var(--line); border-bottom-color: var(--panel); font-weight: 600; }
-.browser-tabs [role="tab"][aria-selected="true"]::before { content: ""; position: absolute; top: -1px; left: 8px; right: 8px; height: 3px; border-radius: 3px; background: var(--accent); }
+.browser-tabs [role="tab"][aria-selected="true"] { margin-bottom: -2px; padding-bottom: 12px; color: var(--text); background: var(--panel); border-color: var(--line); border-bottom-color: var(--panel); font-weight: 600; }
 .browser-tabs [role="tab"]:focus-visible { outline: 2px solid var(--accent); outline-offset: -5px; }
 .search-pagination button { padding: 9px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; font: inherit; cursor: pointer; }
 .search-filters > label, .search-tags-field { min-width: 0; display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
