@@ -166,6 +166,7 @@ export class SoundSearchBrowser
             const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'search-preview';
             const name = document.createElement('span'); name.textContent = entry.name;
             const detail = document.createElement('small');
+            detail.className = 'search-similarity';
             detail.textContent = [entry.score === null ? '' : Text.searchScore(Math.round(entry.score * 100)),
                 entry.sameAudio ? Text.searchSameAudio : ''].filter(Boolean).join(' · ');
             const metadata = document.createElement('span'); metadata.className = 'search-row-metadata';
