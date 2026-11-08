@@ -7,7 +7,7 @@
 ```
 
 指定したバージョンの情報をMojangから取得し、`resource/<バージョン>/hash.json` と `resource/<バージョン>/sounds.json` に保存します。
-音声も `resource/audio/<ハッシュ>.ogg` に保存し、再生時間・波形・類似音／タグ検索用の`index.json`と`vectors.bin`まで生成した後に `Scripts/Constants/SoundResourcePaths.js` のバージョンを切り替えます。
+音声も `resource/audio/<ハッシュ>.ogg` に保存し、再生時間・波形・類似音／タグ検索用の`tags.json`と`vectors.bin`まで生成した後に `Scripts/Constants/SoundResourcePaths.js` のバージョンを切り替えます。
 過去のファイルは残し、同名ファイルの内容が異なる場合は上書きせずエラーにします。
 
 音声は保存済みの正常なファイルを再利用し、未取得・破損分だけを1件ずつ取得します。途中で失敗しても再実行できます。

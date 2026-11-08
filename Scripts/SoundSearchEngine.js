@@ -21,12 +21,12 @@ export function searchSounds(index, vectors, { query = '', tags = [], min = 0, m
     for (const event of index.events) {
         if (event.name === base || !event.name.includes(query.trim().toLowerCase())) continue;
         if (!event.candidates.every(c => c.duration >= min && c.duration <= max)) continue;
-        const candidates = event.candidates.filter(c => tags.every(tag => index.audioTags[c.row].includes(tag)));
+        const candidates = event.candidates.filter(c => tags.every(tag => index.audioTags[c.hash].includes(tag)));
         if (!candidates.length) continue;
         let candidate = candidates[0];
         if (baseline) for (const current of candidates) if (scoreRow(current.row) > scoreRow(candidate.row)) candidate = current;
         result.push({ name: event.name, candidate, score: baseline ? scoreRow(candidate.row) : null,
-            sameAudio: baseRows.has(candidate.row), tags: index.audioTags[candidate.row],
+            sameAudio: baseRows.has(candidate.row), tags: index.audioTags[candidate.hash],
             count: event.candidates.length });
     }
     return result.sort((a, b) => (baseline ? b.score - a.score : 0) || a.name.localeCompare(b.name));
@@ -34,15 +34,15 @@ export function searchSounds(index, vectors, { query = '', tags = [], min = 0, m
 
 export function validateSearchData(index, vectors, version)
 {
-    if (index.schemaVersion !== 1 || index.version !== version || index.sample ||
+    if (index.schemaVersion !== 3 || index.version !== version || index.sample ||
         !Number.isInteger(index.dimensions) || index.dimensions < 1 || !Array.isArray(index.hashes) ||
-        vectors.length !== index.hashes.length * index.dimensions || index.audioTags.length !== index.hashes.length) throw new Error('Invalid search data');
+        vectors.length !== index.hashes.length * index.dimensions || Object.keys(index.audioTags).length !== index.hashes.length) throw new Error('Invalid search data');
     const tagIds = new Set(index.tags.map(tag => tag.id));
     const names = new Set();
     if (tagIds.size !== index.tags.length || new Set(index.hashes).size !== index.hashes.length) throw new Error('Duplicate data');
     for (let row = 0; row < index.hashes.length; row++) {
-        if (!/^[0-9a-f]{40}$/.test(index.hashes[row]) || !Array.isArray(index.audioTags[row]) ||
-            index.audioTags[row].some(tag => !tagIds.has(tag))) throw new Error('Invalid audio tags');
+        if (!/^[0-9a-f]{40}$/.test(index.hashes[row]) || !Array.isArray(index.audioTags[index.hashes[row]]) ||
+            index.audioTags[index.hashes[row]].some(tag => !tagIds.has(tag))) throw new Error('Invalid audio tags');
         let norm = 0;
         for (let d = 0; d < index.dimensions; d++) norm += vectors[row * index.dimensions + d] ** 2;
         if (!Number.isFinite(norm) || Math.abs(norm - 1) > 0.01) throw new Error('Invalid vector');

@@ -224,7 +224,7 @@ export class SoundSearchBrowser
                         const label = document.createElement('span');
                         label.textContent = Text.searchCandidateName(i + 1, candidate.name, candidate.pitch);
                         button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
-                        button.append(label, this.createTagBadges(this.index.audioTags[candidate.row]));
+                        button.append(label, this.createTagBadges(this.index.audioTags[candidate.hash]));
                         button.addEventListener('click', () => playCandidate(candidate, button));
                         panel.append(button);
                     });

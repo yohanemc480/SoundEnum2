@@ -7,6 +7,7 @@ import math
 from pathlib import Path
 import re
 import sys
+import struct
 from sound_search_data import assign_tags, digest, resolve_events, validate_tags, write_binary, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -117,28 +118,27 @@ def main():
             features = model.get_text_features(**inputs.to(device)).cpu().numpy()
         text_vectors.append(normalize(np.mean([normalize(v) for v in features], axis=0)))
     scores = matrix @ np.stack(text_vectors).T
-    audio_tags = [assign_tags(row, tags, overrides.get(sha1, {}))
-                  for sha1, row in zip(hashes, scores, strict=True)]
-    rows = {sha1: i for i, sha1 in enumerate(hashes)}
-    entries = [{'name': name, 'candidates': [{**c, 'row': rows[c['hash']]} for c in cs]}
-               for name, cs in sorted(events.items()) if cs]
-    binary = matrix.astype('<f4').tobytes()
+    audio_tags = {sha1: assign_tags(row, tags, overrides.get(sha1, {}))
+                  for sha1, row in zip(hashes, scores, strict=True)}
+    binary = struct.pack('<4sIII', b'SEVB', 1, len(hashes), dimensions) + b''.join(
+        bytes.fromhex(sha1) + vector.astype('<f4').tobytes()
+        for sha1, vector in zip(hashes, matrix, strict=True))
     vector_hash = hashlib.sha256(binary).hexdigest()
-    index = {'schemaVersion': 1, 'version': args.version, 'metadata': metadata,
+    index = {'schemaVersion': 3, 'version': args.version, 'metadata': metadata,
              'inputs': {'sounds': digest(sounds), 'assets': digest(assets), 'durations': digest(durations),
                         'tags': digest(tags), 'overrides': digest(overrides)},
-             'dimensions': dimensions, 'hashes': hashes, 'audioTags': audio_tags,
+             'audioTags': audio_tags,
              'tags': [{'id': t['id'], 'textKey': t['textKey']} for t in tags],
-             'events': entries, 'vectorHash': vector_hash, 'sample': bool(args.limit)}
+             'vectorHash': vector_hash, 'sample': bool(args.limit)}
     generation = digest(index)
     index['generation'] = generation
     directory = resource / args.version
     directory.mkdir(parents=True, exist_ok=True)
     vector_name = 'vectors.sample.bin' if args.limit else 'vectors.bin'
-    index_name = 'index.sample.json' if args.limit else 'index.json'
+    index_name = 'tags.sample.json' if args.limit else 'tags.json'
     write_binary(directory / vector_name, binary)
     write_json(directory / index_name, index)
-    print(f'Saved {len(entries)} events; vectors={len(binary)} bytes; generation={generation}', flush=True)
+    print(f'Saved {sum(bool(cs) for cs in events.values())} events; vectors={len(binary)} bytes; generation={generation}', flush=True)
 
 
 if __name__ == '__main__':

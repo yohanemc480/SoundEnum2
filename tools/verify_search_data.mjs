@@ -53,7 +53,7 @@ try {
     for (const tag of index.tags) {
         assert.equal(typeof Text[tag.textKey], 'string');
         const result = await resource.request({ type: 'search', options: { tags: [tag.id] } });
-        assert.equal(result.results.length, index.events.filter(e => e.candidates.some(c => index.audioTags[c.row].includes(tag.id))).length);
+        assert.equal(result.results.length, index.events.filter(e => e.candidates.some(c => index.audioTags[c.hash].includes(tag.id))).length);
         assert.ok(result.results.every(row => row.tags.includes(tag.id)));
         tagCounts[tag.id] = result.results.length;
     }
@@ -69,6 +69,6 @@ try {
     }
     const binary = await readFile(new URL(SoundResourcePaths.SearchVectors, root));
     assert.equal(createHash('sha256').update(binary).digest('hex'), index.vectorHash);
-    console.log(JSON.stringify({ events: index.events.length, audio: index.hashes.length,
+    console.log(JSON.stringify({ events: index.events.length, audio: Object.keys(index.audioTags).length,
         vectorBytes: binary.length, loadMs: Math.round(loadMs), tagCounts, reports }, null, 2));
 } finally { resource.dispose(); }

@@ -40,11 +40,11 @@ pipが`No matching distribution found`を表示した場合、それだけでは
 入力は`resource/{version}/sounds.json`、`resource/{version}/hash.json`、`resource/durations.json`、`resource/audio/`です。
 
 - `.cache/clap/`：モデルと音声ベクトル。モデルrevision・前処理・ライブラリバージョン・実行デバイスで識別。破損したベクトルは再生成。
-- `resource/{version}/index.json`：イベント、音声、タグ、生成条件。
+- `resource/{version}/tags.json`：音声ハッシュごとのタグ、タグ一覧、生成条件。
 - 同じディレクトリの`vectors.bin`：little-endian Float32の正規化ベクトル。
-- `--limit`では`resource/{version}/index.sample.json`と`vectors.sample.bin`だけを更新。少数サンプルを通常画面で全件データとして使わない。
+- `--limit`では`resource/{version}/tags.sample.json`と`vectors.sample.bin`だけを更新。少数サンプルを通常画面で全件データとして使わない。
 
-モデルの既定revisionは動作確認済みの`8fa0f1c6d0433df6e97c127f64b2a1d6c0dcda8a`に固定しています。別の版を使う場合は`--revision`で指定します。取得済みモデルだけで実行する場合は`--offline`を追加してください。依存バージョンもmetadataに記録されます。中断後は同じ条件で再実行すると生成済み音声ベクトルを再利用します。Web公開時は`index.json`と`vectors.bin`を一緒に更新してください。ベクトルのSHA-256が索引と一致しない場合は読み込みを拒否します。切り替え用マニフェストと世代フォルダは使用しません。
+モデルの既定revisionは動作確認済みの`8fa0f1c6d0433df6e97c127f64b2a1d6c0dcda8a`に固定しています。別の版を使う場合は`--revision`で指定します。取得済みモデルだけで実行する場合は`--offline`を追加してください。依存バージョンもmetadataに記録されます。中断後は同じ条件で再実行すると生成済み音声ベクトルを再利用します。Web公開時は`tags.json`と`vectors.bin`を一緒に更新してください。ベクトルのSHA-256が索引と一致しない場合は読み込みを拒否します。切り替え用マニフェストと世代フォルダは使用しません。
 
 ベクトルは4,941音声×512次元なら約9.65MiBです。検索タブで遅延ロードし、検索計算をWeb Workerに分離します。上位20件の事前リストを絞り込む方式ではなく、条件に一致するすべての候補を採点します。
 
@@ -106,3 +106,9 @@ node tools/verify_search_data.mjs
 | 木 | 45 |
 
 複数タグの重複を含む件数です。閾値は暫定値であり、件数の多さを精度とは扱いません。
+
+## 検索データ形式（schemaVersion 3）
+
+`vectors.bin`自身が音声ハッシュとベクトルの対応を保持します。16バイトのヘッダーは、識別子`SEVB`（4バイト）、形式バージョン`1`、音声数、次元数（各little-endian uint32）です。その後に音声ごとのSHA-1（20バイト）とlittle-endian Float32のベクトルを順番に格納します。
+
+`tags.json`にはハッシュ一覧・次元数・候補の行番号を保存しません。候補は保存せず、`sounds.json`・`hash.json`・共通の`durations.json`から読み込み時に組み立てます。`audioTags`はハッシュをキーにします。読み込み時にバイナリから内部の行番号を組み立てます。バイナリのサイズ・形式・重複ハッシュ・候補の参照を検証し、JSONの`vectorHash`でファイルの組み合わせも検証します。

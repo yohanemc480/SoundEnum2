@@ -20,14 +20,19 @@ export class SoundResourcePaths
         return `resource/${this.Version}/sounds.json`;
     }
 
+    static get Durations()
+    {
+        return `resource/durations.json`;
+    }
+
     static get Waveforms()
     {
         return `resource/waveforms.json`;
     }
 
-    static get SearchIndex()
+    static get SearchTags()
     {
-        return `resource/${this.Version}/index.json`;
+        return `resource/${this.Version}/tags.json`;
     }
     static get SearchVectors()
     {
