@@ -1,9 +1,11 @@
-"""Java版の最新正式版のサウンド情報を取得し、SoundResourcePaths.jsの参照先を切り替える。"""
+"""指定バージョンの音声・検索リソースを生成し、アプリの参照先を切り替える。"""
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 from tempfile import NamedTemporaryFile
 import time
@@ -26,15 +28,14 @@ def download_json(url, sha1=None):
     return json.loads(data), data
 
 
-def fetch_latest_release():
-    """バージョン一覧から最新正式版のエントリーを取得する。"""
-    manifest, _ = download_json(MANIFEST_URL)
-    version = manifest["latest"]["release"]
+def fetch_version(version):
+    """指定されたバージョンを公式一覧から取得する。"""
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", version):
-        raise ValueError("Invalid release version")
-    entry = next(v for v in manifest["versions"] if v["id"] == version)
-    if entry["type"] != "release":
-        raise ValueError("Expected a stable release")
+        raise ValueError("Invalid version")
+    manifest, _ = download_json(MANIFEST_URL)
+    entry = next((v for v in manifest["versions"] if v["id"] == version), None)
+    if entry is None:
+        raise ValueError(f"Unknown Minecraft version: {version}")
     return entry
 
 
@@ -180,10 +181,9 @@ def replace_definition_file(definition, content):
             temporary.unlink()
 
 
-def update(root=ROOT):
+def update(version, root=ROOT):
     """取得・検証・保存を順に行い、最後にアプリの参照先を切り替える。"""
-    entry = fetch_latest_release()
-    version = entry["id"]
+    entry = fetch_version(version)
     resources, index_bytes = fetch_sound_resources(entry)
 
     definition = root / "Scripts" / "Constants" / "SoundResourcePaths.js"
@@ -196,6 +196,11 @@ def update(root=ROOT):
     build_durations(root, version, resources["hash"])
     build_waveforms(root, version, resources["hash"])
     save_resource_files(files)
+    # 同じPython環境で検索データまで生成し、失敗時は参照先を切り替えない。
+    subprocess.run(
+        [sys.executable, str(root / "tools" / "build_similarity.py"), version],
+        cwd=root, check=True,
+    )
     if updated != original:
         replace_definition_file(definition, updated)
         print(f"Updated Scripts/Constants/SoundResourcePaths.js to {version}")
@@ -204,8 +209,11 @@ def update(root=ROOT):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("version", help="生成するMinecraftバージョン（例: 26.3）")
+    args = parser.parse_args()
     try:
-        update()
+        update(args.version)
     except Exception as error:
         print(f"Update failed: {error}", file=sys.stderr)
         sys.exit(1)

@@ -3,11 +3,11 @@
 リポジトリのルートで実行します（Python 3、インターネット接続が必要）。
 
 ```powershell
-.venv/Scripts/python.exe tools/update_sounds.py
+.venv/Scripts/python.exe tools/update_sounds.py 26.3
 ```
 
-最新正式版の情報をMojangから取得し、`resource/<バージョン>/hash.json` と `resource/<バージョン>/sounds.json` に保存します。
-音声も `resource/audio/<ハッシュ>.ogg` に保存し、すべての取得・検証後に `Scripts/Constants/SoundResourcePaths.js` のバージョンを切り替えます。
+指定したバージョンの情報をMojangから取得し、`resource/<バージョン>/hash.json` と `resource/<バージョン>/sounds.json` に保存します。
+音声も `resource/audio/<ハッシュ>.ogg` に保存し、再生時間・波形・類似音／タグ検索用の`index.json`と`vectors.bin`まで生成した後に `Scripts/Constants/SoundResourcePaths.js` のバージョンを切り替えます。
 過去のファイルは残し、同名ファイルの内容が異なる場合は上書きせずエラーにします。
 
 音声は保存済みの正常なファイルを再利用し、未取得・破損分だけを1件ずつ取得します。途中で失敗しても再実行できます。
@@ -34,3 +34,7 @@ hash.jsonは音声パス（minecraft/sounds/～.ogg）をキー、SHA-1文字列
 ```
 
 再生時間と波形は音声ハッシュをキーとする全バージョン共通データです。生成時は既存の有効な値を再利用し、未登録・不正な値だけを生成します。別バージョンの値は削除しません。波形の仕様が変わる場合は既存ファイルを明示的に再生成してください。
+
+バージョン引数は必須です。最新リリースの自動選択は行いません。公式一覧に存在するバージョンを指定してください。検索データ生成に失敗した場合、アプリの参照バージョンは変更しません。取得・生成済みのデータは残るため、同じコマンドで再実行できます。
+
+検索データ生成には`tools/requirements-clap.txt`の依存ライブラリが必要です。初回はCLAPモデルを取得し、音声を解析するため時間がかかります。再実行では既存の音声ベクトルキャッシュを再利用します。詳しくは[類似音・タグ検索](sound-similarity.md)を参照してください。
