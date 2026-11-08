@@ -1,3 +1,4 @@
+import { SoundAutocomplete } from './SoundAutocomplete.js';
 import { confirmAction } from './ConfirmDialog.js';
 import { readPreferences, savePreferences, restoreSearchPreferences } from './SearchPreferences.js';
 import { showToast } from './Toast.js';
@@ -44,6 +45,16 @@ export class SoundSearchBrowser
 
         this.element = id => document.getElementById(`search-${id}`);
         this.form = this.element('form');
+        this.autocomplete = new SoundAutocomplete(this.element('base'));
+        for (const name of ['query', 'base']) {
+            this.element(`clear-${name}`).addEventListener('click', () => {
+                const input = this.element(name);
+                input.value = '';
+                input.focus();
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                this.autocomplete.hide();
+            });
+        }
         this.waveforms = new SearchWaveforms(document.querySelector('.browser-panel'));
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
         this.form.addEventListener('input', () => {
@@ -84,9 +95,7 @@ export class SoundSearchBrowser
             const index = await this.resource.load();
             if (index.tags.some(tag => typeof Text[tag.textKey] !== 'string')) throw new Error('Unknown tag label');
             this.index = index;
-            const choices = this.element('choices');
-            choices.replaceChildren();
-            for (const event of index.events) choices.append(new Option(event.name, event.name));
+            this.autocomplete.setNames(index.events.map(event => event.name));
             const tags = this.element('tags');
             tags.replaceChildren();
             for (const tag of index.tags) {

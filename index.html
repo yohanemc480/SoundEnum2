@@ -36,8 +36,8 @@
           <form id="search-form-container">
             <fieldset id="search-form" disabled>
               <div class="search-filters">
-                <label><span data-i18n="soundName"></span><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"></label>
-                <label><span data-i18n="searchBase"></span><input id="search-base" list="search-choices" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><datalist id="search-choices"></datalist></label>
+                <div class="search-text-field"><label for="search-query" data-i18n="soundName"></label><div class="clearable-input"><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"><button id="search-clear-query" type="button" class="close-button input-clear" data-i18n-aria-label="searchClearQuery"></button></div></div>
+                <div class="search-text-field"><label for="search-base" data-i18n="searchBase"></label><div class="clearable-input"><input id="search-base" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><button id="search-clear-base" type="button" class="close-button input-clear" data-i18n-aria-label="searchClearBase"></button></div></div>
                 <div class="search-tags-field"><span data-i18n="searchTags"></span><div id="search-tags" class="search-tags" role="group" data-i18n-aria-label="searchTags"></div></div>
               </div>
               <div class="search-options-row">

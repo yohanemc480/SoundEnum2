@@ -93,8 +93,8 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .browser-tabs [role="tab"][aria-selected="true"] { margin-bottom: -2px; padding-bottom: 12px; color: var(--text); background: var(--panel); border-color: var(--line); border-bottom-color: var(--panel); font-weight: 600; }
 .browser-tabs [role="tab"]:focus-visible { outline: 2px solid var(--accent); outline-offset: -5px; }
 .search-pagination button { padding: 9px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; font: inherit; cursor: pointer; }
-.search-filters > label, .search-tags-field { min-width: 0; display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
-.search-filters > label input { width: 100%; }
+.search-text-field, .search-tags-field { min-width: 0; display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
+.search-text-field input { width: 100%; }
 .search-list { max-height: clamp(320px, 52vh, 650px); overflow-y: auto; scrollbar-width: thin; }
 #search-base-preview { margin-bottom: 8px; }
 .search-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
@@ -217,3 +217,14 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 @media (prefers-reduced-motion: reduce) { .confirm-dialog[open], .confirm-dialog[open]::backdrop { animation: none; } }
 
 #reset-command-settings { display: block; margin: 12px 0 0 auto; }
+
+.sound-autocomplete { position: fixed; z-index: 20; padding: 5px; overflow-y: auto; overscroll-behavior: contain; border: 1px solid #42634d; border-radius: 8px; background: var(--panel); color: var(--text); box-shadow: 0 8px 24px #0006; scrollbar-width: thin; }
+.sound-autocomplete [role="option"] { padding: 8px 10px; border-radius: 4px; font: 12px/1.5 Consolas, monospace; overflow-wrap: anywhere; cursor: pointer; }
+.sound-autocomplete [role="option"]:hover, .sound-autocomplete [aria-selected="true"] { background: #283f33; color: var(--accent); }
+
+.clearable-input { position: relative; min-width: 0; }
+.clearable-input input:not([type="range"]) { padding-right: 40px; }
+.clearable-input input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.input-clear { position: absolute; right: 1px; top: 1px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--muted); cursor: pointer; }
+.input-clear:hover { background: #283f33; color: var(--text); }
+.clearable-input:has(input:placeholder-shown) .input-clear { visibility: hidden; }
