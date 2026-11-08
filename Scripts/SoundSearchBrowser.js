@@ -1,3 +1,4 @@
+import { confirmAction } from './ConfirmDialog.js';
 import { readPreferences, savePreferences, restoreSearchPreferences } from './SearchPreferences.js';
 import { showToast } from './Toast.js';
 import { Favorites } from './Favorites.js';
@@ -275,7 +276,8 @@ export class SoundSearchBrowser
             const favorite = document.createElement('button'); favorite.type = 'button';
             favorite.dataset.favorite = entry.name;
             this.updateFavoriteButton(favorite);
-            favorite.addEventListener('click', () => {
+            favorite.addEventListener('click', async () => {
+                if (this.favorites.names.has(entry.name) && !await confirmAction(Text.favoritesRemoveConfirm(entry.name), { acceptLabel: Text.confirmRemove })) return;
                 try {
                     this.favorites.toggle(entry.name);
                     document.querySelectorAll('[data-favorite]').forEach(button => this.updateFavoriteButton(button));

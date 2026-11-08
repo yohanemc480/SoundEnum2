@@ -1,3 +1,4 @@
+import { confirmAction } from './ConfirmDialog.js';
 import { localStorageStore } from './LocalStorage.js';
 import { initializeVersionSelector } from './VersionSelector.js';
 import { applyText } from "./ApplyText.js";
@@ -21,8 +22,8 @@ import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.js";
 import { ResourceManager } from "./Singletons/ResourceManager.js";
 
 applyText();
-document.getElementById('clear-local-storage').addEventListener('click', () => {
-    if (!window.confirm(Text.clearLocalStorageConfirm)) return;
+document.getElementById('clear-local-storage').addEventListener('click', async () => {
+    if (!await confirmAction(Text.clearLocalStorageConfirm, { acceptLabel: Text.confirmDelete })) return;
     try {
         localStorageStore.clear();
         location.reload();

@@ -106,6 +106,12 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .settings-popover .params { grid-template-columns: minmax(0, 1fr); }
 .app-settings-popover { inset: 72px 24px auto auto; }
 .app-settings-popover > button { width: 100%; text-align: left; }
+.confirm-dialog { width: min(420px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; margin: auto; padding: 24px; border: 1px solid #42634d; border-radius: 12px; background: var(--panel); color: var(--text); box-shadow: 0 16px 48px #0008; }
+.confirm-dialog::backdrop { background: #0009; }
+.confirm-dialog h2 { margin-bottom: 12px; }
+.confirm-dialog p { color: #c6d4ce; overflow-wrap: anywhere; white-space: pre-wrap; }
+.confirm-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.confirm-dialog .confirm-dialog-accept { background: #283f33; border-color: #42634d; color: var(--accent); }
 /* 類似音・タグ検索 */
 #search-form { border: 0; padding: 0; margin: 0; min-width: 0; }
 #search-form-container { border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 12px; }
@@ -187,3 +193,13 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 @media (max-width: 560px) {
   .browser-header { flex-wrap: wrap; }
 }
+
+@keyframes confirm-enter { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes confirm-leave { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-4px); } }
+@keyframes confirm-backdrop-enter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes confirm-backdrop-leave { from { opacity: 1; } to { opacity: 0; } }
+.confirm-dialog[open] { animation: confirm-enter .16s ease-out both; }
+.confirm-dialog[open]::backdrop { animation: confirm-backdrop-enter .16s ease-out both; }
+.confirm-dialog.is-closing { animation: confirm-leave .12s ease-in both; }
+.confirm-dialog.is-closing::backdrop { animation: confirm-backdrop-leave .12s ease-in both; }
+@media (prefers-reduced-motion: reduce) { .confirm-dialog[open], .confirm-dialog[open]::backdrop { animation: none; } }
