@@ -6,8 +6,8 @@
 .venv/Scripts/python.exe tools/update_sounds.py 26.3
 ```
 
-指定したバージョンの情報をMojangから取得し、`resource/<バージョン>/hash.json` と `resource/<バージョン>/sounds.json` に保存します。
-音声も `resource/audio/<ハッシュ>.ogg` に保存し、再生時間・波形・類似音／タグ検索用の`tags.json`と`vectors.bin`まで生成した後に `Scripts/Constants/SoundResourcePaths.js` のバージョンを切り替えます。
+指定したバージョンの情報をMojangから取得し、`resource/<バージョン>/audio-file-hashes.json` と `resource/<バージョン>/sound-events.json` に保存します。
+音声も `resource/audio/<ハッシュ>.ogg` に保存し、再生時間・波形・類似音／タグ検索用の`audio-tags.json`と`audio-embeddings.bin`まで生成した後に `Scripts/Constants/SoundResourcePaths.js` のバージョンを切り替えます。
 過去のファイルは残し、同名ファイルの内容が異なる場合は上書きせずエラーにします。
 
 音声は保存済みの正常なファイルを再利用し、未取得・破損分だけを1件ずつ取得します。途中で失敗しても再実行できます。
@@ -15,7 +15,7 @@
 
 ローカル再生の前にこのコマンドを実行し、公開時は `resource/audio/` も配置してください。再生時にMojangへアクセスするフォールバックはありません。
 
-再生時間もOGGから集計し、`resource/durations.json` に保存します。保存済み音声だけから再集計する場合（通信なし）：
+再生時間もOGGから集計し、`resource/audio-durations.json` に保存します。保存済み音声だけから再集計する場合（通信なし）：
 
 ```powershell
 python tools/build_durations.py
@@ -23,9 +23,9 @@ python tools/build_durations.py
 
 バージョン固有のJSONと検索データは `resource/<バージョン>/` にまとめます。現在保持するバージョンは26.3のみです。音声はバージョン間で共有するため `resource/audio/` に保持します。
 
-hash.jsonは音声パス（minecraft/sounds/～.ogg）をキー、SHA-1文字列を値とする対応表です。音声以外の情報やサイズは保存しません。ダウンロード時のサイズ・ハッシュ検証には、取得した公式アセット一覧をメモリ上で使用します。sounds.jsonは公式データの候補音をすべてオブジェクト形式に統一して保存します。文字列の候補はnameだけを持つオブジェクトに変換し、既存の属性・既定値の省略・type: eventによる参照は維持します。
+audio-file-hashes.jsonは音声パス（minecraft/sounds/～.ogg）をキー、SHA-1文字列を値とする対応表です。音声以外の情報やサイズは保存しません。ダウンロード時のサイズ・ハッシュ検証には、取得した公式アセット一覧をメモリ上で使用します。sound-events.jsonは公式データの候補音をすべてオブジェクト形式に統一して保存します。文字列の候補はnameだけを持つオブジェクトに変換し、既存の属性・既定値の省略・type: eventによる参照は維持します。
 
-波形は`resource/waveforms.json`へ事前生成します。音声ハッシュごとに最大256区間の絶対振幅ピークを0〜255の整数で保存し、短冊と試聴欄で共用します。ブラウザでは波形用の音声取得・デコードは行いません。更新スクリプトにもnumpy・soundfileが必要です（既存のCLAP用仮想環境を利用できます）。
+波形は`resource/audio-waveform-peaks.json`へ事前生成します。音声ハッシュごとに最大256区間の絶対振幅ピークを0〜255の整数で保存し、短冊と試聴欄で共用します。ブラウザでは波形用の音声取得・デコードは行いません。更新スクリプトにもnumpy・soundfileが必要です（既存のCLAP用仮想環境を利用できます）。
 
 波形のみ再生成する場合：
 

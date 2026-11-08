@@ -38,8 +38,8 @@ try {
     const start = performance.now();
     const index = await resource.load();
     const loadMs = performance.now() - start;
-    const hashes = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/hash.json`, root)));
-    const sounds = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/sounds.json`, root)));
+    const hashes = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/audio-file-hashes.json`, root)));
+    const sounds = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/sound-events.json`, root)));
     const resolved = resolveSoundEvents(sounds);
     for (const event of index.events) {
         assert.ok(event.name in sounds, event.name);

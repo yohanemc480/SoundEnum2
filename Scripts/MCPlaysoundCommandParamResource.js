@@ -3,7 +3,7 @@ import { ResourceBase } from "./ResourceBase.js";
 
 /**
  * command引数としてのsound名とraw_soundの対応付を行うクラス。
- * sounds.jsonを読み取る。
+ * sound-events.jsonを読み取る。
  * 外部からリソースとして読み込みキャッシュしておき、staticにどこからでも対応付を確認できる。
  */
 export class MCPlaysoundCommandParamResource extends ResourceBase

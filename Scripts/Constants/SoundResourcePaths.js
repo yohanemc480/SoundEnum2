@@ -12,30 +12,30 @@ export class SoundResourcePaths
 
     static get Hash()
     {
-        return `resource/${this.Version}/hash.json`;
+        return `resource/${this.Version}/audio-file-hashes.json`;
     }
 
     static get Sounds()
     {
-        return `resource/${this.Version}/sounds.json`;
+        return `resource/${this.Version}/sound-events.json`;
     }
 
     static get Durations()
     {
-        return `resource/durations.json`;
+        return `resource/audio-durations.json`;
     }
 
     static get Waveforms()
     {
-        return `resource/waveforms.json`;
+        return `resource/audio-waveform-peaks.json`;
     }
 
     static get SearchTags()
     {
-        return `resource/${this.Version}/tags.json`;
+        return `resource/${this.Version}/audio-tags.json`;
     }
     static get SearchVectors()
     {
-        return `resource/${this.Version}/vectors.bin`;
+        return `resource/${this.Version}/audio-embeddings.bin`;
     }
 }

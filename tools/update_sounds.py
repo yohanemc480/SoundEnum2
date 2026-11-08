@@ -88,7 +88,8 @@ def find_new_resource_files(root, version, resources):
     """既存ファイルとの不一致を検出し、新規保存するファイルだけを返す。"""
     files = []
     for suffix, content in resources.items():
-        name = f"{version}/{suffix}.json"
+        filename = {"hash": "audio-file-hashes.json", "sounds": "sound-events.json"}[suffix]
+        name = f"{version}/{filename}"
         target = root / "resource" / name
         if target.exists():
             if json.loads(target.read_bytes()) != json.loads(content):

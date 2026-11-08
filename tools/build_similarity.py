@@ -30,9 +30,9 @@ def main():
         parser.error('limit must be positive')
     resource = ROOT / 'resource'
     read = lambda p: json.loads(p.read_bytes())
-    sounds = read(resource / args.version / 'sounds.json')
-    assets = read(resource / args.version / 'hash.json')
-    all_durations = read(resource / 'durations.json')
+    sounds = read(resource / args.version / 'sound-events.json')
+    assets = read(resource / args.version / 'audio-file-hashes.json')
+    all_durations = read(resource / 'audio-durations.json')
     durations = {sha1: all_durations[sha1] for sha1 in sorted(set(assets.values()))}
     tags = read(ROOT / 'tools/sound-tags.json')
     overrides = read(ROOT / 'tools/sound-tag-overrides.json')
@@ -134,8 +134,8 @@ def main():
     index['generation'] = generation
     directory = resource / args.version
     directory.mkdir(parents=True, exist_ok=True)
-    vector_name = 'vectors.sample.bin' if args.limit else 'vectors.bin'
-    index_name = 'tags.sample.json' if args.limit else 'tags.json'
+    vector_name = 'audio-embeddings.sample.bin' if args.limit else 'audio-embeddings.bin'
+    index_name = 'audio-tags.sample.json' if args.limit else 'audio-tags.json'
     write_binary(directory / vector_name, binary)
     write_json(directory / index_name, index)
     print(f'Saved {sum(bool(cs) for cs in events.values())} events; vectors={len(binary)} bytes; generation={generation}', flush=True)

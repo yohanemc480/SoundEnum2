@@ -43,9 +43,9 @@ def vorbis_duration(path):
 
 def build_durations(root, version, index_bytes=None):
     """対象バージョンの音声を解析し、ハッシュと秒数の対応を保存する。"""
-    index = json.loads(index_bytes or (root / "resource" / version / "hash.json").read_bytes())
+    index = json.loads(index_bytes or (root / "resource" / version / "audio-file-hashes.json").read_bytes())
     hashes = sorted(set(index.values()))
-    target = root / "resource" / "durations.json"
+    target = root / "resource" / "audio-durations.json"
     durations = json.loads(target.read_bytes()) if target.exists() else {}
     if not isinstance(durations, dict):
         raise ValueError("Invalid durations data")

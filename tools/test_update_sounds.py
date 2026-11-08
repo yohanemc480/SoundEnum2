@@ -35,7 +35,7 @@ class UpdateTests(unittest.TestCase):
                     self.assertEqual(command[0], updater.sys.executable)
                     self.assertTrue(kwargs["check"])
                     self.assertEqual(definition.read_bytes(), original)
-                    self.assertTrue((root / "resource/26.4/sounds.json").is_file())
+                    self.assertTrue((root / "resource/26.4/sound-events.json").is_file())
                     if fails:
                         raise subprocess.CalledProcessError(1, command)
 

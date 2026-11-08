@@ -12,8 +12,8 @@ BINS = 256
 def build_waveforms(root, version, hash_bytes=None):
     import numpy as np
     import soundfile as sf
-    hashes = sorted(set(json.loads(hash_bytes or (root / 'resource' / version / 'hash.json').read_bytes()).values()))
-    target = root / 'resource' / 'waveforms.json'
+    hashes = sorted(set(json.loads(hash_bytes or (root / 'resource' / version / 'audio-file-hashes.json').read_bytes()).values()))
+    target = root / 'resource' / 'audio-waveform-peaks.json'
     if target.exists():
         data = json.loads(target.read_bytes())
         if data.get('schemaVersion') != 1 or data.get('bins') != BINS or not isinstance(data.get('waveforms'), dict):
