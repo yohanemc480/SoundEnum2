@@ -1,6 +1,5 @@
 /** 画面に表示する文言。固定文言はプロパティ、値を含む文言は関数で参照する。 */
 export const Text = Object.freeze({
-    adjustPreviewVolume: "試聴音量を調整",
     appEyebrow: "MINECRAFT SOUND BROWSER",
     appTagline: "音を探して、聴いて、コマンドに。",
     appTitle: "SoundEnum — Minecraft Sound Browser",

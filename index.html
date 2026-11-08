@@ -64,10 +64,10 @@
             <svg class="preview-pause-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
           </button>
           <div class="preview-volume-control">
-            <button id="preview-volume-toggle" type="button" data-i18n-aria-label="adjustPreviewVolume" data-i18n-title="previewVolume" aria-controls="select-master-volume" aria-expanded="false">
+            <button id="preview-volume-toggle" type="button" data-i18n-aria-label="previewVolume" aria-controls="select-master-volume" aria-expanded="false">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 9v6h4l5 4V5L7 9H3zm12-1v8a5 5 0 0 0 0-8zm0-4v2a7 7 0 0 1 0 12v2a9 9 0 0 0 0-16z"/></svg>
             </button>
-            <div class="param" id="select-master-volume" role="group" data-i18n-aria-label="previewVolume" hidden></div>
+            <div class="param" id="select-master-volume" role="group" data-i18n-aria-label="previewVolume" aria-hidden="true" inert></div>
           </div>
           <output id="preview-time">0:00.0 / 0:00.0</output>
         </div>
