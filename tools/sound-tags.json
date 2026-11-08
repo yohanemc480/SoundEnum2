@@ -1,0 +1,11 @@
+[
+  {"id":"explosion","textKey":"tagExplosion","prompts":["The sound of an explosion.","A loud explosive blast."],"threshold":0.3},
+  {"id":"footstep","textKey":"tagFootstep","prompts":["The sound of footsteps.","Someone walking on a surface."],"threshold":0.3},
+  {"id":"glass","textKey":"tagGlass","prompts":["The sound of glass breaking.","Glass clinking and ringing."],"threshold":0.3},
+  {"id":"impact","textKey":"tagImpact","prompts":["The sound of a hit or impact.","An object being struck."],"threshold":0.3},
+  {"id":"metal","textKey":"tagMetal","prompts":["The sound of metal clanging.","A metallic ringing sound."],"threshold":0.3},
+  {"id":"stone","textKey":"tagStone","prompts":["The sound of rocks colliding.","Stone grinding and crumbling."],"threshold":0.3},
+  {"id":"voice","textKey":"tagVoice","prompts":["The sound of a voice.","A creature making a vocal sound."],"threshold":0.3},
+  {"id":"water","textKey":"tagWater","prompts":["The sound of splashing water.","Water flowing and bubbling."],"threshold":0.3},
+  {"id":"wood","textKey":"tagWood","prompts":["The sound of knocking on wood.","Wood cracking and creaking."],"threshold":0.3}
+]
