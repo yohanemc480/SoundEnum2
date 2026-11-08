@@ -6,13 +6,14 @@ import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
  */
 export class SelectSourceArea
 {
-    _button;
+    _select;
 
     constructor(appendTarget)
     {
         $(document).ready(() =>
         {
             let $selectPullDown = $('<select>').appendTo(appendTarget);
+            this._select = $selectPullDown;
             for (const key in MCCommandSoundSource)
             {
                 const displayText = MCCommandSoundSource[key];
@@ -32,5 +33,12 @@ export class SelectSourceArea
                 SoundManager.Instance.SetSource(MCCommandSoundSource[selectedKey]);
             });
         });
+    }
+
+    OnUpdateValue(source)
+    {
+        SoundManager.Instance.SetSource(source);
+        this._select.val(Object.keys(MCCommandSoundSource).find(key =>
+            MCCommandSoundSource[key] === SoundManager.Instance.GetSource()));
     }
 }

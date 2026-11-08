@@ -1,3 +1,4 @@
+import { LocalStorageSchema } from './LocalStorageSchema.js';
 import { confirmAction } from './ConfirmDialog.js';
 import { localStorageStore } from './LocalStorage.js';
 import { initializeVersionSelector } from './VersionSelector.js';
@@ -54,10 +55,19 @@ new HistoryManager();
 let outputArea = new OutputArea(".output", Text.commandOutput);
 
 // 各パラメータ選択エリアの追加
-new SelectSourceArea("#select-source");
-new SelectVolumeArea("#select-sound-volume");
-new SelectPitchArea("#select-pitch");
-new SelectMinVolumeArea("#select-min-volume");
+const sourceArea = new SelectSourceArea("#select-source");
+const volumeArea = new SelectVolumeArea("#select-sound-volume");
+const pitchArea = new SelectPitchArea("#select-pitch");
+const minVolumeArea = new SelectMinVolumeArea("#select-min-volume");
+$(document).ready(() => {
+    document.getElementById('reset-command-settings').addEventListener('click', () => {
+        const defaults = LocalStorageSchema.CommandSettings.createDefault();
+        sourceArea.OnUpdateValue(defaults.source);
+        volumeArea.OnUpdateValue(String(defaults.volume));
+        pitchArea.OnUpdateValue(String(defaults.pitch));
+        minVolumeArea.OnUpdateValue(String(defaults.minVolume));
+    });
+});
 
 new SelectMasterVolumeArea("#select-master-volume");
 initializeBrowserTabs();

@@ -202,3 +202,5 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .confirm-dialog.is-closing { animation: confirm-leave .12s ease-in both; }
 .confirm-dialog.is-closing::backdrop { animation: confirm-backdrop-leave .12s ease-in both; }
 @media (prefers-reduced-motion: reduce) { .confirm-dialog[open], .confirm-dialog[open]::backdrop { animation: none; } }
+
+#reset-command-settings { margin-top: 20px; width: 100%; }

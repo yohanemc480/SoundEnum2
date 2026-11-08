@@ -44,6 +44,7 @@ export const Text = Object.freeze({
     previewVolume: "試聴音量",
     previous: "前へ",
     queryPlaceholder: "例：bell、ambient",
+    resetCommandSettings: "デフォルトに戻す",
     retry: "再読み込み",
     searchAssignedTags: "この音のタグ",
     searchBase: "類似音の基準（空欄でタグ検索）",
