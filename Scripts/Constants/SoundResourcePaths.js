@@ -12,16 +12,16 @@ export class SoundResourcePaths
 
     static get Hash()
     {
-        return `resource/${this.Version}hash.json`;
+        return `resource/${this.Version}/hash.json`;
     }
 
     static get Sounds()
     {
-        return `resource/${this.Version}sounds.json`;
+        return `resource/${this.Version}/sounds.json`;
     }
 
     static get Search()
     {
-        return `resource/${this.Version}search.json`;
+        return `resource/${this.Version}/search.json`;
     }
 }

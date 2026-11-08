@@ -69,7 +69,7 @@ def find_new_resource_files(root, version, resources):
     """既存ファイルとの不一致を検出し、新規保存するファイルだけを返す。"""
     files = []
     for suffix, content in resources.items():
-        name = f"{version}{suffix}.json"
+        name = f"{version}/{suffix}.json"
         target = root / "resource" / name
         if target.exists():
             if json.loads(target.read_bytes()) != json.loads(content):
@@ -82,9 +82,10 @@ def find_new_resource_files(root, version, resources):
 def save_resource_files(files):
     """既存ファイルを上書きせず、新しいバージョンのJSONを保存する。"""
     for target, content in files:
+        target.parent.mkdir(parents=True, exist_ok=True)
         with target.open("xb") as output:
             output.write(content)
-        print(f"Saved resource/{target.name}")
+        print(f"Saved resource/{target.parent.name}/{target.name}")
 
 
 def collect_audio_assets(index_bytes):

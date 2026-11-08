@@ -16,7 +16,7 @@ export class SoundSearchResource
         const manifestUrl = new URL(SoundResourcePaths.Search, location.href);
         const manifest = await (await read(manifestUrl)).json();
         if (manifest.schemaVersion !== 1 || manifest.version !== SoundResourcePaths.Version || !/^[a-f0-9]{64}$/.test(manifest.generation)) throw new Error('Invalid manifest');
-        const prefix = `search/${manifest.version}/${manifest.generation}/`;
+        const prefix = `search/${manifest.generation}/`;
         if (manifest.index !== prefix + 'index.json' || manifest.vectors !== prefix + 'vectors.bin') throw new Error('Invalid paths');
         const [index, binary] = await Promise.all([
             read(new URL(manifest.index, manifestUrl)).then(r => r.json()),

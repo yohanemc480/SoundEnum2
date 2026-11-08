@@ -108,9 +108,9 @@ CLAPを使用し、必要なPythonライブラリを導入する方針は決定�
 | `tools/sound-tags.json`（追加予定） | タグID、表示文言キー、説明文、軸、閾値 |
 | `tools/sound-tag-overrides.json`（追加予定） | ハッシュごとの手動追加・除外タグ |
 | `.cache/clap/` | モデルと正規化ベクトル。Web配信・Git管理対象外 |
-| `resource/{version}similarity.json` | 現行のハッシュ別近傍一覧。単独では複合絞り込みの完全な検索には不足 |
-| `resource/{version}search-index.json`（追加予定） | IDと候補音声の対応、タグ判定、生成メタデータ |
-| `resource/{version}audio-vectors.bin`（追加予定） | 全件の正規化ベクトル。ブラウザで絞り込み後の類似度を計算する用途 |
+| `resource/{version}/similarity.json` | 現行のハッシュ別近傍一覧。単独では複合絞り込みの完全な検索には不足 |
+| `resource/{version}/search-index.json`（追加予定） | IDと候補音声の対応、タグ判定、生成メタデータ |
+| `resource/{version}/audio-vectors.bin`（追加予定） | 全件の正規化ベクトル。ブラウザで絞り込み後の類似度を計算する用途 |
 
 ベクトルの行順と次元、バイト形式はsearch-indexに記録する。初期案はlittle-endianのFloat32で、音声数×次元数×4バイトの容量を見積もる。実測して配信容量が大きければ分割読み込みや量子化を検討する。
 

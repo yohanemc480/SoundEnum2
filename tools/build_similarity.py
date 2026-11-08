@@ -29,9 +29,9 @@ def main():
         parser.error('limit must be positive')
     resource = ROOT / 'resource'
     read = lambda p: json.loads(p.read_bytes())
-    sounds = read(resource / f'{args.version}sounds.json')
-    assets = read(resource / f'{args.version}hash.json')['objects']
-    durations = read(resource / f'{args.version}durations.json')
+    sounds = read(resource / args.version / 'sounds.json')
+    assets = read(resource / args.version / 'hash.json')['objects']
+    durations = read(resource / args.version / 'durations.json')
     tags = read(ROOT / 'tools/sound-tags.json')
     overrides = read(ROOT / 'tools/sound-tag-overrides.json')
     validate_tags(tags, overrides)
@@ -131,15 +131,15 @@ def main():
              'events': entries, 'vectorHash': vector_hash, 'sample': bool(args.limit)}
     generation = digest(index)
     index['generation'] = generation
-    directory = resource / 'search' / args.version / generation
+    directory = resource / args.version / 'search' / generation
     directory.mkdir(parents=True, exist_ok=True)
     write_binary(directory / 'vectors.bin', binary)
     write_json(directory / 'index.json', index)
     manifest = {'schemaVersion': 1, 'version': args.version, 'generation': generation,
-                'index': f'search/{args.version}/{generation}/index.json',
-                'vectors': f'search/{args.version}/{generation}/vectors.bin'}
+                'index': f'search/{generation}/index.json',
+                'vectors': f'search/{generation}/vectors.bin'}
     suffix = 'search.sample.json' if args.limit else 'search.json'
-    write_json(resource / f'{args.version}{suffix}', manifest)
+    write_json(resource / args.version / suffix, manifest)
     print(f'Saved {len(entries)} events; vectors={len(binary)} bytes; generation={generation}', flush=True)
 
 

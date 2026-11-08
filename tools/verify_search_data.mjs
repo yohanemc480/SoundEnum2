@@ -38,8 +38,8 @@ try {
     const start = performance.now();
     const index = await resource.load();
     const loadMs = performance.now() - start;
-    const hashes = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}hash.json`, root)));
-    const sounds = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}sounds.json`, root)));
+    const hashes = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/hash.json`, root)));
+    const sounds = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/sounds.json`, root)));
     const resolved = resolveSoundEvents(sounds);
     for (const event of index.events) {
         assert.ok(event.name in sounds, event.name);
@@ -68,7 +68,7 @@ try {
             top: result.results.slice(0, 5).map(row => ({ name: row.name, score: +row.score.toFixed(3) })) });
     }
     const manifest = JSON.parse(await readFile(new URL(SoundResourcePaths.Search, root)));
-    const binary = await readFile(new URL(`resource/${manifest.vectors}`, root));
+    const binary = await readFile(new URL(manifest.vectors, new URL(SoundResourcePaths.Search, root)));
     assert.equal(createHash('sha256').update(binary).digest('hex'), index.vectorHash);
     console.log(JSON.stringify({ events: index.events.length, audio: index.hashes.length,
         vectorBytes: binary.length, loadMs: Math.round(loadMs), tagCounts, reports }, null, 2));
