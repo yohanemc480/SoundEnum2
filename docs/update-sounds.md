@@ -3,7 +3,7 @@
 リポジトリのルートで実行します（Python 3、インターネット接続が必要）。
 
 ```powershell
-python tools/update_sounds.py
+.venv/Scripts/python.exe tools/update_sounds.py
 ```
 
 最新正式版の情報をMojangから取得し、`resource/<バージョン>/hash.json` と `resource/<バージョン>/sounds.json` に保存します。
@@ -15,7 +15,7 @@ python tools/update_sounds.py
 
 ローカル再生の前にこのコマンドを実行し、公開時は `resource/audio/` も配置してください。再生時にMojangへアクセスするフォールバックはありません。
 
-再生時間もOGGから集計し、`resource/<バージョン>/durations.json` に保存します。保存済み音声だけから再集計する場合（通信なし）：
+再生時間もOGGから集計し、`resource/durations.json` に保存します。保存済み音声だけから再集計する場合（通信なし）：
 
 ```powershell
 python tools/build_durations.py
@@ -24,3 +24,13 @@ python tools/build_durations.py
 バージョン固有のJSONと検索データは `resource/<バージョン>/` にまとめます。現在保持するバージョンは26.3のみです。音声はバージョン間で共有するため `resource/audio/` に保持します。
 
 hash.jsonは音声パス（minecraft/sounds/～.ogg）をキー、SHA-1文字列を値とする対応表です。音声以外の情報やサイズは保存しません。ダウンロード時のサイズ・ハッシュ検証には、取得した公式アセット一覧をメモリ上で使用します。sounds.jsonは公式データの候補音をすべてオブジェクト形式に統一して保存します。文字列の候補はnameだけを持つオブジェクトに変換し、既存の属性・既定値の省略・type: eventによる参照は維持します。
+
+波形は`resource/waveforms.json`へ事前生成します。音声ハッシュごとに最大256区間の絶対振幅ピークを0〜255の整数で保存し、短冊と試聴欄で共用します。ブラウザでは波形用の音声取得・デコードは行いません。更新スクリプトにもnumpy・soundfileが必要です（既存のCLAP用仮想環境を利用できます）。
+
+波形のみ再生成する場合：
+
+```powershell
+.venv/Scripts/python.exe tools/build_waveforms.py 26.3
+```
+
+再生時間と波形は音声ハッシュをキーとする全バージョン共通データです。生成時は既存の有効な値を再利用し、未登録・不正な値だけを生成します。別バージョンの値は削除しません。波形の仕様が変わる場合は既存ファイルを明示的に再生成してください。

@@ -1,3 +1,4 @@
+import { getWaveform } from "./WaveformResource.js";
 export class PreviewWaveform
 {
     constructor(audio, canvas)
@@ -6,31 +7,21 @@ export class PreviewWaveform
         this.peaks = null;
         this.progress = 0;
         this.generation = 0;
-        audio.addEventListener('previewreset', () => {
+        audio.addEventListener('previewreset', event => {
             ++this.generation;
             this.peaks = null;
             this.setProgress(0);
+            this.load(event.detail);
         });
-        audio.addEventListener('previewdata', event => this.load(event.detail));
         new ResizeObserver(() => this.draw()).observe(canvas);
     }
 
-    async load(blob)
+    async load(hash)
     {
         const generation = this.generation;
         try {
-            this.decoder ??= new OfflineAudioContext(1, 1, 44100);
-            const buffer = await this.decoder.decodeAudioData(await blob.arrayBuffer());
+            const peaks = await getWaveform(hash);
             if (generation !== this.generation) return;
-            const peaks = new Float32Array(Math.min(1024, buffer.length));
-            for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
-                const samples = buffer.getChannelData(channel);
-                for (let bin = 0; bin < peaks.length; bin++) {
-                    const start = Math.floor(bin * samples.length / peaks.length);
-                    const end = Math.floor((bin + 1) * samples.length / peaks.length);
-                    for (let i = start; i < end; i++) peaks[bin] = Math.max(peaks[bin], Math.abs(samples[i]));
-                }
-            }
             this.peaks = peaks;
             this.draw();
         } catch {

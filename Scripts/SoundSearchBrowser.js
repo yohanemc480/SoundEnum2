@@ -1,4 +1,5 @@
 import { Text } from './Text.js';
+import { SearchWaveforms } from './SearchWaveforms.js';
 import { SoundSearchResource } from './SoundSearchResource.js';
 import { SoundManager } from './Singletons/SoundManager.js';
 import { HistoryManager } from './Singletons/HistoryManager.js';
@@ -36,6 +37,7 @@ export class SoundSearchBrowser
 
         this.element = id => document.getElementById(`search-${id}`);
         this.form = this.element('form');
+        this.waveforms = new SearchWaveforms(this.element('list'));
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
         this.form.addEventListener('input', () => {
             ++this.requestId;
@@ -54,6 +56,7 @@ export class SoundSearchBrowser
         if (this.index || this.loading) return;
         this.loading = true;
         ++this.requestId;
+        this.waveforms.clear();
         this.element('list').replaceChildren();
         this.element('pagination').hidden = true;
         this.form.disabled = true;
@@ -91,6 +94,7 @@ export class SoundSearchBrowser
         if (!this.index) return;
         this.candidatePopover.hidePopover();
         const id = ++this.requestId;
+        this.waveforms.clear();
         this.element('list').replaceChildren();
         this.element('pagination').hidden = true;
         const min = this.element('min').value === '' ? 0 : this.element('min').valueAsNumber;
@@ -140,6 +144,7 @@ export class SoundSearchBrowser
 
     render()
     {
+        this.waveforms.clear();
         const list = this.element('list');
         this.candidatePopover.hidePopover();
         list.replaceChildren(); list.scrollTop = 0;
@@ -192,7 +197,10 @@ export class SoundSearchBrowser
             content.append(heading, metadata);
             const actions = document.createElement('div'); actions.className = 'search-row-actions';
             actions.append(similar);
-            main.append(content, actions); row.append(main);
+            const waveform = document.createElement('canvas');
+            waveform.className = 'search-row-waveform';
+            waveform.setAttribute('aria-hidden', 'true');
+            main.append(content, waveform, actions); row.append(main);
             if (entry.count > 1) {
                 const trigger = document.createElement('button'); trigger.type = 'button';
                 trigger.textContent = Text.searchCandidate(entry.count);
@@ -227,6 +235,7 @@ export class SoundSearchBrowser
                 heading.append(trigger);
             }
             list.append(row);
+            this.waveforms.observe(waveform, entry.candidate.hash);
         }
     }
 }

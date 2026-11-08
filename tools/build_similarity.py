@@ -31,7 +31,8 @@ def main():
     read = lambda p: json.loads(p.read_bytes())
     sounds = read(resource / args.version / 'sounds.json')
     assets = read(resource / args.version / 'hash.json')
-    durations = read(resource / args.version / 'durations.json')
+    all_durations = read(resource / 'durations.json')
+    durations = {sha1: all_durations[sha1] for sha1 in sorted(set(assets.values()))}
     tags = read(ROOT / 'tools/sound-tags.json')
     overrides = read(ROOT / 'tools/sound-tag-overrides.json')
     validate_tags(tags, overrides)

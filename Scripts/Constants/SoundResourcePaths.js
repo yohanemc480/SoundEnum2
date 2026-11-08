@@ -20,6 +20,11 @@ export class SoundResourcePaths
         return `resource/${this.Version}/sounds.json`;
     }
 
+    static get Waveforms()
+    {
+        return `resource/waveforms.json`;
+    }
+
     static get SearchIndex()
     {
         return `resource/${this.Version}/index.json`;

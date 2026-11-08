@@ -37,7 +37,7 @@ pipが`No matching distribution found`を表示した場合、それだけでは
 
 ## 入出力と再実行
 
-入力は`resource/{version}/sounds.json`、`resource/{version}/hash.json`、`resource/{version}/durations.json`、`resource/audio/`です。
+入力は`resource/{version}/sounds.json`、`resource/{version}/hash.json`、`resource/durations.json`、`resource/audio/`です。
 
 - `.cache/clap/`：モデルと音声ベクトル。モデルrevision・前処理・ライブラリバージョン・実行デバイスで識別。破損したベクトルは再生成。
 - `resource/{version}/index.json`：イベント、音声、タグ、生成条件。

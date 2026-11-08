@@ -1,5 +1,6 @@
 """保存済みのOGG Vorbisから再生時間を集計する（通信は行わない）。"""
 import json
+import math
 from pathlib import Path
 import re
 import struct
@@ -44,12 +45,17 @@ def build_durations(root, version, index_bytes=None):
     """対象バージョンの音声を解析し、ハッシュと秒数の対応を保存する。"""
     index = json.loads(index_bytes or (root / "resource" / version / "hash.json").read_bytes())
     hashes = sorted(set(index.values()))
-    durations = {}
+    target = root / "resource" / "durations.json"
+    durations = json.loads(target.read_bytes()) if target.exists() else {}
+    if not isinstance(durations, dict):
+        raise ValueError("Invalid durations data")
     for sha1 in hashes:
         if not re.fullmatch(r"[0-9a-f]{40}", sha1):
             raise ValueError("Invalid audio hash")
+        value = durations.get(sha1)
+        if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value >= 0:
+            continue
         durations[sha1] = vorbis_duration(root / "resource" / "audio" / f"{sha1}.ogg")
-    target = root / "resource" / version / "durations.json"
     target.parent.mkdir(parents=True, exist_ok=True)
     content = (json.dumps(durations, indent=2) + "\n").encode()
     if not target.exists() or target.read_bytes() != content:
@@ -62,7 +68,7 @@ def build_durations(root, version, index_bytes=None):
         finally:
             if temporary is not None and temporary.exists():
                 temporary.unlink()
-    print(f"Durations: {len(durations)} files -> resource/{version}/{target.name}")
+    print(f"Durations: {len(durations)} files -> resource/{target.name}")
 
 
 if __name__ == "__main__":

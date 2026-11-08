@@ -41,7 +41,7 @@ export class SoundManager extends SingletonBase
         var soundHashResource = ResourceManager.Instance.GetSoundHashResouce();
         var rawSound = selectedRawSound ?? commandSound.GetRawSoundRandomly();
         this._audio.dataset.soundId = commandSound.GetSoundName();
-        this._audio.dispatchEvent(new Event('previewreset'));
+        this._audio.dispatchEvent(new CustomEvent('previewreset', { detail: rawSound.GetHash(soundHashResource) }));
         this._audio.removeAttribute('src');
         this._audio.load();
         if (this._audioUrl) URL.revokeObjectURL(this._audioUrl);
@@ -55,7 +55,6 @@ export class SoundManager extends SingletonBase
             if (controller.signal.aborted) return;
             this._audioUrl = URL.createObjectURL(blob);
             this._audio.src = this._audioUrl;
-            this._audio.dispatchEvent(new CustomEvent('previewdata', { detail: blob }));
         } catch (error) {
             if (!controller.signal.aborted) this._audio.dispatchEvent(new Event('previewerror'));
             return;

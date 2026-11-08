@@ -112,6 +112,8 @@ h3 > span:first-child { margin-right: 8px; color: var(--accent); font-family: mo
 .search-row { display: flex; flex-direction: column; padding: 3px 0; }
 .search-row-main { display: flex; gap: 8px; align-items: center; padding-right: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); cursor: pointer; }
 .search-row-content { flex: 1; min-width: 0; padding: 6px 10px; }
+.search-row-waveform { width: clamp(80px, 14vw, 180px); height: 30px; flex: 0 0 auto; opacity: .65; pointer-events: none; }
+@media (max-width: 900px) { .search-row-waveform { display: none; } }
 .search-row-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .search-preview { min-width: 0; text-align: left; }
 .search-row-metadata { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }

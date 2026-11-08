@@ -33,6 +33,11 @@ export class MCRawSound
         }
     }
 
+    GetHash(soundHashResource)
+    {
+        return soundHashResource.NameToHash(this._rawSoundName);
+    }
+
     GetPitch()
     {
         return this._pitch;
@@ -45,7 +50,7 @@ export class MCRawSound
 
     /** サイト内に保存した音声ファイルの参照先を返す。 */
     CreateLink(soundHashResource) {
-        let hash = soundHashResource.NameToHash(this._rawSoundName);
+        let hash = this.GetHash(soundHashResource);
         return SoundResourcePaths.Audio(hash);
     }
 }
