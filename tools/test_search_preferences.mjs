@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizePreferences, readPreferences, savePreferences, restoreSearchPreferences } from '../Scripts/SearchPreferences.js';
+import { normalizePreferences } from '../Scripts/LocalStorageSchema.js';
+import { readPreferences, savePreferences, restoreSearchPreferences } from '../Scripts/SearchPreferences.js';
 
 test('preferences persist all fields and partial updates preserve search conditions', () => {
     let value = null;

@@ -17,6 +17,14 @@ export class LocalStorage {
         this.backend.setItem(key, JSON.stringify(value));
     }
 
+    readEntry(schema) {
+        return schema.normalize(this.read(schema.key, schema.createDefault()));
+    }
+
+    writeEntry(schema, value) {
+        this.write(schema.key, schema.normalize(value));
+    }
+
     remove(key) {
         this.backend.removeItem(key);
     }

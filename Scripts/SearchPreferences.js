@@ -1,26 +1,13 @@
 import { localStorageStore } from './LocalStorage.js';
-
-const KEY = 'soundenum.search-preferences';
-
-export function normalizePreferences(value = {}) {
-    value = value && typeof value === 'object' ? value : {};
-    return {
-        version: typeof value.version === 'string' ? value.version : '',
-        query: typeof value.query === 'string' ? value.query : '',
-        base: typeof value.base === 'string' ? value.base : '',
-        tags: Array.isArray(value.tags) ? [...new Set(value.tags.filter(tag => typeof tag === 'string'))] : [],
-        excludeMultiple: value.excludeMultiple === true,
-        tab: value.tab === 'favorites-tab' ? 'favorites-tab' : 'search-tab',
-    };
-}
+import { LocalStorageSchema, normalizePreferences } from './LocalStorageSchema.js';
 
 export function readPreferences() {
-    try { return normalizePreferences(localStorageStore.read(KEY, {})); }
+    try { return localStorageStore.readEntry(LocalStorageSchema.SearchPreferences); }
     catch (error) { console.warn('Cannot read search preferences', error); return normalizePreferences(); }
 }
 
 export function savePreferences(changes) {
-    try { localStorageStore.write(KEY, normalizePreferences({ ...readPreferences(), ...changes })); }
+    try { localStorageStore.writeEntry(LocalStorageSchema.SearchPreferences, { ...readPreferences(), ...changes }); }
     catch (error) { console.warn('Cannot save search preferences', error); }
 }
 

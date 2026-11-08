@@ -1,18 +1,16 @@
 import { localStorageStore } from './LocalStorage.js';
-
-const KEY = 'soundenum.favorites';
+import { LocalStorageSchema } from './LocalStorageSchema.js';
 
 export class Favorites {
     constructor(storage = localStorageStore) {
         this.storage = storage;
-        const saved = storage.read(KEY, []);
-        if (!Array.isArray(saved) || saved.some(name => typeof name !== 'string')) throw new Error('Invalid favorites');
+        const saved = storage.readEntry(LocalStorageSchema.Favorites);
         this.names = new Set(saved);
     }
     toggle(name) {
         const next = new Set(this.names);
         if (next.has(name)) next.delete(name); else next.add(name);
-        this.storage.write(KEY, [...next]);
+        this.storage.writeEntry(LocalStorageSchema.Favorites, [...next]);
         this.names = next;
     }
 }
