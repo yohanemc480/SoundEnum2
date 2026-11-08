@@ -176,7 +176,7 @@ export class SoundSearchBrowser
             const metadata = document.createElement('span'); metadata.className = 'search-row-metadata';
             if (detail.textContent) metadata.append(detail);
             metadata.append(this.createTagBadges(entry.tags));
-            preview.append(name, metadata);
+            preview.append(name);
             const playCandidate = (candidate, button) => {
                 const manager = SoundManager.Instance;
                 const command = new MCCommandSound(entry.name, manager.GetSource(), MCCommandSelector.All, manager.GetVolume(), manager.GetPitch(), manager.GetMinVolume());
@@ -193,9 +193,17 @@ export class SoundSearchBrowser
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
             similar.addEventListener('click', () => { this.element('base').value = entry.name; this.search(); });
             const main = document.createElement('div'); main.className = 'search-row-main';
+            main.addEventListener('click', event => {
+                if (event.target.closest('button')) return;
+                preview.click();
+            });
+            const content = document.createElement('div'); content.className = 'search-row-content';
+            const heading = document.createElement('div'); heading.className = 'search-row-heading';
+            heading.append(preview);
+            content.append(heading, metadata);
             const actions = document.createElement('div'); actions.className = 'search-row-actions';
             actions.append(similar);
-            main.append(preview, actions); row.append(main);
+            main.append(content, actions); row.append(main);
             if (entry.count > 1) {
                 const trigger = document.createElement('button'); trigger.type = 'button';
                 trigger.textContent = Text.searchCandidate(entry.count);
@@ -226,7 +234,8 @@ export class SoundSearchBrowser
                     // 別の行から開き直した場合も、新しい位置でtoggleイベントを受ける。
                     panel.hidePopover();
                 });
-                actions.append(trigger);
+                trigger.className = 'search-candidate-trigger';
+                heading.append(trigger);
             }
             list.append(row);
         }
