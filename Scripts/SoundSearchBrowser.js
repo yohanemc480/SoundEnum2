@@ -1,3 +1,4 @@
+import { readPreferences, savePreferences, restoreSearchPreferences } from './SearchPreferences.js';
 import { showToast } from './Toast.js';
 import { Favorites } from './Favorites.js';
 import { Text } from './Text.js';
@@ -45,6 +46,7 @@ export class SoundSearchBrowser
         this.waveforms = new SearchWaveforms(document.querySelector('.browser-panel'));
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
         this.form.addEventListener('input', () => {
+            this.saveSearchPreferences();
             ++this.requestId;
             clearTimeout(this.timer);
             this.timer = setTimeout(() => this.search(), 120);
@@ -93,6 +95,11 @@ export class SoundSearchBrowser
                 label.append(checkbox, document.createTextNode(Text[tag.textKey]));
                 tags.append(label);
             }
+            const saved = restoreSearchPreferences(readPreferences(), index);
+            this.element('query').value = saved.query;
+            this.element('base').value = saved.base;
+            this.element('exclude-multiple').checked = saved.excludeMultiple;
+            tags.querySelectorAll('input').forEach(input => { input.checked = saved.tags.includes(input.value); });
             this.form.disabled = false;
             await this.search();
             this.renderFavorites();
@@ -105,9 +112,17 @@ export class SoundSearchBrowser
         } finally { this.loading = false; }
     }
 
+    saveSearchPreferences()
+    {
+        savePreferences({ query: this.element('query').value, base: this.element('base').value.trim(),
+            tags: [...this.element('tags').querySelectorAll('input:checked')].map(input => input.value),
+            excludeMultiple: this.element('exclude-multiple').checked });
+    }
+
     async search()
     {
         if (!this.index) return;
+        this.saveSearchPreferences();
         this.candidatePopover.hidePopover();
         const id = ++this.requestId;
         this.waveforms.clear();

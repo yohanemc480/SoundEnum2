@@ -1,9 +1,11 @@
+import { readPreferences, savePreferences } from './SearchPreferences.js';
 /** 各検索画面から独立したタブの操作とキーボード移動。 */
 export function initializeBrowserTabs()
 {
     const tabs = [...document.querySelectorAll('[data-browser-tab]')];
     tabs.forEach((tab, index) => {
         tab.addEventListener('click', () => {
+            savePreferences({ tab: tab.id });
             tabs.forEach(other => {
                 const selected = other === tab;
                 other.setAttribute('aria-selected', selected);
@@ -18,4 +20,5 @@ export function initializeBrowserTabs()
             tabs[next].focus(); tabs[next].click();
         });
     });
+    tabs.find(tab => tab.id === readPreferences().tab)?.click();
 }

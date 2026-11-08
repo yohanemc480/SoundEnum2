@@ -1,3 +1,4 @@
+import { readPreferences, savePreferences } from './SearchPreferences.js';
 import { Text } from './Text.js';
 
 export function selectResourceVersion(versions, requested)
@@ -16,11 +17,13 @@ export async function initializeVersionSelector()
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const versions = await response.json();
         const url = new URL(location.href);
-        const version = selectResourceVersion(versions, url.searchParams.get('version'));
+        const version = selectResourceVersion(versions, url.searchParams.get('version') ?? readPreferences().version);
         select.replaceChildren(...versions.map(v => new Option(v, v)));
         select.value = version;
+        savePreferences({ version });
         select.disabled = false;
         select.addEventListener('change', () => {
+            savePreferences({ version: select.value });
             url.searchParams.set('version', select.value);
             location.assign(url.href);
         });
