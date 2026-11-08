@@ -68,12 +68,4 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
         return true;
     }
 
-    /**
-     * playsoundの全サウンド名を取得する。
-     * @returns
-     */
-    GetAllCommandSoundName()
-    {
-        return Object.keys(this._jsonData);
-    }
 }
