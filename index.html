@@ -18,17 +18,17 @@
       <section class="panel browser-panel">
         <div class="section-heading"><h2 data-i18n="browserTitle"></h2></div>
         <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
-          <button type="button" id="category-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="category-panel" data-i18n="category"></button>
-          <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="search-panel" tabindex="-1" data-i18n="searchTitle"></button>
+          <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="search-panel" data-i18n="searchTitle"></button>
+          <button type="button" id="category-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="category-panel" tabindex="-1" data-i18n="category"></button>
         </div>
-        <div id="category-panel" role="tabpanel" aria-labelledby="category-tab">
+        <div id="category-panel" role="tabpanel" aria-labelledby="category-tab" hidden>
         <div class="sound-genres-list">
           <section class="genre-column"><h3><span>01</span> <span data-i18n="category"></span></h3><div class="sound-genres" id="sound-genres-first"></div></section>
           <section class="genre-column"><h3><span>02</span> <span data-i18n="target"></span></h3><div class="sound-genres" id="sound-genres-second" data-i18n-data-empty-text="selectLeft"></div></section>
           <section class="genre-column"><h3><span>03</span> <span data-i18n="sound"></span></h3><div class="sound-genres" id="sound-genres-third" data-i18n-data-empty-text="selectLeft"></div></section>
         </div>
         </div>
-        <div id="search-panel" role="tabpanel" aria-labelledby="search-tab" hidden>
+        <div id="search-panel" role="tabpanel" aria-labelledby="search-tab">
           <form id="search-form-container">
             <fieldset id="search-form" disabled>
               <div class="search-filters">

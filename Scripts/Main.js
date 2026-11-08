@@ -57,4 +57,5 @@ GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);
 
 new SelectMasterVolumeArea("#select-master-volume");
 initializeBrowserTabs();
-new SoundSearchBrowser(outputArea);
+const searchBrowser = new SoundSearchBrowser(outputArea);
+searchBrowser.load();
