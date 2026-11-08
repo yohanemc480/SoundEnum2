@@ -224,7 +224,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .clearable-input:has(input:placeholder-shown) .input-clear { visibility: hidden; }
 
 .composition-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
-.composition-row { padding: 12px; margin: 6px 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.composition-row { padding: 4px 8px; margin: 4px 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 .composition-row > .section-heading { flex-wrap: nowrap; margin-bottom: 0; }
 .composition-row .composition-name { font: 12px/1.5 Consolas, monospace; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .search-row button.composition-add { font-size: 20px; line-height: 18px; width: 34px; padding: 6px; }
@@ -258,3 +258,11 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 
 #composition-play .composition-stop-icon, #composition-play.is-playing .composition-play-icon { display: none; }
 #composition-play.is-playing .composition-stop-icon { display: block; }
+
+.composition-command { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.composition-command .section-heading { margin-bottom: 8px; }
+#composition-output { min-height: 0; }
+#composition-output .output-text { height: 72px; min-height: 0; white-space: pre-wrap; overflow-y: auto; }
+
+.composition-actions > .settings-button:not(.close-button) { padding: 3px 8px; min-height: 28px; }
+.composition-row .composition-name { min-height: 28px; }

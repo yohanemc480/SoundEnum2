@@ -1,3 +1,5 @@
+import { OutputArea } from './OutputArea.js';
+import { formatSoundCommand } from './FormatSoundCommand.js';
 import { SelectMasterVolumeArea } from './SelectMasterVolumeArea.js';
 import { CompositionWaveform } from './CompositionWaveform.js';
 import { mountSoundSettings } from './SoundSettings.js';
@@ -23,6 +25,7 @@ export class SoundComposition {
         try { this.rows = localStorageStore.readEntry(LocalStorageSchema.Composition); }
         catch (error) { console.error(error); this.writable = false; showToast(Text.compositionFailure); }
         this.element = id => document.getElementById(`composition-${id}`);
+        this.output = new OutputArea('#composition-output', Text.commandOutput);
         this.waveform = new CompositionWaveform(this.element('waveform'), this.element('time'));
         this.volume = SoundManager.Instance.GetMasterVolume();
         new SelectMasterVolumeArea('#composition-volume', { value: this.volume, onChange: value => {
@@ -44,6 +47,7 @@ export class SoundComposition {
             localStorageStore.writeEntry(LocalStorageSchema.Composition, rows);
             this.rows = rows;
             this.refreshWaveform();
+            this.updateOutput();
             return true;
         } catch (error) { console.error(error); showToast(Text.compositionFailure); return false; }
     }
@@ -59,7 +63,11 @@ export class SoundComposition {
             return candidate ? [{ ...row, candidate }] : [];
         }));
     }
+    updateOutput() {
+        this.output.SetText(this.rows.map(row => formatSoundCommand(row)).join('\n'));
+    }
     render() {
+        this.updateOutput();
         this.refreshWaveform();
         const list = this.element('list');
         this.disposePopovers?.forEach(dispose => dispose());

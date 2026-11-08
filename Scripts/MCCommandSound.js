@@ -1,3 +1,4 @@
+import { formatSoundCommand } from './FormatSoundCommand.js';
 import { selectWeightedCandidate } from './SelectWeightedCandidate.js';
 import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
 import { MCCommandSelector } from "./Constants/MCCommandSelector.js";
@@ -71,7 +72,7 @@ export class MCCommandSound
      */
     ToString()
     {
-        return `playsound minecraft:${this._soundName} ${this._source} ${this._selector} ${this._position} ${this._volume} ${this._pitch} ${this._minVolume}`;
+        return formatSoundCommand({ name: this._soundName, source: this._source, volume: this._volume, pitch: this._pitch, minVolume: this._minVolume }, this._selector, this._position);
     }
 
     /**

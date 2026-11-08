@@ -19,7 +19,6 @@ export const Text = Object.freeze({
     compositionCount: count => `${count}音選択中`,
     compositionEmpty: "検索結果やお気に入りの＋から音を追加できます。",
     compositionFailure: "組み合わせの読み込み・保存・試聴に失敗しました。",
-    compositionNote: "複数候補の音は再生ごとに重み付きで選びます。",
     compositionPlay: "まとめて試聴",
     compositionRemove: "組み合わせから削除",
     compositionStop: "停止",
