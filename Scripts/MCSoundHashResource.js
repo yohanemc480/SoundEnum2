@@ -43,12 +43,8 @@ export class MCSoundHashResource extends ResourceBase
      * @returns bool
      */
     IsSoundResourceExist(rawSoundResourceName) {
-        let keys = Object.keys(this._jsonData["objects"]);
-        if (!keys.includes(this.NameToFullPath(rawSoundResourceName)))
-        {
-            return false;
-        }
-        return true;
+        return Object.prototype.hasOwnProperty.call(
+            this._jsonData["objects"], this.NameToFullPath(rawSoundResourceName));
     }
 
     /**
