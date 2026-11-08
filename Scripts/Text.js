@@ -19,6 +19,7 @@ export const Text = Object.freeze({
     compositionCount: count => `${count}音選択中`,
     compositionEmpty: "検索結果やお気に入りの＋から音を追加できます。",
     compositionFailure: "組み合わせの読み込み・保存・試聴に失敗しました。",
+    compositionLimit: limit => `組み合わせは最大${limit}音までです`,
     compositionPlay: "まとめて試聴",
     compositionRemove: "組み合わせから削除",
     compositionStop: "停止",

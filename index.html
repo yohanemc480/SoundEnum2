@@ -64,10 +64,6 @@
     <aside class="sub" data-i18n-aria-label="previewAndComposition">
       <section class="panel preview-panel">
         <div class="section-heading preview-heading"><h2 data-i18n="preview"></h2><span id="preview-sound-id" aria-live="polite"></span><span class="preview-indicator"><span id="preview-loading" role="status" data-i18n-aria-label="loading" hidden></span></span></div>
-        <div class="preview-waveform">
-          <canvas id="preview-waveform" aria-hidden="true"></canvas>
-          <input id="preview-seek" type="range" min="0" max="0" step="0.01" value="0" data-i18n-aria-label="seek" disabled>
-        </div>
         <div class="preview-transport">
           <button id="preview-toggle" type="button" class="transport-button" data-i18n-aria-label="play" data-i18n-title="play" disabled>
             <svg class="preview-play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
@@ -79,6 +75,10 @@
             </button>
             <div class="param" id="select-master-volume" role="group" data-i18n-aria-label="previewVolume" aria-hidden="true" inert></div>
           </div>
+          <div class="preview-waveform">
+            <canvas id="preview-waveform" aria-hidden="true"></canvas>
+            <input id="preview-seek" type="range" min="0" max="0" step="0.01" value="0" data-i18n-aria-label="seek" disabled>
+          </div>
           <output id="preview-time">0:00.0 / 0:00.0</output>
         </div>
         <p id="preview-status" role="status"></p>
@@ -89,8 +89,7 @@
       </section>
       <section id="composition-panel" class="panel composition-panel" aria-labelledby="composition-title">
         <div class="section-heading"><div class="composition-title"><h2 id="composition-title" data-i18n="compositionTitle"></h2><span id="composition-count"></span></div><span class="composition-heading-status"><span class="preview-indicator"><span id="composition-loading" role="status" data-i18n-aria-label="loading" hidden></span></span></span></div>
-        <canvas id="composition-waveform" role="img" data-i18n-aria-label="compositionWaveform"></canvas>
-        <div class="composition-toolbar">
+        <div class="composition-toolbar preview-transport">
           <button id="composition-play" type="button" class="transport-button" data-i18n-aria-label="compositionPlay" data-i18n-title="compositionPlay" disabled>
             <svg class="composition-play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
             <svg class="composition-stop-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6h12v12H6z"/></svg>
@@ -101,6 +100,7 @@
             </button>
             <div class="param" id="composition-volume" role="group" data-i18n-aria-label="previewVolume" aria-hidden="true" inert></div>
           </div>
+          <canvas id="composition-waveform" role="img" data-i18n-aria-label="compositionWaveform"></canvas>
           <output id="composition-time">0:00.0 / 0:00.0</output>
         </div>
         <p id="composition-status" role="status"></p>

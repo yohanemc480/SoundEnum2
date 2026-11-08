@@ -13,6 +13,7 @@ import { SoundManager } from './Singletons/SoundManager.js';
 import { showToast } from './Toast.js';
 
 export class SoundComposition {
+    static MaxSounds = 10;
     constructor({ onPreview, onSimilar }) {
         this.onPreview = onPreview;
         this.onSimilar = onSimilar;
@@ -52,9 +53,27 @@ export class SoundComposition {
         } catch (error) { console.error(error); showToast(Text.compositionFailure); return false; }
     }
     add(name) {
+        if (this.rows.length >= SoundComposition.MaxSounds) {
+            showToast(Text.compositionLimit(SoundComposition.MaxSounds));
+            return;
+        }
         const manager = SoundManager.Instance;
         if (this.save([...this.rows, { name, source: manager.GetSource(), volume: manager.GetVolume(), pitch: manager.GetPitch(), minVolume: manager.GetMinVolume() }])) {
-            this.stop(); this.render(); showToast(Text.compositionAdded);
+            this.stop(); this.render();
+            const list = this.element('list');
+            const added = list.lastElementChild;
+            requestAnimationFrame(() => {
+                if (!added?.isConnected) return;
+                list.scrollTop = list.scrollHeight;
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                added.animate([
+                    { transform: 'scale(.96)', opacity: .4 },
+                    { transform: 'scale(1.015)', opacity: 1, offset: .55 },
+                    { transform: 'scale(.995)', offset: .8 },
+                    { transform: 'scale(1)', opacity: 1 },
+                ], { duration: 320, easing: 'ease-out' });
+            });
+            showToast(Text.compositionAdded);
         }
     }
     refreshWaveform() {
