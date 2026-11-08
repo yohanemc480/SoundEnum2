@@ -106,7 +106,7 @@ h3 > span:first-child { margin-right: 8px; color: var(--accent); font-family: mo
 /* 類似音・タグ検索 */
 #search-form { border: 0; padding: 0; margin: 0; min-width: 0; }
 #search-status { min-height: 1.5em; }
-.search-filters { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: minmax(180px, 2fr) minmax(120px, 1fr) 90px 90px; }
+.search-filters { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: minmax(120px, 1fr) minmax(180px, 2fr) 90px 90px; }
 .search-tags { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 12px; }
 .search-tags label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
 .search-row { display: flex; flex-direction: column; padding: 3px 0; }
