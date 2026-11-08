@@ -1,4 +1,4 @@
-"""指定バージョンの音声・検索リソースを生成し、アプリの参照先を切り替える。"""
+"""指定バージョンの音声・検索リソースを生成し、選択可能なバージョン一覧へ登録する。"""
 
 import argparse
 import hashlib
@@ -9,6 +9,7 @@ import subprocess
 import sys
 from tempfile import NamedTemporaryFile
 import time
+from sound_search_data import write_json
 from build_durations import build_durations
 from build_waveforms import build_waveforms
 from urllib.request import urlopen
@@ -69,19 +70,6 @@ def fetch_sound_resources(entry):
               if name.startswith("minecraft/sounds/") and name.endswith(".ogg")}
     hash_bytes = (json.dumps(hashes, ensure_ascii=False, indent=2) + "\n").encode()
     return {"hash": hash_bytes, "sounds": sound_bytes}, index_bytes
-
-
-def build_updated_references(original, version):
-    """定義クラスのバージョンだけを置き換え、参照先をまとめて切り替える。"""
-    pattern = rb"""(static Version = )['"][^'"\r\n]+['"];"""
-    updated, count = re.subn(
-        pattern,
-        lambda match: match[1] + f'"{version}";'.encode(),
-        original,
-    )
-    if count != 1:
-        raise ValueError("Expected exactly one Version in SoundResourcePaths.js")
-    return updated
 
 
 def find_new_resource_files(root, version, resources):
@@ -169,44 +157,30 @@ def save_audio_files(root, index_bytes):
         print(f"Audio {number}/{len(pending)}: {target.name}", flush=True)
 
 
-def replace_definition_file(definition, content):
-    """一時ファイルへの書き込みが完了してからSoundResourcePaths.jsを差し替える。"""
-    temporary = None
-    try:
-        with NamedTemporaryFile(dir=definition.parent, suffix=".tmp", delete=False) as output:
-            temporary = Path(output.name)
-            output.write(content)
-        temporary.replace(definition)
-    finally:
-        if temporary is not None and temporary.exists():
-            temporary.unlink()
-
-
 def update(version, root=ROOT):
-    """取得・検証・保存を順に行い、最後にアプリの参照先を切り替える。"""
+    """取得・検証・保存を順に行い、最後に選択可能なバージョン一覧へ登録する。"""
     entry = fetch_version(version)
     resources, index_bytes = fetch_sound_resources(entry)
 
-    definition = root / "Scripts" / "Constants" / "SoundResourcePaths.js"
-    original = definition.read_bytes()
-    updated = build_updated_references(original, version)
+    catalog = root / "resource" / "available-versions.json"
+    versions = json.loads(catalog.read_bytes()) if catalog.exists() else []
+    if not isinstance(versions, list) or any(not isinstance(v, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", v) for v in versions) or len(set(versions)) != len(versions):
+        raise ValueError("Invalid available versions")
     files = find_new_resource_files(root, version, resources)
 
-    # 全音声とJSONを保存してから参照先を切り替える。
+    # 全リソースの生成後に選択肢へ登録する。
     save_audio_files(root, index_bytes)
     build_durations(root, version, resources["hash"])
     build_waveforms(root, version, resources["hash"])
     save_resource_files(files)
-    # 同じPython環境で検索データまで生成し、失敗時は参照先を切り替えない。
+    # 同じPython環境で検索データまで生成し、失敗時は選択肢へ登録しない。
     subprocess.run(
         [sys.executable, str(root / "tools" / "build_similarity.py"), version],
         cwd=root, check=True,
     )
-    if updated != original:
-        replace_definition_file(definition, updated)
-        print(f"Updated Scripts/Constants/SoundResourcePaths.js to {version}")
-    else:
-        print(f"Already up to date: {version}")
+    if version not in versions:
+        write_json(catalog, [version, *versions])
+    print(f"Resources ready: {version}")
 
 
 if __name__ == "__main__":

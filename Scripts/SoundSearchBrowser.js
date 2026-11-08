@@ -9,10 +9,10 @@ import { MCRawSound } from './MCRawSound.js';
 
 export class SoundSearchBrowser
 {
-    constructor(outputArea)
+    constructor(outputArea, paths)
     {
         this.outputArea = outputArea;
-        this.resource = new SoundSearchResource();
+        this.resource = new SoundSearchResource(paths);
         this.requestId = 0;
         this.page = 0;
         this.results = [];

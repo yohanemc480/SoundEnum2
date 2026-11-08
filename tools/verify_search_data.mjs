@@ -5,7 +5,7 @@ import { Worker as NodeWorker } from 'node:worker_threads';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { SoundSearchResource } from '../Scripts/SoundSearchResource.js';
-import { SoundResourcePaths } from '../Scripts/Constants/SoundResourcePaths.js';
+import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.js';
 import { Text } from '../Scripts/Text.js';
 import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.js';
 
@@ -33,13 +33,14 @@ globalThis.Worker = class {
     terminate() { return this.worker.terminate(); }
 };
 
-const resource = new SoundSearchResource();
+const paths = new ResourcePathProvider(JSON.parse(await readFile(new URL('resource/available-versions.json', root)))[0]);
+const resource = new SoundSearchResource(paths);
 try {
     const start = performance.now();
     const index = await resource.load();
     const loadMs = performance.now() - start;
-    const hashes = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/audio-file-hashes.json`, root)));
-    const sounds = JSON.parse(await readFile(new URL(`resource/${SoundResourcePaths.Version}/sound-events.json`, root)));
+    const hashes = JSON.parse(await readFile(new URL(`resource/${paths.Version}/audio-file-hashes.json`, root)));
+    const sounds = JSON.parse(await readFile(new URL(`resource/${paths.Version}/sound-events.json`, root)));
     const resolved = resolveSoundEvents(sounds);
     for (const event of index.events) {
         assert.ok(event.name in sounds, event.name);
@@ -67,7 +68,7 @@ try {
         reports.push({ base, milliseconds: Math.round(performance.now() - started),
             top: result.results.slice(0, 5).map(row => ({ name: row.name, score: +row.score.toFixed(3) })) });
     }
-    const binary = await readFile(new URL(SoundResourcePaths.SearchVectors, root));
+    const binary = await readFile(new URL(paths.SearchVectors, root));
     assert.equal(createHash('sha256').update(binary).digest('hex'), index.vectorHash);
     console.log(JSON.stringify({ events: index.events.length, audio: Object.keys(index.audioTags).length,
         vectorBytes: binary.length, loadMs: Math.round(loadMs), tagCounts, reports }, null, 2));

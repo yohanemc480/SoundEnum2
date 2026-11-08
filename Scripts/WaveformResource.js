@@ -1,9 +1,9 @@
-import { SoundResourcePaths } from './Constants/SoundResourcePaths.js';
+import { SharedAudioPaths } from './ResourcePathProvider.js';
 
 let loading;
 export async function getWaveform(hash)
 {
-    loading ??= fetch(SoundResourcePaths.Waveforms).then(async response => {
+    loading ??= fetch(SharedAudioPaths.Waveforms).then(async response => {
         if (!response.ok) throw new Error('Waveforms unavailable');
         const data = await response.json();
         if (data.schemaVersion !== 1 || data.bins !== 256 || !data.waveforms) throw new Error('Invalid waveforms');

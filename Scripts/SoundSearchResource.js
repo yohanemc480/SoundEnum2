@@ -1,8 +1,12 @@
 import { buildSearchEvents } from './BuildSearchEvents.js';
-import { SoundResourcePaths } from './Constants/SoundResourcePaths.js';
 
 export class SoundSearchResource
 {
+    constructor(paths)
+    {
+        this.paths = paths;
+    }
+
     serial = 0;
     pending = new Map();
 
@@ -15,11 +19,11 @@ export class SoundSearchResource
             return response;
         };
         const [tagData, binary, sounds, hashes, durations] = await Promise.all([
-            read(new URL(SoundResourcePaths.SearchTags, location.href)).then(r => r.json()),
-            read(new URL(SoundResourcePaths.SearchVectors, location.href)).then(r => r.arrayBuffer()),
-            read(new URL(SoundResourcePaths.Sounds, location.href)).then(r => r.json()),
-            read(new URL(SoundResourcePaths.Hash, location.href)).then(r => r.json()),
-            read(new URL(SoundResourcePaths.Durations, location.href)).then(r => r.json())
+            read(new URL(this.paths.SearchTags, location.href)).then(r => r.json()),
+            read(new URL(this.paths.SearchVectors, location.href)).then(r => r.arrayBuffer()),
+            read(new URL(this.paths.Sounds, location.href)).then(r => r.json()),
+            read(new URL(this.paths.Hash, location.href)).then(r => r.json()),
+            read(new URL(this.paths.Durations, location.href)).then(r => r.json())
         ]);
         const index = { ...tagData, events: buildSearchEvents(sounds, hashes, durations) };
         const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', binary))].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -32,7 +36,7 @@ export class SoundSearchResource
             if (data.error) task.reject(new Error(data.error)); else task.resolve(data);
         };
         this.worker.onerror = () => this.dispose();
-        await this.request({ type: 'init', index, binary, version: SoundResourcePaths.Version }, [binary]);
+        await this.request({ type: 'init', index, binary, version: this.paths.Version }, [binary]);
         return index;
     }
 

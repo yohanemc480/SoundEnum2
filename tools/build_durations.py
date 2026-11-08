@@ -72,6 +72,5 @@ def build_durations(root, version, index_bytes=None):
 
 
 if __name__ == "__main__":
-    definition = (ROOT / "Scripts/Constants/SoundResourcePaths.js").read_text(encoding="utf-8-sig")
-    version = re.search(r'static Version = [\'"]([^\'"]+)', definition)[1]
+    version = json.loads((ROOT / "resource" / "available-versions.json").read_bytes())[0]
     build_durations(ROOT, version)

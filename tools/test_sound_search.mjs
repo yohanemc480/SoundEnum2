@@ -1,3 +1,5 @@
+import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.js';
+import { selectResourceVersion } from '../Scripts/VersionSelector.js';
 import { buildSearchEvents } from '../Scripts/BuildSearchEvents.js';
 import { decodeSearchVectors } from '../Scripts/SearchVectors.js';
 import test from 'node:test';
@@ -120,4 +122,24 @@ test('search candidates derive nested settings and durations from source resourc
     assert.equal(events.find(e => e.name === 'leaf').candidates[0].duration, 12);
     assert.throws(() => buildSearchEvents(sounds, {}, { [hash]: 6 }));
     assert.throws(() => buildSearchEvents(sounds, hashes, {}));
+});
+
+test('version selection accepts only generated versions and falls back to default', () => {
+    assert.equal(selectResourceVersion(['26.3'], null), '26.3');
+    assert.equal(selectResourceVersion(['26.4', '26.3'], '26.3'), '26.3');
+    assert.equal(selectResourceVersion(['26.4', '26.3'], '../other'), '26.4');
+    assert.throws(() => selectResourceVersion([], null));
+    assert.throws(() => selectResourceVersion(['../other'], null));
+    assert.throws(() => selectResourceVersion(['26.3', '26.3'], null));
+});
+
+test('resource providers keep versions isolated and immutable', () => {
+    const first = new ResourcePathProvider('26.3');
+    const second = new ResourcePathProvider('26.4');
+    assert.equal(first.Sounds, 'resource/26.3/sound-events.json');
+    assert.equal(second.Sounds, 'resource/26.4/sound-events.json');
+    assert.throws(() => { first.Version = '26.4'; });
+    assert.equal(first.Sounds, 'resource/26.3/sound-events.json');
+    assert.equal(first.Waveforms, second.Waveforms);
+    assert.throws(() => new ResourcePathProvider('../other'));
 });

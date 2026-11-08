@@ -1,4 +1,5 @@
 """Version selection and publication ordering for resource updates."""
+import json
 import subprocess
 import tempfile
 import unittest
@@ -25,9 +26,9 @@ class UpdateTests(unittest.TestCase):
             with self.subTest(fails=fails), tempfile.TemporaryDirectory(dir=updater.ROOT) as directory:
                 root = Path(directory).resolve()
                 assert root.is_relative_to(updater.ROOT.resolve())
-                definition = root / "Scripts/Constants/SoundResourcePaths.js"
+                definition = root / "resource/available-versions.json"
                 definition.parent.mkdir(parents=True)
-                original = b'static Version = "26.3";'
+                original = b'["26.3"]'
                 definition.write_bytes(original)
 
                 def generate(command, **kwargs):
@@ -51,8 +52,8 @@ class UpdateTests(unittest.TestCase):
                     else:
                         updater.update("26.4", root)
                     run.assert_called_once()
-                expected = original if fails else b'static Version = "26.4";'
-                self.assertEqual(definition.read_bytes(), expected)
+                expected = ['26.3'] if fails else ['26.4', '26.3']
+                self.assertEqual(json.loads(definition.read_bytes()), expected)
 
 
 if __name__ == "__main__":

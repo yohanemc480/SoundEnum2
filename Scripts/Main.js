@@ -1,3 +1,4 @@
+import { initializeVersionSelector } from './VersionSelector.js';
 import { applyText } from "./ApplyText.js";
 import { Text } from "./Text.js";
 import { PreviewPlayer } from "./PreviewPlayer.js";
@@ -8,7 +9,7 @@ import { SoundGenreTree } from "./SoundGenreTree.js";
 import { MCSoundHashResource } from "./MCSoundHashResource.js";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.js";
 import { NetworkFileLoader } from "./NetworkFileLoader.js";
-import { SoundResourcePaths } from "./Constants/SoundResourcePaths.js";
+import { ResourcePathProvider } from "./ResourcePathProvider.js";
 import { GenreButtonGenerator } from "./GenreButtonGenerator.js";
 import { SoundManager } from "./Singletons/SoundManager.js";
 import { OutputArea } from "./OutputArea.js";
@@ -23,14 +24,15 @@ import { ResourceManager } from "./Singletons/ResourceManager.js";
 
 
 applyText();
+const paths = new ResourcePathProvider(await initializeVersionSelector());
 
 // リソースの読み込み
 const soundHashResource = await new MCSoundHashResource(
-    await new NetworkFileLoader(SoundResourcePaths.Hash).FetchData()
+    await new NetworkFileLoader(paths.Hash).FetchData()
 )
 
 const playsoundCommandParamResouce = await new MCPlaysoundCommandParamResource(
-    await new NetworkFileLoader(SoundResourcePaths.Sounds).FetchData()
+    await new NetworkFileLoader(paths.Sounds).FetchData()
 )
 
 soundHashResource.ParseResource();
@@ -57,5 +59,5 @@ GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);
 
 new SelectMasterVolumeArea("#select-master-volume");
 initializeBrowserTabs();
-const searchBrowser = new SoundSearchBrowser(outputArea);
+const searchBrowser = new SoundSearchBrowser(outputArea, paths);
 searchBrowser.load();

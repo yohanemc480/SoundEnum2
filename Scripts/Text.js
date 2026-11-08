@@ -78,5 +78,7 @@ export const Text = Object.freeze({
     tagWater: "水",
     tagWood: "木",
     target: "対象",
+    version: "バージョン",
+    versionLoadFailure: "バージョン一覧を読み込めませんでした。ページを再読み込みしてください。",
     volume: "音量",
 });

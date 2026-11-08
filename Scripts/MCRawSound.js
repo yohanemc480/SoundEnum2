@@ -1,4 +1,4 @@
-import { SoundResourcePaths } from "./Constants/SoundResourcePaths.js";
+import { SharedAudioPaths } from "./ResourcePathProvider.js";
 
 /**
  * アセットとして存在しているサウンドを表すクラス。
@@ -51,6 +51,6 @@ export class MCRawSound
     /** サイト内に保存した音声ファイルの参照先を返す。 */
     CreateLink(soundHashResource) {
         let hash = this.GetHash(soundHashResource);
-        return SoundResourcePaths.Audio(hash);
+        return SharedAudioPaths.Audio(hash);
     }
 }
