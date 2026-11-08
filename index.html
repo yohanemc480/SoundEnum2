@@ -3,31 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MCPlaySoundGenerator</title>
+  <title>SoundEnum — Minecraft Sound Browser</title>
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" href="style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-  <div class="main">
-    <div class="title">MCPlaySoundGenerator</div>
-    <div class="params">
-      <div class="param" id="select-source">ソース</div>
-      <div class="param" id="select-sound-volume">音量</div>
-      <div class="param" id="select-pitch">ピッチ</div>
-      <div class="param" id ="select-min-volume">最低音量</div>
-    </div>
-    <div class="sound-genres-list">
-      <div class="sound-genres" id="sound-genres-first"></div>
-      <div class="sound-genres" id="sound-genres-second"></div>
-      <div class="sound-genres" id="sound-genres-third"></div>
-    </div>
-  </div>
-  <div class="sub">
-    <div class="param" id="select-master-volume">全体音量</div>
-    <div class="history"></div>
-    <div class="output"></div>
-  </div>
+  <header class="app-header">
+    <div><div class="eyebrow">MINECRAFT SOUND BROWSER</div><h1>SoundEnum<span class="brand-dot">.</span></h1></div>
+    <p>音を探して、聴いて、コマンドに。</p>
+  </header>
+  <main class="workspace">
+    <section class="main" aria-label="サウンド選択">
+      <section class="panel settings-panel">
+        <div class="section-heading"><h2>コマンド設定</h2><span>PLAY SOUND</span></div>
+        <div class="params">
+          <label class="param" id="select-source"><span class="param-label">ソース</span></label>
+          <label class="param" id="select-sound-volume"><span class="param-label">音量</span></label>
+          <div class="param" id="select-pitch" role="group" aria-label="ピッチ"><span class="param-label">ピッチ</span></div>
+          <div class="param" id="select-min-volume" role="group" aria-label="最低音量"><span class="param-label">最低音量</span></div>
+        </div>
+      </section>
+      <section class="panel browser-panel">
+        <div class="section-heading"><h2>サウンドを探す</h2><span>左から順に選択</span></div>
+        <div class="sound-genres-list">
+          <section class="genre-column"><h3><span>01</span> カテゴリ</h3><div class="sound-genres" id="sound-genres-first"></div></section>
+          <section class="genre-column"><h3><span>02</span> 対象</h3><div class="sound-genres" id="sound-genres-second"></div></section>
+          <section class="genre-column"><h3><span>03</span> サウンド</h3><div class="sound-genres" id="sound-genres-third"></div></section>
+        </div>
+      </section>
+    </section>
+    <aside class="sub" aria-label="試聴と履歴">
+      <section class="panel preview-panel">
+        <div class="section-heading"><h2>試聴音量</h2><span>PREVIEW</span></div>
+        <div class="param" id="select-master-volume" role="group" aria-label="試聴音量"></div>
+      </section>
+      <section class="panel command-panel">
+        <div class="section-heading"><h2>コマンド</h2><span>クリックでコピー</span></div>
+        <div class="output" aria-live="polite"></div>
+      </section>
+      <section class="panel history-panel">
+        <div class="section-heading"><h2>再生履歴</h2></div>
+        <p class="section-note">クリックで再生・コピー</p>
+        <div class="history"></div>
+      </section>
+    </aside>
+  </main>
   <script src="Scripts/Main.js" type="module"></script>
 </body>
 </html>
