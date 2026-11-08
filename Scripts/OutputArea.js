@@ -1,33 +1,24 @@
 import { copyCommand } from "./CopyCommand.js";
+import { createCopyButton } from "./CopyButton.js";
 
-/**
- * コマンドの出力エリアを表すクラス
- */
 export class OutputArea
 {
-    _button;
     constructor(appendTarget, displayName)
     {
-        $(document).ready(() =>
-        {
-            let $button = $('<div>').text(displayName).appendTo(appendTarget);
-            $button.addClass('output-text');
-            this._button = $button;
-
-            // クリック時にコマンドをコピーできるように。
-            $button.click(() =>
-            {
-                copyCommand(this._button.text());
-            });
+        this.text = document.createElement('div');
+        this.text.className = 'output-text';
+        this.text.textContent = displayName;
+        this.copyButton = createCopyButton(() => this.text.textContent);
+        this.copyButton.disabled = true;
+        this.text.addEventListener('click', () => {
+            if (!this.copyButton.disabled) copyCommand(this.text.textContent);
         });
+        document.querySelector(appendTarget).append(this.text, this.copyButton);
     }
 
-    /**
-     * 出力エリアにテキストを設定する。
-     * @param {*} text
-     */
     SetText(text)
     {
-        this._button.text(text);
+        this.text.textContent = text;
+        this.copyButton.disabled = !text;
     }
 }
