@@ -37,18 +37,32 @@ def fetch_latest_release():
     return entry
 
 
+def normalize_sounds(sounds):
+    """候補音をオブジェクトに統一し、既定値の省略とイベント参照を保持する。"""
+    normalized = {}
+    for name, event in sounds.items():
+        normalized[name] = dict(event)
+        if "sounds" in event:
+            normalized[name]["sounds"] = [
+                {"name": candidate} if isinstance(candidate, str) else dict(candidate)
+                for candidate in event["sounds"]
+            ]
+    return normalized
+
+
 def fetch_sound_resources(entry):
     """正式版の詳細、アセット一覧、サウンド定義の順に取得する。"""
     metadata, _ = download_json(entry["url"], entry.get("sha1"))
     index_info = metadata["assetIndex"]
     index, index_bytes = download_json(index_info["url"], index_info["sha1"])
     sound_hash = index["objects"]["minecraft/sounds.json"]["hash"]
-    sounds, sound_bytes = download_json(
+    sounds, _ = download_json(
         f"https://resources.download.minecraft.net/{sound_hash[:2]}/{sound_hash}",
         sound_hash,
     )
     if not isinstance(sounds, dict) or not sounds:
         raise ValueError("Empty or invalid sounds.json")
+    sound_bytes = (json.dumps(normalize_sounds(sounds), ensure_ascii=False, indent=2) + "\n").encode()
     hashes = {name: asset["hash"] for name, asset in index["objects"].items()
               if name.startswith("minecraft/sounds/") and name.endswith(".ogg")}
     hash_bytes = (json.dumps(hashes, ensure_ascii=False, indent=2) + "\n").encode()
