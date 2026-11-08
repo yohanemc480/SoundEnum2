@@ -16,9 +16,11 @@
   <main class="workspace">
     <section class="main" data-i18n-aria-label="soundSelection">
       <section class="panel browser-panel">
-        <div class="section-heading"><h2 data-i18n="browserTitle"></h2><label class="version-selector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label></div>
-        <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
-          <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="search-panel" data-i18n="searchTitle"></button>
+        <div class="browser-header">
+          <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
+            <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="search-panel" data-i18n="searchTitle"></button>
+          </div>
+          <label class="version-selector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label>
         </div>
         <div id="search-panel" role="tabpanel" aria-labelledby="search-tab">
           <form id="search-form-container">
