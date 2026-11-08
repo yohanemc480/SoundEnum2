@@ -29,7 +29,7 @@ export class SelectPitchArea
                 type: "range",
                 min: MCCommandSound.MinPitch,
                 max: MCCommandSound.MaxPitch,
-                step: "0.01",
+                step: "0.1",
                 value: MCCommandSound.DefaultPitch
             }).appendTo(appendTarget);
 

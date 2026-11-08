@@ -29,7 +29,7 @@ export class SelectMinVolumeArea
                 type: "range",
                 min: MCCommandSound.MinMinVolume,
                 max: MCCommandSound.MaxMinVolume,
-                step: "0.01",
+                step: "0.1",
                 value: MCCommandSound.DefaultMinVolume
             }).appendTo(appendTarget);
 

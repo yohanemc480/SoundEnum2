@@ -62,9 +62,8 @@ h2 { font-size: 14px; font-weight: 650; }
 .param-label { flex: 0 0 100%; color: var(--muted); font-size: 12px; }
 input, select { font: inherit; color: var(--text); }
 input:not([type="range"]), select { min-width: 0; height: 38px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
-select, #select-sound-volume input { width: 100%; }
+select { width: 100%; }
 .param input:not([type="range"]) { width: 64px; text-align: right; }
-#select-sound-volume input { width: 100%; text-align: left; }
 input[type="range"] { flex: 1; width: 80px; min-width: 50px; margin: 0; accent-color: var(--accent); cursor: pointer; }
 input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .browser-panel { flex: 1; padding-bottom: 12px; }

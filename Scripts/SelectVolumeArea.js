@@ -7,10 +7,20 @@ import { MCCommandSound } from "./MCCommandSound.js";
 export class SelectVolumeArea
 {
     _textInputHolder;
+    _slider;
     constructor(appendTarget)
     {
         $(document).ready(() =>
         {
+            const $slider = $("<input>", {
+                type: "range",
+                min: MCCommandSound.MinVolume,
+                max: 1,
+                step: "0.1",
+                value: MCCommandSound.DefaultVolume
+            }).appendTo(appendTarget);
+            $slider.on("input", () => this.OnUpdateValue($slider.val()));
+
             let $textInputHolder = $("<input>",
             {
                 value: MCCommandSound.DefaultVolume
@@ -23,11 +33,12 @@ export class SelectVolumeArea
             });
 
             this._textInputHolder = $textInputHolder;
+            this._slider = $slider;
         });
     }
     OnUpdateValue(value)
     {
-        let numericPart = value.match(/-?\d+(\.\d+)?/)[0];
+        let numericPart = String(value).match(/-?\d+(\.\d+)?/)?.[0];
 
         if (numericPart == null)
         {
@@ -42,5 +53,6 @@ export class SelectVolumeArea
         var floatValue = parseFloat(numericPart);
         SoundManager.Instance.SetVolume(floatValue);
         this._textInputHolder.val(floatValue);
+        this._slider.val(Math.min(floatValue, 1));
     }
 }
