@@ -175,7 +175,12 @@ export class SoundSearchBrowser
             preview.addEventListener('click', () => playCandidate(entry.candidate, preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
-            similar.addEventListener('click', () => { this.element('base').value = entry.name; this.search(); });
+            similar.addEventListener('click', () => {
+                clearTimeout(this.timer);
+                this.element('form-container').reset();
+                this.element('base').value = entry.name;
+                this.search();
+            });
             const main = document.createElement('div'); main.className = 'search-row-main';
             main.addEventListener('click', event => {
                 if (event.target.closest('button')) return;
