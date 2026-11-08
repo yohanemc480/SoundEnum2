@@ -176,7 +176,7 @@ export class SoundSearchBrowser
             const playCandidate = (candidate, button) => {
                 const manager = SoundManager.Instance;
                 const command = new MCCommandSound(entry.name, manager.GetSource(), MCCommandSelector.All, manager.GetVolume(), manager.GetPitch(), manager.GetMinVolume());
-                manager.Play(command, new MCRawSound(candidate));
+                manager.Play(command, candidate ? new MCRawSound(candidate) : null);
                 this.outputArea.SetText(command.ToString());
                 HistoryManager.Instance.Register(command);
                 HistoryManager.Instance.ScrollToBottom();
@@ -184,7 +184,7 @@ export class SoundSearchBrowser
                 this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
                 button.classList.add('selected');
             };
-            preview.addEventListener('click', () => playCandidate(candidates[Math.floor(Math.random() * candidates.length)], preview));
+            preview.addEventListener('click', () => playCandidate(null, preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
             similar.addEventListener('click', () => {

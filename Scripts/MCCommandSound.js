@@ -1,3 +1,4 @@
+import { selectWeightedCandidate } from './SelectWeightedCandidate.js';
 import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
 import { MCCommandSelector } from "./Constants/MCCommandSelector.js";
 import { MCRawSound } from "./MCRawSound.js";
@@ -61,8 +62,7 @@ export class MCCommandSound
      */
     GetRawSoundRandomly()
     {
-        var random = Math.floor(Math.random() * this._rawSounds.length);
-        return this._rawSounds[random];
+        return selectWeightedCandidate(this._rawSounds, sound => sound.GetWeight());
     }
 
     /**

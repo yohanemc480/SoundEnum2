@@ -29,13 +29,18 @@ export class MCRawSound
         }
         if (keys.includes("weight"))
         {
-            this.weight = soundData["weight"];
+            this._weight = soundData["weight"];
         }
     }
 
     GetHash(soundHashResource)
     {
         return soundHashResource.NameToHash(this._rawSoundName);
+    }
+
+    GetWeight()
+    {
+        return this._weight;
     }
 
     GetPitch()
