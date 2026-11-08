@@ -16,9 +16,49 @@ REVISION = '8fa0f1c6d0433df6e97c127f64b2a1d6c0dcda8a'
 PREPROCESS = 'mono-resample-10s-weighted-v2'
 
 
+def encode_audio_batches(items, load_audio, infer, normalize, window, batch_size):
+    """音声をまたいで区間をまとめ、音声ごとの加重平均を返す。"""
+    import numpy as np
+    pending, owners, states = [], [], {}
+
+    def flush():
+        features = infer(pending)
+        if len(features) != len(pending):
+            raise ValueError('Unexpected embedding batch size')
+        finished = []
+        for (key, weight, last), feature in zip(owners, features, strict=True):
+            vector = normalize(feature)
+            total, length = states.get(key, (np.zeros_like(vector, dtype=np.float64), 0))
+            states[key] = (total + vector.astype(np.float64) * weight, length + weight)
+            if last:
+                total, length = states.pop(key)
+                finished.append((key, normalize(total / length)))
+        pending.clear()
+        owners.clear()
+        return finished
+
+    for key in items:
+        audio = load_audio(key)
+        for start in range(0, len(audio), window):
+            chunk = audio[start:start + window]
+            pending.append(chunk)
+            owners.append((key, len(chunk), start + window >= len(audio)))
+            if len(pending) == batch_size:
+                yield from flush()
+    if pending:
+        yield from flush()
+
+
+def show_progress(label, completed, total):
+    filled = completed * 24 // total if total else 24
+    percent = completed * 100 // total if total else 100
+    print(f"\r{label} [{'#' * filled}{'-' * (24 - filled)}] {percent:3d}% {completed}/{total}", end='', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('version')
+    parser.add_argument('--batch-size', type=int, default=4, help='CLAPで同時処理する10秒区間数（既定: 4）')
     parser.add_argument('--limit', type=int, help='検証用。通常の検索データを更新しない')
     parser.add_argument('--revision', default=REVISION, help='CLAPモデルのcommit')
     parser.add_argument('--offline', action='store_true', help='取得済みモデルのみ使用する')
@@ -28,6 +68,8 @@ def main():
         parser.error('Invalid version')
     if args.limit is not None and args.limit < 1:
         parser.error('limit must be positive')
+    if args.batch_size < 1:
+        parser.error('batch-size must be positive')
     resource = ROOT / 'resource'
     read = lambda p: json.loads(p.read_bytes())
     sounds = read(resource / args.version / 'sound-events.json')
@@ -81,42 +123,56 @@ def main():
             raise ValueError('Invalid embedding')
         return vector / norm
 
-    vectors = []
-    print(f'CLAP: {device}, revision={revision}', flush=True)
-    for i, sha1 in enumerate(hashes):
-        cached = cache / cache_key / f'{sha1}.json'
-        try:
-            # 保存済みの単位ベクトルを再正規化すると丸め誤差で世代IDが変わる。
-            vector = np.asarray(read(cached), dtype=np.float32)
-            if (vector.shape != (dimensions,) or not np.isfinite(vector).all()
-                    or abs(float(np.linalg.norm(vector)) - 1) > 1e-5):
-                raise ValueError('Invalid cached embedding')
-        except (OSError, ValueError, TypeError):
-            audio, source_rate = sf.read(resource / 'audio' / f'{sha1}.ogg', dtype='float32', always_2d=True)
-            audio = audio.mean(axis=1)
-            if not len(audio) or not np.isfinite(audio).all():
-                raise ValueError(f'Invalid audio: {sha1}')
-            divisor = math.gcd(source_rate, rate)
-            audio = resample_poly(audio, rate // divisor, source_rate // divisor)
-            chunks, weights = [], []
-            for start in range(0, len(audio), window):
-                chunk = audio[start:start + window]
-                inputs = processor.feature_extractor(chunk, sampling_rate=rate, return_tensors='pt')
-                with torch.inference_mode():
-                    feature = model.get_audio_features(**inputs.to(device))[0]
-                chunks.append(normalize(feature.cpu().numpy()))
-                weights.append(len(chunk))
-            vector = normalize(np.average(chunks, axis=0, weights=weights))
-            write_json(cached, vector.tolist())
-        vectors.append(vector)
-        print(f'Audio {i + 1}/{len(hashes)}: {sha1}', flush=True)
-    matrix = np.stack(vectors)
-    text_vectors = []
-    for tag in tags:
-        inputs = processor.tokenizer(tag['prompts'], padding=True, return_tensors='pt')
+    vectors, missing = {}, []
+    print(f'CLAP: {device}, batch={args.batch_size}', flush=True)
+    try:
+        for i, sha1 in enumerate(hashes, 1):
+            try:
+                vector = np.asarray(read(cache / cache_key / f'{sha1}.json'), dtype=np.float32)
+                if (vector.shape != (dimensions,) or not np.isfinite(vector).all()
+                        or abs(float(np.linalg.norm(vector)) - 1) > 1e-5):
+                    raise ValueError('Invalid cached embedding')
+                vectors[sha1] = vector
+            except (OSError, ValueError, TypeError):
+                missing.append(sha1)
+            show_progress('CLAP cache', i, len(hashes))
+    finally:
+        print(flush=True)
+
+    def load_audio(sha1):
+        audio, source_rate = sf.read(resource / 'audio' / f'{sha1}.ogg', dtype='float32', always_2d=True)
+        audio = audio.mean(axis=1)
+        if not len(audio) or not np.isfinite(audio).all():
+            raise ValueError(f'Invalid audio: {sha1}')
+        divisor = math.gcd(source_rate, rate)
+        return resample_poly(audio, rate // divisor, source_rate // divisor)
+
+    def infer(chunks):
+        inputs = processor.feature_extractor(chunks, sampling_rate=rate, return_tensors='pt')
         with torch.inference_mode():
-            features = model.get_text_features(**inputs.to(device)).cpu().numpy()
-        text_vectors.append(normalize(np.mean([normalize(v) for v in features], axis=0)))
+            return model.get_audio_features(**inputs.to(device)).cpu().numpy()
+
+    completed = len(vectors)
+    show_progress('CLAP audio', completed, len(hashes))
+    try:
+        for sha1, vector in encode_audio_batches(missing, load_audio, infer, normalize, window, args.batch_size):
+            write_json(cache / cache_key / f'{sha1}.json', vector.tolist())
+            vectors[sha1] = vector
+            completed += 1
+            show_progress('CLAP audio', completed, len(hashes))
+    finally:
+        print(flush=True)
+    matrix = np.stack([vectors[sha1] for sha1 in hashes])
+    text_vectors = []
+    try:
+        for number, tag in enumerate(tags, 1):
+            inputs = processor.tokenizer(tag['prompts'], padding=True, return_tensors='pt')
+            with torch.inference_mode():
+                features = model.get_text_features(**inputs.to(device)).cpu().numpy()
+            text_vectors.append(normalize(np.mean([normalize(v) for v in features], axis=0)))
+            show_progress("CLAP tags", number, len(tags))
+    finally:
+        print(flush=True)
     scores = matrix @ np.stack(text_vectors).T
     audio_tags = {sha1: assign_tags(row, tags, overrides.get(sha1, {}))
                   for sha1, row in zip(hashes, scores, strict=True)}
@@ -138,7 +194,7 @@ def main():
     index_name = 'audio-tags.sample.json' if args.limit else 'audio-tags.json'
     write_binary(directory / vector_name, binary)
     write_json(directory / index_name, index)
-    print(f'Saved {sum(bool(cs) for cs in events.values())} events; vectors={len(binary)} bytes; generation={generation}', flush=True)
+    print(f'Saved {sum(bool(cs) for cs in events.values())} events; vectors={len(binary)} bytes', flush=True)
 
 
 if __name__ == '__main__':

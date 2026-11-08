@@ -8,7 +8,7 @@ import re
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
-import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from sound_search_data import write_json
 from build_durations import build_durations
 from build_waveforms import build_waveforms
@@ -139,7 +139,7 @@ def download_audio_file(target, sha1, size):
 
 
 def save_audio_files(root, index_bytes):
-    """未取得・破損した音声だけを順番に取得する。中断後も再実行で続行できる。"""
+    """未取得・破損した音声を最大4件並列で取得する。"""
     assets = collect_audio_assets(index_bytes)
     directory = root / "resource" / "audio"
     directory.mkdir(parents=True, exist_ok=True)
@@ -148,13 +148,27 @@ def save_audio_files(root, index_bytes):
         for sha1, size in assets.items()
         if not audio_file_is_valid(directory / f"{sha1}.ogg", sha1, size)
     ]
-    print(f"Audio: {len(pending)} to download, {len(assets) - len(pending)} cached", flush=True)
-    for number, (target, sha1, size) in enumerate(pending, 1):
-        # 並列取得や自動再試行は行わず、リクエストの間隔を空ける。
-        if number > 1:
-            time.sleep(0.2)
-        download_audio_file(target, sha1, size)
-        print(f"Audio {number}/{len(pending)}: {target.name}", flush=True)
+    total = len(pending)
+    cached = len(assets) - total
+
+    def progress(completed):
+        filled = 24 if total == 0 else completed * 24 // total
+        percent = 100 if total == 0 else completed * 100 // total
+        print(f"\rAudio [{'#' * filled}{'-' * (24 - filled)}] {percent:3d}% {completed}/{total} (cached: {cached})", end="", flush=True)
+
+    progress(0)
+    executor = ThreadPoolExecutor(max_workers=4)
+    futures = []
+    try:
+        futures = [executor.submit(download_audio_file, *item) for item in pending]
+        for completed, future in enumerate(as_completed(futures), 1):
+            future.result()
+            progress(completed)
+    finally:
+        for future in futures:
+            future.cancel()
+        executor.shutdown(wait=True, cancel_futures=True)
+        print(flush=True)
 
 
 def update(version, root=ROOT):

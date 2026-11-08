@@ -1,4 +1,7 @@
 """Version selection and publication ordering for resource updates."""
+import io
+import threading
+from contextlib import redirect_stdout
 import json
 import subprocess
 import tempfile
@@ -10,6 +13,42 @@ import update_sounds as updater
 
 
 class UpdateTests(unittest.TestCase):
+    def test_parallel_download_progress_and_cache(self):
+        hashes = [f"{i:040x}" for i in range(5)]
+        barrier = threading.Barrier(4)
+        downloaded = []
+        lock = threading.Lock()
+
+        def download(path, sha1, size):
+            barrier.wait(timeout=5)
+            with lock:
+                downloaded.append(sha1)
+
+        with tempfile.TemporaryDirectory(dir=updater.ROOT) as directory:
+            root = Path(directory).resolve()
+            assert root.is_relative_to(updater.ROOT.resolve())
+            output = io.StringIO()
+            with patch.object(updater, 'collect_audio_assets', return_value=dict.fromkeys(hashes, 10)), \
+                 patch.object(updater, 'audio_file_is_valid', side_effect=lambda p, h, s: h == hashes[0]), \
+                 patch.object(updater, 'download_audio_file', side_effect=download), redirect_stdout(output):
+                updater.save_audio_files(root, b'{}')
+            self.assertCountEqual(downloaded, hashes[1:])
+            self.assertIn('100% 4/4 (cached: 1)', output.getvalue())
+            self.assertEqual(output.getvalue().count('\n'), 1)
+            for sha1 in hashes:
+                self.assertNotIn(sha1, output.getvalue())
+
+    def test_download_failure_propagates(self):
+        with tempfile.TemporaryDirectory(dir=updater.ROOT) as directory:
+            root = Path(directory).resolve()
+            assert root.is_relative_to(updater.ROOT.resolve())
+            with patch.object(updater, 'collect_audio_assets', return_value={'a' * 40: 10}), \
+                 patch.object(updater, 'audio_file_is_valid', return_value=False), \
+                 patch.object(updater, 'download_audio_file', side_effect=OSError('download failed')), \
+                 redirect_stdout(io.StringIO()):
+                with self.assertRaises(OSError):
+                    updater.save_audio_files(root, b'{}')
+
     def test_explicit_version(self):
         entries = [{"id": "26.3"}, {"id": "26.4"}]
         with patch.object(updater, "download_json", return_value=({"versions": entries}, b"")):
