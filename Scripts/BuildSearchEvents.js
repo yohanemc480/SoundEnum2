@@ -11,8 +11,9 @@ export function buildSearchEvents(sounds, hashes, durations)
             const volume = c.volume ?? 1;
             const weight = c.weight ?? 1;
             const duration = durations[hash];
-            if (!/^[0-9a-f]{40}$/.test(hash) || !Number.isFinite(duration) || duration < 0 ||
-                !Number.isFinite(pitch) || pitch <= 0 || !Number.isFinite(volume) || volume < 0 ||
+            if (!/^[0-9a-f]{40}$/.test(hash)) throw new Error(`Missing/invalid audio hash: ${name}: ${c.name}`);
+            if (!Number.isFinite(duration) || duration < 0) throw new Error(`Missing/invalid audio duration: ${name}: ${hash}`);
+            if (!Number.isFinite(pitch) || pitch <= 0 || !Number.isFinite(volume) || volume < 0 ||
                 !Number.isFinite(weight) || weight <= 0) throw new Error(`Invalid sound candidate: ${name}`);
             return { name: c.name, hash, pitch, volume, weight, duration: duration / pitch };
         }) }));

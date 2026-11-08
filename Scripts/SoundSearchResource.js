@@ -14,7 +14,7 @@ export class SoundSearchResource
     {
         this.dispose();
         const read = async url => {
-            const response = await fetch(url);
+            const response = await fetch(url, { cache: 'no-cache' });
             if (!response.ok) throw new Error(response.status === 404 ? 'missing' : `HTTP ${response.status}`);
             return response;
         };
