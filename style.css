@@ -46,6 +46,7 @@ h1, h2, h3, p { margin: 0; }
 .app-header { max-width: 1600px; margin: auto; padding: 28px 32px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .eyebrow { color: var(--muted); font-size: 10px; letter-spacing: .18em; font-weight: 600; }
 h1 { font-size: 30px; letter-spacing: -.04em; font-weight: 650; }
+.app-header-identity { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px 32px; min-width: 0; }
 .app-brand { min-width: 0; }
 .app-brand .eyebrow { display: block; color: var(--accent); letter-spacing: .18em; }
 .brand-name { display: block; font-size: clamp(22px, 3vw, 30px); line-height: 1.5; }
@@ -85,7 +86,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 
 [hidden] { display: none !important; }
 .browser-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; border-bottom: 2px solid var(--line); }
-.browser-header .version-selector { align-self: center; padding-bottom: 6px; }
 .browser-tabs { display: flex; gap: 4px; padding: 0 4px; }
 .browser-tabs [role="tab"] { position: relative; padding: 10px 19px; color: var(--muted); background: var(--surface); border: 2px solid transparent; border-radius: 8px 8px 0 0; font: inherit; cursor: pointer; transition: color .15s, background .15s; }
 .browser-tabs [role="tab"]:hover { color: var(--text); background: #22312b; }

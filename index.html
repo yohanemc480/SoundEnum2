@@ -10,7 +10,10 @@
 </head>
 <body>
   <header class="app-header">
-    <h1 class="app-brand" data-i18n-aria-label="appTitle"><span class="eyebrow" data-i18n="appEyebrow">MINECRAFT</span><span class="brand-name" data-i18n="appName">Sound Browser</span></h1>
+    <div class="app-header-identity">
+      <h1 class="app-brand" data-i18n-aria-label="appTitle"><span class="eyebrow" data-i18n="appEyebrow">MINECRAFT</span><span class="brand-name" data-i18n="appName">Sound Browser</span></h1>
+      <label class="version-selector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label>
+    </div>
     <div class="app-header-actions">
       <p data-i18n="appTagline"></p>
       <button type="button" class="settings-button app-settings-button" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
@@ -31,7 +34,6 @@
             <button type="button" id="favorites-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="favorites-panel" tabindex="-1" data-i18n="favoritesTitle"></button>
             <button type="button" id="compositions-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="compositions-panel" tabindex="-1" data-i18n="savedCompositionsTitle"></button>
           </div>
-          <label class="version-selector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label>
         </div>
         <div id="search-panel" role="tabpanel" aria-labelledby="search-tab">
           <form id="search-form-container">

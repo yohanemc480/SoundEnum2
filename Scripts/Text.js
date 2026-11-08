@@ -59,7 +59,7 @@ export const Text = Object.freeze({
     savedCompositionDefaultName: number => `組み合わせ(${number})`,
     savedCompositionDelete: "削除",
     savedCompositionDeleteConfirm: name => `組み合わせ「${name}」を削除しますか？`,
-    savedCompositionEmpty: "保存した組み合わせはありません。",
+    savedCompositionEmpty: "保存した組み合わせはありません。検索結果やお気に入りの＋で音を追加し、組み合わせ試聴の「現在の組み合わせを保存」を押してください。",
     savedCompositionFailure: "組み合わせの保存データを読み書きできませんでした。",
     savedCompositionLimit: limit => `保存できる組み合わせは最大${limit}個までです`,
     savedCompositionLoad: "呼び出す",
