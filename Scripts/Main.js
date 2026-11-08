@@ -20,6 +20,16 @@ import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.js";
 import { ResourceManager } from "./Singletons/ResourceManager.js";
 
 applyText();
+document.getElementById('clear-local-storage').addEventListener('click', () => {
+    if (!window.confirm(Text.clearLocalStorageConfirm)) return;
+    try {
+        localStorage.clear();
+        location.reload();
+    } catch (error) {
+        console.error(error);
+        window.alert(Text.clearLocalStorageFailure);
+    }
+});
 const paths = new ResourcePathProvider(await initializeVersionSelector());
 
 // リソースの読み込み

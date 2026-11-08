@@ -11,8 +11,17 @@
 <body>
   <header class="app-header">
     <div><div class="eyebrow" data-i18n="appEyebrow"></div><h1>SoundEnum<span class="brand-dot">.</span></h1></div>
-    <p data-i18n="appTagline"></p>
+    <div class="app-header-actions">
+      <p data-i18n="appTagline"></p>
+      <button type="button" class="settings-button app-settings-button" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 2h4l.5 3 1.4.8 2.8-1 2 3.4-2.3 2v1.6l2.3 2-2 3.4-2.8-1-1.4.8-.5 3h-4l-.5-3-1.4-.8-2.8 1-2-3.4 2.3-2v-1.6l-2.3-2 2-3.4 2.8 1 1.4-.8Z" transform="translate(0 1)"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
   </header>
+  <section id="app-settings" class="settings-popover app-settings-popover" popover="auto" aria-labelledby="app-settings-title">
+    <div class="section-heading"><h2 id="app-settings-title" data-i18n="settings"></h2><button type="button" class="settings-button" popovertarget="app-settings" popovertargetaction="hide" data-i18n="close"></button></div>
+    <button id="clear-local-storage" type="button" class="settings-button" data-i18n="clearLocalStorage"></button>
+  </section>
   <main class="workspace">
     <section class="main" data-i18n-aria-label="soundSelection">
       <section class="panel browser-panel">
