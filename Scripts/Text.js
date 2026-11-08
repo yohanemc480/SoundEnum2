@@ -12,7 +12,6 @@ export const Text = Object.freeze({
     close: "閉じる",
     closeCommandSettings: "コマンド設定を閉じる",
     command: "コマンド",
-    commandOutput: "コマンド出力エリア",
     commandSettings: "コマンド設定",
     compositionAdd: "組み合わせに追加",
     compositionAdded: "組み合わせに追加しました",
