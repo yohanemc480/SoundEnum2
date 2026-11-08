@@ -29,6 +29,7 @@
           <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
             <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="search-panel" data-i18n="searchTitle"></button>
             <button type="button" id="favorites-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="favorites-panel" tabindex="-1" data-i18n="favoritesTitle"></button>
+            <button type="button" id="compositions-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="compositions-panel" tabindex="-1" data-i18n="savedCompositionsTitle"></button>
           </div>
           <label class="version-selector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label>
         </div>
@@ -58,6 +59,10 @@
         <div id="favorites-panel" role="tabpanel" aria-labelledby="favorites-tab" hidden>
           <p id="favorites-status" role="status"></p>
           <div id="favorites-list" class="search-list"></div>
+        </div>
+        <div id="compositions-panel" role="tabpanel" aria-labelledby="compositions-tab" hidden>
+          <p id="saved-compositions-status" role="status"></p>
+          <div id="saved-compositions-list" class="search-list"></div>
         </div>
       </section>
     </section>
@@ -105,6 +110,7 @@
         </div>
         <p id="composition-status" role="status"></p>
         <div id="composition-list" class="search-list"></div>
+        <div class="composition-save-actions"><button id="save-composition" type="button" class="settings-button" data-i18n="savedCompositionSave" disabled></button></div>
         <div class="composition-command">
           <div class="section-heading"><h2 data-i18n="command"></h2></div>
           <div id="composition-output" class="output" aria-live="polite"></div>

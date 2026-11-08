@@ -3,5 +3,6 @@ export const LocalStorageKey = Object.freeze({
     CommandSettings: 'soundenum.command-settings',
     Composition: 'soundenum.composition',
     Favorites: 'soundenum.favorites',
+    SavedCompositions: 'soundenum.saved-compositions',
     SearchPreferences: 'soundenum.search-preferences',
 });

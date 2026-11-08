@@ -16,7 +16,13 @@ export function confirmAction(message, { acceptLabel = Text.confirmAccept } = {}
     return result;
 }
 
-function openDialog(message, acceptLabel)
+export function promptText(message, { value = '', maxLength = 20, validate, acceptLabel = Text.confirmAccept } = {}) {
+    const result = pending.then(() => openDialog(message, acceptLabel, { value, maxLength, validate }));
+    pending = result.catch(() => {});
+    return result;
+}
+
+function openDialog(message, acceptLabel, textOptions)
 {
     return new Promise(resolve => {
         const previousFocus = document.activeElement;
@@ -41,6 +47,18 @@ function openDialog(message, acceptLabel)
         confirm.type = 'button';
         confirm.className = 'settings-button confirm-dialog-accept';
         confirm.textContent = acceptLabel;
+        let input, resultValue;
+        if (textOptions) {
+            input = document.createElement('input');
+            input.type = 'text'; input.value = textOptions.value;
+            input.maxLength = textOptions.maxLength; input.required = true;
+            input.className = 'dialog-text-input';
+            input.setAttribute('aria-label', message);
+            input.addEventListener('input', () => input.setCustomValidity(''));
+            input.addEventListener('keydown', event => {
+                if (event.key === 'Enter' && !event.isComposing) { event.preventDefault(); confirm.click(); }
+            });
+        }
         let closing = false;
         const close = (accepted = false) => {
             if (closing) return;
@@ -55,7 +73,14 @@ function openDialog(message, acceptLabel)
             setTimeout(() => dialog.close(accepted ? 'confirmed' : ''), 120);
         };
         cancel.addEventListener('click', () => close());
-        confirm.addEventListener('click', () => close(true));
+        confirm.addEventListener('click', () => {
+            if (input) {
+                try { resultValue = textOptions.validate ? textOptions.validate(input.value) : input.value; }
+                catch (error) { input.setCustomValidity(error.message); input.reportValidity(); return; }
+                if (!input.reportValidity()) return;
+            }
+            close(true);
+        });
         dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
         let backdropPressed = false;
         const outside = event => {
@@ -71,11 +96,14 @@ function openDialog(message, acceptLabel)
             const accepted = dialog.returnValue === 'confirmed';
             dialog.remove();
             if (previousFocus?.isConnected) previousFocus.focus();
-            resolve(accepted);
+            resolve(textOptions ? (accepted ? resultValue : null) : accepted);
         }, { once: true });
         actions.append(cancel, confirm);
-        dialog.append(title, description, actions);
+        dialog.append(title, description);
+        if (input) dialog.append(input);
+        dialog.append(actions);
         document.body.append(dialog);
         dialog.showModal();
+        if (input) { input.focus(); input.select(); }
     });
 }

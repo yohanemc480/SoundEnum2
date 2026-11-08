@@ -1,3 +1,4 @@
+import { SavedCompositions } from './SavedCompositions.js';
 import { SoundComposition } from './SoundComposition.js';
 import { mountSoundSettings } from './SoundSettings.js';
 import { confirmAction } from './ConfirmDialog.js';
@@ -71,4 +72,5 @@ const composition = new SoundComposition({
     onSimilar: name => searchBrowser.searchSimilar(name),
 });
 const searchBrowser = new SoundSearchBrowser(outputArea, paths, composition);
+new SavedCompositions(composition, paths.Version);
 searchBrowser.load();

@@ -1,3 +1,4 @@
+import { revealAddedItem } from './RevealAddedItem.js';
 import { OutputArea } from './OutputArea.js';
 import { formatSoundCommand } from './FormatSoundCommand.js';
 import { SelectMasterVolumeArea } from './SelectMasterVolumeArea.js';
@@ -41,6 +42,7 @@ export class SoundComposition {
     setEvents(events) {
         this.events = new Map(events.map(event => [event.name, event]));
         this.render();
+        this.onChange?.();
     }
     save(rows) {
         try {
@@ -49,6 +51,7 @@ export class SoundComposition {
             this.rows = rows;
             this.refreshWaveform();
             this.updateOutput();
+            this.onChange?.();
             return true;
         } catch (error) { console.error(error); showToast(Text.compositionFailure); return false; }
     }
@@ -60,19 +63,7 @@ export class SoundComposition {
         const manager = SoundManager.Instance;
         if (this.save([...this.rows, { name, source: manager.GetSource(), volume: manager.GetVolume(), pitch: manager.GetPitch(), minVolume: manager.GetMinVolume() }])) {
             this.stop(); this.render();
-            const list = this.element('list');
-            const added = list.lastElementChild;
-            requestAnimationFrame(() => {
-                if (!added?.isConnected) return;
-                list.scrollTop = list.scrollHeight;
-                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-                added.animate([
-                    { transform: 'scale(.96)', opacity: .4 },
-                    { transform: 'scale(1.015)', opacity: 1, offset: .55 },
-                    { transform: 'scale(.995)', offset: .8 },
-                    { transform: 'scale(1)', opacity: 1 },
-                ], { duration: 320, easing: 'ease-out' });
-            });
+            revealAddedItem(this.element('list'));
             showToast(Text.compositionAdded);
         }
     }

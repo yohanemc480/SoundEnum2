@@ -11,7 +11,7 @@ import { LocalStorageKey } from './Constants/LocalStorageKey.js';
  * @property {string} base 類似音の基準となるサウンドID
  * @property {string[]} tags AND検索するタグID
  * @property {boolean} excludeMultiple 複数候補のある音を除外するか
- * @property {'search-tab'|'favorites-tab'} tab 開いているタブ
+ * @property {'search-tab'|'favorites-tab'|'compositions-tab'} tab 開いているタブ
  */
 
 /** @returns {SearchPreferencesValue} */
@@ -23,7 +23,7 @@ export function normalizePreferences(value = {}) {
         base: typeof value.base === 'string' ? value.base : '',
         tags: Array.isArray(value.tags) ? [...new Set(value.tags.filter(tag => typeof tag === 'string'))] : [],
         excludeMultiple: value.excludeMultiple === true,
-        tab: value.tab === 'favorites-tab' ? value.tab : 'search-tab',
+        tab: ['favorites-tab', 'compositions-tab'].includes(value.tab) ? value.tab : 'search-tab',
     };
 }
 
@@ -62,6 +62,29 @@ export function normalizeComposition(value) {
     });
 }
 
+export function normalizeCompositionName(value) {
+    if (typeof value !== 'string') throw new Error('Invalid composition name');
+    const name = value.normalize('NFKC');
+    if (!/^[A-Za-z0-9\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}ー々・ _().-]+$/u.test(name) ||
+        !name.trim() || name.trim().length > 20) throw new Error('Invalid composition name');
+    return name.trim();
+}
+
+/** @typedef {{id: string, name: string, version: string, sounds: CompositionValue}[]} SavedCompositionsValue */
+export function normalizeSavedCompositions(value) {
+    if (!Array.isArray(value)) throw new Error('Invalid saved compositions');
+    const ids = new Set();
+    return value.map(item => {
+        if (!item || typeof item.id !== 'string' || !item.id || ids.has(item.id) ||
+            typeof item.name !== 'string' || !item.name.trim() || item.name.length > 20 ||
+            !Array.isArray(item.sounds) || !item.sounds.length || item.sounds.length > 10) throw new Error('Invalid saved composition');
+        if (item.version !== undefined && item.version !== '' &&
+            (typeof item.version !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(item.version))) throw new Error('Invalid saved version');
+        ids.add(item.id);
+        return { id: item.id, name: normalizeCompositionName(item.name), version: item.version ?? '', sounds: normalizeComposition(item.sounds) };
+    });
+}
+
 /** @returns {FavoriteSoundIds} */
 function normalizeFavorites(value) {
     if (!Array.isArray(value) || value.some(name => typeof name !== 'string')) throw new Error('Invalid favorites');
@@ -87,6 +110,11 @@ export const LocalStorageSchema = Object.freeze({
         key: LocalStorageKey.Favorites,
         createDefault: () => [],
         normalize: normalizeFavorites,
+    }),
+    SavedCompositions: Object.freeze({
+        key: LocalStorageKey.SavedCompositions,
+        createDefault: () => [],
+        normalize: normalizeSavedCompositions,
     }),
     SearchPreferences: Object.freeze({
         key: LocalStorageKey.SearchPreferences,
