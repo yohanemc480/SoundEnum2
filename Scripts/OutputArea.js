@@ -1,3 +1,5 @@
+import { copyCommand } from "./CopyCommand.js";
+
 /**
  * コマンドの出力エリアを表すクラス
  */
@@ -15,7 +17,7 @@ export class OutputArea
             // クリック時にコマンドをコピーできるように。
             $button.click(() =>
             {
-                navigator.clipboard.writeText(this._button.text());
+                copyCommand(this._button.text());
             });
         });
     }

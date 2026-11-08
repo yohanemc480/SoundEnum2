@@ -68,7 +68,6 @@
       </section>
       <section class="panel command-panel">
         <div class="section-heading"><h2>コマンド</h2><button type="button" id="command-settings-button" class="settings-button" popovertarget="command-settings">設定</button></div>
-        <p class="section-note">クリックでコピー</p>
         <div class="output" aria-live="polite"></div>
       </section>
       <section class="panel history-panel">
@@ -87,6 +86,7 @@
           <div class="param" id="select-min-volume" role="group" aria-label="最低音量"><span class="param-label">最低音量</span></div>
         </div>
   </section>
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <script src="Scripts/CommandSettingsPopover.js" type="module"></script>
   <script src="Scripts/Main.js" type="module"></script>
 </body>

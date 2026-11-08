@@ -1,4 +1,5 @@
 import { SoundManager } from "./Singletons/SoundManager.js";
+import { copyCommand } from "./CopyCommand.js";
 
 /**
  * 再生履歴一つを表すクラス
@@ -17,7 +18,7 @@ export class HistoryLog
             // クリック時にサウンドの再生ができるように。
             $button.click(() =>
             {
-                navigator.clipboard.writeText(commandSound.ToString());
+                copyCommand(commandSound.ToString());
                 SoundManager.Instance.Play(commandSound);
             });
         });
