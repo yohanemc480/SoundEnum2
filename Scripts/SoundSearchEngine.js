@@ -1,5 +1,5 @@
 /** DOMと独立した検索処理。候補音声単位でAND条件を評価する。 */
-export function searchSounds(index, vectors, { query = '', tags = [], min = 0, max = Infinity, base = '' } = {})
+export function searchSounds(index, vectors, { query = '', tags = [], min = 0, max = Infinity, base = '', excludeMultiple = false } = {})
 {
     if (!Number.isFinite(min) || min < 0 || Number.isNaN(max) || min > max) throw new Error('Invalid range');
     const baseline = base ? index.events.find(event => event.name === base) : null;
@@ -19,6 +19,7 @@ export function searchSounds(index, vectors, { query = '', tags = [], min = 0, m
     };
     const result = [];
     for (const event of index.events) {
+        if (excludeMultiple && event.candidates.length > 1) continue;
         if (event.name === base || !event.name.includes(query.trim().toLowerCase())) continue;
         if (!event.candidates.every(c => c.duration >= min && c.duration <= max)) continue;
         const candidates = event.candidates.filter(c => tags.every(tag => index.audioTags[c.hash].includes(tag)));

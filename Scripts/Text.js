@@ -43,6 +43,7 @@ export const Text = Object.freeze({
     searchDurationMax: "最大（秒）",
     searchDurationMin: "最小（秒）",
     searchEmpty: "条件に合うサウンドはありません。",
+    searchExcludeMultiple: "複数候補があるサウンドを除外",
     searchFailure: "検索データを読み込めませんでした。生成ファイルを確認して再試行してください。",
     searchInvalidBase: "候補一覧にあるサウンドIDを基準に指定してください。",
     searchInvalidRange: "0以上の秒数を、最小 ≤ 最大になるように指定してください。",

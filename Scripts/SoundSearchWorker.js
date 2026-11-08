@@ -1,5 +1,5 @@
 import { decodeSearchVectors } from './SearchVectors.js';
-import { searchSounds, validateSearchData } from './SoundSearchEngine.js';
+import { searchSounds, validateSearchData } from './SoundSearchEngine.js?revision=exclude-multiple-v1';
 let index, vectors;
 self.onmessage = ({ data }) => {
     try {

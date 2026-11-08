@@ -143,3 +143,11 @@ test('resource providers keep versions isolated and immutable', () => {
     assert.equal(first.Waveforms, second.Waveforms);
     assert.throws(() => new ResourcePathProvider('../other'));
 });
+
+test('exclude multiple checks original candidates before tag filtering', () => {
+    const index = fixture();
+    assert.ok(searchSounds(index, vectors, { tags: ['metal'] }).some(r => r.name === 'split'));
+    assert.deepEqual(searchSounds(index, vectors, { tags: ['metal'], excludeMultiple: true }).map(r => r.name), ['both']);
+    assert.ok(!searchSounds(index, vectors, { base: 'base', excludeMultiple: true }).some(r => r.name === 'split'));
+    assert.ok(searchSounds(index, vectors, {}).some(r => r.name === 'split'));
+});

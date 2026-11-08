@@ -28,7 +28,9 @@ export class SoundSearchResource
         const index = { ...tagData, events: buildSearchEvents(sounds, hashes, durations) };
         const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', binary))].map(b => b.toString(16).padStart(2, '0')).join('');
         if (hash !== index.vectorHash) throw new Error('Vector checksum mismatch');
-        this.worker = new Worker(new URL('./SoundSearchWorker.js', import.meta.url), { type: 'module' });
+        const workerUrl = new URL('./SoundSearchWorker.js', import.meta.url);
+        workerUrl.searchParams.set('revision', 'exclude-multiple-v1');
+        this.worker = new Worker(workerUrl, { type: 'module' });
         this.worker.onmessage = ({ data }) => {
             const task = this.pending.get(data.id);
             if (!task) return;

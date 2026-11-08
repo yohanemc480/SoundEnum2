@@ -44,6 +44,10 @@ export class SoundSearchBrowser
             clearTimeout(this.timer);
             this.timer = setTimeout(() => this.search(), 120);
         });
+        this.element('exclude-multiple').addEventListener('change', () => {
+            clearTimeout(this.timer);
+            this.search();
+        });
         document.getElementById('search-tab').addEventListener('click', () => this.load());
         this.element('retry').addEventListener('click', () => { this.index = null; this.load(); });
         this.element('clear').addEventListener('click', () => { this.element('form-container').reset(); this.search(); });
@@ -110,6 +114,7 @@ export class SoundSearchBrowser
         try {
             const { results } = await this.resource.request({ type: 'search', options: {
                 query: this.element('query').value, base, min, max,
+                excludeMultiple: this.element('exclude-multiple').checked,
                 tags: [...this.element('tags').querySelectorAll('input:checked')].map(input => input.value)
             } });
             if (id !== this.requestId) return;
