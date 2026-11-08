@@ -171,6 +171,17 @@ def save_audio_files(root, index_bytes):
         print(flush=True)
 
 
+def sort_available_versions(versions):
+    """公式のリリース日時で新しい順に並べる。"""
+    manifest, _ = download_json(MANIFEST_URL)
+    entries = {entry['id']: entry for entry in manifest['versions']}
+    missing = set(versions) - entries.keys()
+    if missing:
+        raise ValueError(f"Unknown versions in catalog: {sorted(missing)}")
+    from datetime import datetime
+    return sorted(versions, key=lambda v: (datetime.fromisoformat(entries[v]['releaseTime']), v), reverse=True)
+
+
 def update(version, root=ROOT):
     """取得・検証・保存を順に行い、最後に選択可能なバージョン一覧へ登録する。"""
     entry = fetch_version(version)
@@ -180,6 +191,7 @@ def update(version, root=ROOT):
     versions = json.loads(catalog.read_bytes()) if catalog.exists() else []
     if not isinstance(versions, list) or any(not isinstance(v, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", v) for v in versions) or len(set(versions)) != len(versions):
         raise ValueError("Invalid available versions")
+    ordered_versions = sort_available_versions(list(dict.fromkeys([*versions, version])))
     files = find_new_resource_files(root, version, resources)
 
     # 全リソースの生成後に選択肢へ登録する。
@@ -192,8 +204,8 @@ def update(version, root=ROOT):
         [sys.executable, str(root / "tools" / "build_similarity.py"), version],
         cwd=root, check=True,
     )
-    if version not in versions:
-        write_json(catalog, [version, *versions])
+    if ordered_versions != versions:
+        write_json(catalog, ordered_versions)
     print(f"Resources ready: {version}")
 
 

@@ -49,6 +49,17 @@ class UpdateTests(unittest.TestCase):
                 with self.assertRaises(OSError):
                     updater.save_audio_files(root, b'{}')
 
+    def test_versions_follow_release_dates_not_generation_or_name_order(self):
+        entries = [
+            {'id': '1.7.10', 'releaseTime': '2014-06-26T00:00:00+00:00'},
+            {'id': '26.3', 'releaseTime': '2026-09-01T00:00:00+00:00'},
+            {'id': '1.10', 'releaseTime': '2016-06-08T00:00:00+00:00'},
+            {'id': '1.9', 'releaseTime': '2016-02-29T00:00:00+00:00'},
+        ]
+        with patch.object(updater, 'download_json', return_value=({'versions': entries}, b'')):
+            self.assertEqual(updater.sort_available_versions(['1.7.10', '1.9', '26.3', '1.10']),
+                             ['26.3', '1.10', '1.9', '1.7.10'])
+
     def test_explicit_version(self):
         entries = [{"id": "26.3"}, {"id": "26.4"}]
         with patch.object(updater, "download_json", return_value=({"versions": entries}, b"")):
@@ -80,6 +91,7 @@ class UpdateTests(unittest.TestCase):
                         raise subprocess.CalledProcessError(1, command)
 
                 with patch.object(updater, "fetch_version", return_value={"id": "26.4"}), \
+                     patch.object(updater, "sort_available_versions", return_value=["26.4", "26.3"]), \
                      patch.object(updater, "fetch_sound_resources", return_value=({"hash": b"{}", "sounds": b"{}"}, b"{}")), \
                      patch.object(updater, "save_audio_files"), \
                      patch.object(updater, "build_durations"), \
