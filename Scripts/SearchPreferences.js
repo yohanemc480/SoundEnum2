@@ -1,3 +1,5 @@
+import { localStorageStore } from './LocalStorage.js';
+
 const KEY = 'soundenum.search-preferences';
 
 export function normalizePreferences(value = {}) {
@@ -13,12 +15,12 @@ export function normalizePreferences(value = {}) {
 }
 
 export function readPreferences() {
-    try { return normalizePreferences(JSON.parse(localStorage.getItem(KEY) ?? '{}')); }
+    try { return normalizePreferences(localStorageStore.read(KEY, {})); }
     catch (error) { console.warn('Cannot read search preferences', error); return normalizePreferences(); }
 }
 
 export function savePreferences(changes) {
-    try { localStorage.setItem(KEY, JSON.stringify(normalizePreferences({ ...readPreferences(), ...changes }))); }
+    try { localStorageStore.write(KEY, normalizePreferences({ ...readPreferences(), ...changes })); }
     catch (error) { console.warn('Cannot save search preferences', error); }
 }
 

@@ -1,3 +1,4 @@
+import { localStorageStore } from './LocalStorage.js';
 import { initializeVersionSelector } from './VersionSelector.js';
 import { applyText } from "./ApplyText.js";
 import { Text } from "./Text.js";
@@ -23,7 +24,7 @@ applyText();
 document.getElementById('clear-local-storage').addEventListener('click', () => {
     if (!window.confirm(Text.clearLocalStorageConfirm)) return;
     try {
-        localStorage.clear();
+        localStorageStore.clear();
         location.reload();
     } catch (error) {
         console.error(error);
