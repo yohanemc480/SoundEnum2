@@ -1,3 +1,4 @@
+import { Text } from "./Text.js";
 import { SoundManager } from "./Singletons/SoundManager.js";
 import { SettingDefine } from "./Constants/SettingDefine.js";
 
@@ -49,7 +50,7 @@ export class SelectMasterVolumeArea
             {
                 type: "range",
                 id: "preview-volume",
-                "aria-label": "試聴音量",
+                "aria-label": Text.previewVolume,
                 min: SettingDefine.MinMasterVolume,
                 max: SettingDefine.MaxMasterVolume,
                 step: "0.01", 

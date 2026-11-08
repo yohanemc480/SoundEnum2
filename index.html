@@ -3,87 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SoundEnum — Minecraft Sound Browser</title>
+  <title data-i18n="appTitle"></title>
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
   <header class="app-header">
-    <div><div class="eyebrow">MINECRAFT SOUND BROWSER</div><h1>SoundEnum<span class="brand-dot">.</span></h1></div>
-    <p>音を探して、聴いて、コマンドに。</p>
+    <div><div class="eyebrow" data-i18n="appEyebrow"></div><h1>SoundEnum<span class="brand-dot">.</span></h1></div>
+    <p data-i18n="appTagline"></p>
   </header>
   <main class="workspace">
-    <section class="main" aria-label="サウンド選択">
+    <section class="main" data-i18n-aria-label="soundSelection">
       <section class="panel browser-panel">
-        <div class="section-heading"><h2>サウンドを探す</h2></div>
-        <div class="browser-tabs" role="tablist" aria-label="探し方">
-          <button type="button" id="category-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="category-panel">カテゴリ</button>
-          <button type="button" id="duration-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="duration-panel" tabindex="-1">再生時間</button>
+        <div class="section-heading"><h2 data-i18n="browserTitle"></h2></div>
+        <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
+          <button type="button" id="category-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="category-panel" data-i18n="category"></button>
+          <button type="button" id="duration-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="duration-panel" tabindex="-1" data-i18n="duration"></button>
         </div>
         <div id="category-panel" role="tabpanel" aria-labelledby="category-tab">
         <div class="sound-genres-list">
-          <section class="genre-column"><h3><span>01</span> カテゴリ</h3><div class="sound-genres" id="sound-genres-first"></div></section>
-          <section class="genre-column"><h3><span>02</span> 対象</h3><div class="sound-genres" id="sound-genres-second"></div></section>
-          <section class="genre-column"><h3><span>03</span> サウンド</h3><div class="sound-genres" id="sound-genres-third"></div></section>
+          <section class="genre-column"><h3><span>01</span> <span data-i18n="category"></span></h3><div class="sound-genres" id="sound-genres-first"></div></section>
+          <section class="genre-column"><h3><span>02</span> <span data-i18n="target"></span></h3><div class="sound-genres" id="sound-genres-second" data-i18n-data-empty-text="selectLeft"></div></section>
+          <section class="genre-column"><h3><span>03</span> <span data-i18n="sound"></span></h3><div class="sound-genres" id="sound-genres-third" data-i18n-data-empty-text="selectLeft"></div></section>
         </div>
         </div>
         <div id="duration-panel" role="tabpanel" aria-labelledby="duration-tab" hidden>
           <div class="duration-filters">
-            <label>サウンド名<input id="duration-query" type="search" placeholder="例：bell、ambient"></label>
-            <label>最小（秒）<input id="duration-min" type="number" min="0" step="any" placeholder="0"></label>
-            <label>最大（秒）<input id="duration-max" type="number" min="0" step="any" placeholder="上限なし"></label>
-            <label>並び順<select id="duration-sort"><option value="asc">短い順（最短時間）</option><option value="desc">長い順（最長時間）</option></select></label>
+            <label><span data-i18n="soundName"></span><input id="duration-query" type="search" data-i18n-placeholder="queryPlaceholder"></label>
+            <label><span data-i18n="durationMin"></span><input id="duration-min" type="number" min="0" step="any" placeholder="0"></label>
+            <label><span data-i18n="durationMax"></span><input id="duration-max" type="number" min="0" step="any" data-i18n-placeholder="noLimit"></label>
+            <label><span data-i18n="sort"></span><select id="duration-sort"><option value="asc" data-i18n="sortAscending"></option><option value="desc" data-i18n="sortDescending"></option></select></label>
           </div>
-          <p class="section-note">ピッチ設定1での時間。複数候補は最短〜最長で表示し、全候補が指定範囲に収まるものを検索します。クリックでランダムに試聴。</p>
+          <p class="section-note" data-i18n="durationNote"></p>
           <p id="duration-status" role="status"></p>
-          <button id="duration-retry" type="button" hidden>再読み込み</button>
+          <button id="duration-retry" type="button" hidden data-i18n="retry"></button>
           <div id="duration-list" class="duration-list"></div>
-          <nav id="duration-pagination" class="duration-pagination" aria-label="再生時間検索のページ" hidden>
-            <button id="duration-previous" type="button">前へ</button>
-            <select id="duration-page" aria-label="ページを選択"></select>
-            <button id="duration-next" type="button">次へ</button>
+          <nav id="duration-pagination" class="duration-pagination" data-i18n-aria-label="durationPagination" hidden>
+            <button id="duration-previous" type="button" data-i18n="previous"></button>
+            <select id="duration-page" data-i18n-aria-label="selectPage"></select>
+            <button id="duration-next" type="button" data-i18n="next"></button>
           </nav>
         </div>
       </section>
     </section>
-    <aside class="sub" aria-label="試聴と履歴">
+    <aside class="sub" data-i18n-aria-label="previewAndHistory">
       <section class="panel preview-panel">
-        <div class="section-heading"><h2>試聴</h2><span class="preview-indicator"><span id="preview-loading" role="status" aria-label="読み込み中" hidden></span>PREVIEW</span></div>
-        <input id="preview-seek" type="range" min="0" max="0" step="0.01" value="0" aria-label="再生位置" disabled>
+        <div class="section-heading"><h2 data-i18n="preview"></h2><span class="preview-indicator"><span id="preview-loading" role="status" data-i18n-aria-label="loading" hidden></span><span data-i18n="previewBadge"></span></span></div>
+        <input id="preview-seek" type="range" min="0" max="0" step="0.01" value="0" data-i18n-aria-label="seek" disabled>
         <div class="preview-transport">
-          <button id="preview-toggle" type="button" aria-label="再生" title="再生" disabled>
+          <button id="preview-toggle" type="button" data-i18n-aria-label="play" data-i18n-title="play" disabled>
             <svg class="preview-play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
             <svg class="preview-pause-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
           </button>
           <div class="preview-volume-control">
-            <button id="preview-volume-toggle" type="button" aria-label="試聴音量を調整" title="試聴音量" aria-controls="select-master-volume" aria-expanded="false">
+            <button id="preview-volume-toggle" type="button" data-i18n-aria-label="adjustPreviewVolume" data-i18n-title="previewVolume" aria-controls="select-master-volume" aria-expanded="false">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 9v6h4l5 4V5L7 9H3zm12-1v8a5 5 0 0 0 0-8zm0-4v2a7 7 0 0 1 0 12v2a9 9 0 0 0 0-16z"/></svg>
             </button>
-            <div class="param" id="select-master-volume" role="group" aria-label="試聴音量" hidden></div>
+            <div class="param" id="select-master-volume" role="group" data-i18n-aria-label="previewVolume" hidden></div>
           </div>
           <output id="preview-time">0:00.0 / 0:00.0</output>
         </div>
         <p id="preview-status" role="status"></p>
       </section>
       <section class="panel command-panel">
-        <div class="section-heading"><h2>コマンド</h2><button type="button" id="command-settings-button" class="settings-button" popovertarget="command-settings">設定</button></div>
+        <div class="section-heading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" class="settings-button" popovertarget="command-settings" data-i18n="settings"></button></div>
         <div class="output" aria-live="polite"></div>
       </section>
       <section class="panel history-panel">
-        <div class="section-heading"><h2>再生履歴</h2></div>
-        <p class="section-note">クリックで再生・コピー</p>
-        <div class="history"></div>
+        <div class="section-heading"><h2 data-i18n="historyTitle"></h2></div>
+        <p class="section-note" data-i18n="historyNote"></p>
+        <div class="history" data-i18n-data-empty-text="historyEmpty"></div>
       </section>
     </aside>
   </main>
   <section id="command-settings" class="settings-popover" popover="auto" aria-labelledby="command-settings-title">
-    <div class="section-heading"><h2 id="command-settings-title">コマンド設定</h2><button type="button" class="settings-button" popovertarget="command-settings" popovertargetaction="hide" aria-label="コマンド設定を閉じる">閉じる</button></div>
+    <div class="section-heading"><h2 id="command-settings-title" data-i18n="commandSettings"></h2><button type="button" class="settings-button" popovertarget="command-settings" popovertargetaction="hide" data-i18n-aria-label="closeCommandSettings" data-i18n="close"></button></div>
         <div class="params">
-          <label class="param" id="select-source"><span class="param-label">ソース</span></label>
-          <label class="param" id="select-sound-volume"><span class="param-label">音量</span></label>
-          <div class="param" id="select-pitch" role="group" aria-label="ピッチ"><span class="param-label">ピッチ</span></div>
-          <div class="param" id="select-min-volume" role="group" aria-label="最低音量"><span class="param-label">最低音量</span></div>
+          <label class="param" id="select-source"><span class="param-label" data-i18n="source"></span></label>
+          <label class="param" id="select-sound-volume"><span class="param-label" data-i18n="volume"></span></label>
+          <div class="param" id="select-pitch" role="group" data-i18n-aria-label="pitch"><span class="param-label" data-i18n="pitch"></span></div>
+          <div class="param" id="select-min-volume" role="group" data-i18n-aria-label="minVolume"><span class="param-label" data-i18n="minVolume"></span></div>
         </div>
   </section>
   <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>

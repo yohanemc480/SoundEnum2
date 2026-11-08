@@ -1,3 +1,4 @@
+import { Text } from "./Text.js";
 import { SoundResourcePaths } from "./Constants/SoundResourcePaths.js";
 import { SoundManager } from "./Singletons/SoundManager.js";
 import { HistoryManager } from "./Singletons/HistoryManager.js";
@@ -71,7 +72,7 @@ export class DurationBrowser
     {
         if (this.entries !== null || this.loading) return;
         this.loading = true;
-        this.status.textContent = '再生時間を読み込み中…';
+        this.status.textContent = Text.durationLoading;
         document.querySelector('#duration-retry').hidden = true;
         try {
             const response = await fetch(SoundResourcePaths.Durations);
@@ -79,7 +80,7 @@ export class DurationBrowser
             this.entries = createDurationEntries(this.resource, this.hashes, await response.json());
             this.render();
         } catch (error) {
-            this.status.textContent = '再生時間を読み込めませんでした。データを生成済みか確認してください。';
+            this.status.textContent = Text.durationLoadFailure;
             document.querySelector('#duration-retry').hidden = false;
             console.error(error);
         } finally { this.loading = false; }
@@ -95,7 +96,7 @@ export class DurationBrowser
         this.list.replaceChildren();
         this.pagination.hidden = true;
         if (!minInput.validity.valid || !maxInput.validity.valid || Number.isNaN(min) || Number.isNaN(max) || min > max) {
-            this.status.textContent = '0以上の秒数を、最小 ≤ 最大になるように指定してください。';
+            this.status.textContent = Text.durationInvalidRange;
             return;
         }
         this.filtered = filterDurationEntries(this.entries, document.querySelector('#duration-query').value.trim(), min, max, document.querySelector('#duration-sort').value === 'desc');
@@ -111,7 +112,7 @@ export class DurationBrowser
         this.list.scrollTop = 0;
         this.pageSelect.replaceChildren();
         for (let index = 0; index < totalPages; index++) {
-            this.pageSelect.add(new Option(`${index + 1} / ${totalPages} ページ`, index));
+            this.pageSelect.add(new Option(Text.durationPage(index + 1, totalPages), index));
         }
         this.pageSelect.value = String(this.page);
         this.previous.disabled = this.page === 0;
@@ -125,7 +126,7 @@ export class DurationBrowser
             name.textContent = entry.name;
             const duration = document.createElement('span');
             duration.className = 'duration-value';
-            duration.textContent = Math.abs(entry.max - entry.min) < 0.001 ? `${entry.min.toFixed(3)} 秒` : `${entry.min.toFixed(3)}–${entry.max.toFixed(3)} 秒`;
+            duration.textContent = Math.abs(entry.max - entry.min) < 0.001 ? Text.durationSeconds(entry.min.toFixed(3)) : Text.durationRange(entry.min.toFixed(3), entry.max.toFixed(3));
             button.append(name, duration);
             button.addEventListener('click', () => {
                 const manager = SoundManager.Instance;
@@ -141,6 +142,6 @@ export class DurationBrowser
         }
         const first = this.page * 100 + 1;
         const last = Math.min((this.page + 1) * 100, this.filtered.length);
-        this.status.textContent = this.filtered.length ? `${this.filtered.length} 件中 ${first}–${last} 件` : '条件に合うサウンドはありません。';
+        this.status.textContent = this.filtered.length ? Text.durationResults(this.filtered.length, first, last) : Text.durationEmpty;
     }
 }

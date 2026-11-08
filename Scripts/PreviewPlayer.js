@@ -1,3 +1,4 @@
+import { Text } from "./Text.js";
 /** 試聴中の音声と再生ボタン・シークバーを同期する。 */
 export class PreviewPlayer
 {
@@ -18,7 +19,7 @@ export class PreviewPlayer
             const ready = Number.isFinite(audio.duration) && audio.duration > 0 && !audio.error;
             button.disabled = !audio.getAttribute('src') || !!audio.error;
             const playing = !audio.paused && !audio.ended;
-            const label = playing ? '一時停止' : '再生';
+            const label = playing ? Text.pause : Text.play;
             button.classList.toggle('is-playing', playing);
             button.setAttribute('aria-label', label);
             button.title = label;
@@ -38,7 +39,7 @@ export class PreviewPlayer
                 await audio.play();
                 status.textContent = '';
             } catch (error) {
-                if (error.name !== 'AbortError') status.textContent = '再生できませんでした。音声を選び直してください。';
+                if (error.name !== 'AbortError') status.textContent = Text.previewSelectAgain;
             }
             update();
         });
@@ -86,8 +87,8 @@ export class PreviewPlayer
             audio.addEventListener(event, () => { loading.hidden = true; });
         }
         audio.addEventListener('canplay', () => { status.textContent = ''; update(); });
-        audio.addEventListener('error', () => { status.textContent = '音声を読み込めませんでした。'; update(); });
-        audio.addEventListener('previewerror', () => { status.textContent = '再生できませんでした。再生ボタンで再試行してください。'; update(); });
+        audio.addEventListener('error', () => { status.textContent = Text.previewLoadFailure; update(); });
+        audio.addEventListener('previewerror', () => { status.textContent = Text.previewRetry; update(); });
         update();
     }
 }

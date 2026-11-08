@@ -1,3 +1,5 @@
+import { applyText } from "./ApplyText.js";
+import { Text } from "./Text.js";
 import { DurationBrowser } from "./DurationBrowser.js";
 import { PreviewPlayer } from "./PreviewPlayer.js";
 console.log("main.jsの読み込みを始めました");
@@ -19,6 +21,8 @@ import { ResourceManager } from "./Singletons/ResourceManager.js";
 
 
 
+applyText();
+
 // リソースの読み込み
 const soundHashResource = await new MCSoundHashResource(
     await new NetworkFileLoader(SoundResourcePaths.Hash).FetchData()
@@ -36,7 +40,7 @@ new SoundManager();
 new PreviewPlayer(SoundManager.Instance.GetAudio());
 new HistoryManager();
 
-let outputArea = new OutputArea(".output", "コマンド出力エリア");
+let outputArea = new OutputArea(".output", Text.commandOutput);
 
 let soundNames = playsoundCommandParamResouce.GetAllCommandSoundName();
 let tree = new SoundGenreTree(soundNames);
