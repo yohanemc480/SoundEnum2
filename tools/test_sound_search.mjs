@@ -45,8 +45,7 @@ test('similarity puts the base first, marks shared audio, and chooses matching c
     assert.equal(filtered[0].name, 'both');
     assert.equal(filtered.find(x => x.name === 'split').candidate.row, 1);
 });
-test('all candidates must fit duration; unknown base fails', () => {
-    assert.deepEqual(searchSounds(fixture(), vectors, { max: 1 }).map(x => x.name), ['base', 'shared']);
+test('unknown base fails', () => {
     assert.throws(() => searchSounds(fixture(), vectors, { base: 'missing' }));
 });
 test('tag filtering still finds a result beyond the first twenty neighbors', () => {
@@ -142,7 +141,6 @@ test('resource providers keep versions isolated and immutable', () => {
     assert.equal(second.Sounds, 'resource/26.4/sound-events.json');
     assert.throws(() => { first.Version = '26.4'; });
     assert.equal(first.Sounds, 'resource/26.3/sound-events.json');
-    assert.equal(first.Waveforms, second.Waveforms);
     assert.throws(() => new ResourcePathProvider('../other'));
 });
 

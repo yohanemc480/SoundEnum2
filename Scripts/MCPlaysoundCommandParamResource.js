@@ -25,21 +25,6 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
     }
 
     /**
-     * エイリアス的に設定されているサウンドを解決する。
-     * "hoge"というキー名のsoundsを探しに行くみたいな。
-     * 解決先もcompoundであることが前提になっている。
-     * @param {*} aliasSound {"name":"hoge","type":"event"}みたいな形式
-     * @returns [{"name":"~","type":"sounds",,},{},{},,,]
-     */
-    ResolveAliasSound(aliasSound)
-    {
-        const events = JSON.parse(this._rawResource);
-        const wrapper = '__soundenum_alias__';
-        if (Object.hasOwn(events, wrapper)) throw new Error('Reserved alias key');
-        return resolveSoundEvents({ ...events, [wrapper]: { sounds: [aliasSound] } })[wrapper];
-    }
-
-    /**
      * コマンド名からサウンドのパラメータを取得する。
      * @param {*} soundCommandName "ambient.warped_forest.mood"みたいな形式
      * @returns [{"name":"~","type":"sounds",,},{},{},,,]
@@ -67,5 +52,4 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
         }
         return true;
     }
-
 }

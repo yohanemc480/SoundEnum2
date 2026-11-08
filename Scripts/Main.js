@@ -9,7 +9,6 @@ import { Text } from "./Text.js";
 import { PreviewPlayer } from "./PreviewPlayer.js";
 import { initializeBrowserTabs } from "./BrowserTabs.js";
 import { SoundSearchBrowser } from "./SoundSearchBrowser.js";
-console.log("main.jsの読み込みを始めました");
 import { MCSoundHashResource } from "./MCSoundHashResource.js";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.js";
 import { NetworkFileLoader } from "./NetworkFileLoader.js";

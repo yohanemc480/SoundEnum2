@@ -8,7 +8,6 @@ export class MCRawSound
     _volume = 1;
     _pitch = 1;
     _weight = 1;
-    _soundLink = "";//サーバーから直接音源を DLできるリンク
     _rawSoundName = "";
 
     /**

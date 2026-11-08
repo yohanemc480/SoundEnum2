@@ -74,14 +74,4 @@ export class MCCommandSound
     {
         return formatSoundCommand({ name: this._soundName, source: this._source, volume: this._volume, pitch: this._pitch, minVolume: this._minVolume }, this._selector, this._position);
     }
-
-    /**
-     * 他のコマンドサウンドと同一かを判定する。
-     * @param {*} other
-     * @returns
-     */
-    Equals(other)
-    {
-        return this.ToString() == other.ToString();
-    }
 }

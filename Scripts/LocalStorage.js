@@ -25,10 +25,6 @@ export class LocalStorage {
         this.write(schema.key, schema.normalize(value));
     }
 
-    remove(key) {
-        this.backend.removeItem(key);
-    }
-
     clear() {
         this.backend.clear();
     }

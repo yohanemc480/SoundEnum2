@@ -8,12 +8,6 @@ export class ResourcePathProvider
         Object.freeze(this);
     }
 
-    /** 同じ音声はバージョンをまたいで共通のファイルを使う。 */
-    Audio(hash)
-    {
-        return SharedAudioPaths.Audio(hash);
-    }
-
     get Hash()
     {
         return `resource/${this.Version}/audio-file-hashes.json`;
@@ -27,11 +21,6 @@ export class ResourcePathProvider
     get Durations()
     {
         return `resource/audio-durations.json`;
-    }
-
-    get Waveforms()
-    {
-        return SharedAudioPaths.Waveforms;
     }
 
     get SearchTags()
