@@ -20,11 +20,6 @@ export class SoundResourcePaths
         return `resource/${this.Version}sounds.json`;
     }
 
-    static get Durations()
-    {
-        return `resource/${this.Version}durations.json`;
-    }
-
     static get Search()
     {
         return `resource/${this.Version}search.json`;

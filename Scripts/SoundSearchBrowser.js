@@ -112,7 +112,7 @@ export class SoundSearchBrowser
         const min = this.element('min').value === '' ? 0 : this.element('min').valueAsNumber;
         const max = this.element('max').value === '' ? Infinity : this.element('max').valueAsNumber;
         if (!this.element('min').validity.valid || !this.element('max').validity.valid || !Number.isFinite(min) || Number.isNaN(max) || min > max) {
-            this.element('status').textContent = Text.durationInvalidRange; return;
+            this.element('status').textContent = Text.searchInvalidRange; return;
         }
         const base = this.element('base').value.trim();
         if (base && !this.index.events.some(event => event.name === base)) {
@@ -164,8 +164,8 @@ export class SoundSearchBrowser
         this.element('previous').disabled = this.page === 0;
         this.element('next').disabled = this.page >= pages - 1;
         this.element('pagination').hidden = !pages;
-        this.element('page').textContent = Text.durationPage(this.page + 1, pages);
-        this.element('status').textContent = this.results.length ? Text.durationResults(this.results.length, this.page * 50 + 1, Math.min((this.page + 1) * 50, this.results.length)) : Text.durationEmpty;
+        this.element('page').textContent = Text.searchPage(this.page + 1, pages);
+        this.element('status').textContent = this.results.length ? Text.searchResults(this.results.length, this.page * 50 + 1, Math.min((this.page + 1) * 50, this.results.length)) : Text.searchEmpty;
         for (const entry of this.results.slice(this.page * 50, (this.page + 1) * 50)) {
             const row = document.createElement('div'); row.className = 'search-row';
             const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'search-preview';
