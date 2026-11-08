@@ -49,7 +49,10 @@ def fetch_sound_resources(entry):
     )
     if not isinstance(sounds, dict) or not sounds:
         raise ValueError("Empty or invalid sounds.json")
-    return {"hash": index_bytes, "sounds": sound_bytes}
+    hashes = {name: asset["hash"] for name, asset in index["objects"].items()
+              if name.startswith("minecraft/sounds/") and name.endswith(".ogg")}
+    hash_bytes = (json.dumps(hashes, ensure_ascii=False, indent=2) + "\n").encode()
+    return {"hash": hash_bytes, "sounds": sound_bytes}, index_bytes
 
 
 def build_updated_references(original, version):
@@ -166,7 +169,7 @@ def update(root=ROOT):
     """取得・検証・保存を順に行い、最後にアプリの参照先を切り替える。"""
     entry = fetch_latest_release()
     version = entry["id"]
-    resources = fetch_sound_resources(entry)
+    resources, index_bytes = fetch_sound_resources(entry)
 
     definition = root / "Scripts" / "Constants" / "SoundResourcePaths.js"
     original = definition.read_bytes()
@@ -174,7 +177,7 @@ def update(root=ROOT):
     files = find_new_resource_files(root, version, resources)
 
     # 全音声とJSONを保存してから参照先を切り替える。
-    save_audio_files(root, resources["hash"])
+    save_audio_files(root, index_bytes)
     build_durations(root, version, resources["hash"])
     save_resource_files(files)
     if updated != original:

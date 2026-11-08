@@ -30,7 +30,7 @@ def main():
     resource = ROOT / 'resource'
     read = lambda p: json.loads(p.read_bytes())
     sounds = read(resource / args.version / 'sounds.json')
-    assets = read(resource / args.version / 'hash.json')['objects']
+    assets = read(resource / args.version / 'hash.json')
     durations = read(resource / args.version / 'durations.json')
     tags = read(ROOT / 'tools/sound-tags.json')
     overrides = read(ROOT / 'tools/sound-tag-overrides.json')

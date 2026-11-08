@@ -78,7 +78,7 @@ def resolve_events(sounds, assets, durations):
                 key = f"minecraft/sounds/{target}.ogg"
                 if key not in assets:
                     raise ValueError(f"Missing asset: {name}: {key}")
-                sha1 = assets[key]["hash"]
+                sha1 = assets[key]
                 if not re.fullmatch(r"[0-9a-f]{40}", sha1):
                     raise ValueError(f"Invalid hash: {sha1}")
                 duration = durations.get(sha1)

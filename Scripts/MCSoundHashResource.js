@@ -34,7 +34,7 @@ export class MCSoundHashResource extends ResourceBase
             Error(`${rawSoundResourceName}は存在しないリソースのためハッシュ値の取得に失敗しました。`)
         }
         let soundPath = this.NameToFullPath(rawSoundResourceName);
-        return this._jsonData["objects"][soundPath]["hash"];
+        return this._jsonData[soundPath];
     }
 
     /**
@@ -44,7 +44,7 @@ export class MCSoundHashResource extends ResourceBase
      */
     IsSoundResourceExist(rawSoundResourceName) {
         return Object.prototype.hasOwnProperty.call(
-            this._jsonData["objects"], this.NameToFullPath(rawSoundResourceName));
+            this._jsonData, this.NameToFullPath(rawSoundResourceName));
     }
 
     /**

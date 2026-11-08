@@ -9,7 +9,7 @@ class SearchDataTests(unittest.TestCase):
         events = {'root': {'sounds': [{'name': 'middle', 'type': 'event', 'pitch': 2}]},
                   'middle': {'sounds': [{'name': 'leaf', 'type': 'event', 'volume': .5}]},
                   'leaf': {'sounds': ['test']}}
-        result = resolve_events(events, {'minecraft/sounds/test.ogg': {'hash': HASH}}, {HASH: 4})
+        result = resolve_events(events, {'minecraft/sounds/test.ogg': HASH}, {HASH: 4})
         self.assertEqual(result['root'][0]['pitch'], 2)
         self.assertEqual(result['root'][0]['volume'], .5)
         self.assertEqual(result['root'][0]['duration'], 2)

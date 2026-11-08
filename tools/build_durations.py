@@ -43,8 +43,7 @@ def vorbis_duration(path):
 def build_durations(root, version, index_bytes=None):
     """対象バージョンの音声を解析し、ハッシュと秒数の対応を保存する。"""
     index = json.loads(index_bytes or (root / "resource" / version / "hash.json").read_bytes())
-    hashes = sorted({v["hash"] for k, v in index["objects"].items()
-                     if k.startswith("minecraft/sounds/") and k.endswith(".ogg")})
+    hashes = sorted(set(index.values()))
     durations = {}
     for sha1 in hashes:
         if not re.fullmatch(r"[0-9a-f]{40}", sha1):

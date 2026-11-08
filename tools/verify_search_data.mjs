@@ -45,7 +45,7 @@ try {
         assert.ok(event.name in sounds, event.name);
         assert.deepEqual(event.candidates.map(c => [c.name, c.pitch, c.volume]),
             resolved[event.name].map(c => [c.name, c.pitch ?? 1, c.volume ?? 1]), event.name);
-        for (const c of event.candidates) assert.equal(hashes.objects[`minecraft/sounds/${c.name}.ogg`]?.hash, c.hash);
+        for (const c of event.candidates) assert.equal(hashes[`minecraft/sounds/${c.name}.ogg`], c.hash);
     }
     const all = await resource.request({ type: 'search', options: {} });
     assert.equal(all.results.length, index.events.length);
