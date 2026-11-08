@@ -171,3 +171,14 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   .history-panel > :not(.history) { flex-shrink: 0; }
   .history { flex: 1; min-height: 0; height: auto; }
 }
+
+.search-row button:disabled { opacity: .45; cursor: default; }
+.search-row button[data-favorite] { width: 34px; padding: 6px; font-size: 20px; line-height: 18px; }
+.search-row button[data-favorite][aria-pressed="true"] { color: #f5c451; }
+@media (min-width: 1100px) and (min-height: 700px) {
+  #favorites-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  #favorites-status { flex-shrink: 0; }
+}
+@media (max-width: 560px) {
+  .browser-header { flex-wrap: wrap; }
+}

@@ -27,6 +27,16 @@ export class SearchWaveforms
         });
     }
 
+    unobserve(canvas)
+    {
+        this.observer.unobserve(canvas);
+        this.resize.unobserve(canvas);
+        this.rotation.delete(canvas);
+        this.items.delete(canvas);
+        this.visible.delete(canvas);
+        this.queue = this.queue.filter(item => item !== canvas);
+    }
+
     clear()
     {
         clearInterval(this.timer);

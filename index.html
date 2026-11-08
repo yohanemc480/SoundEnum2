@@ -19,6 +19,7 @@
         <div class="browser-header">
           <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
             <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="search-panel" data-i18n="searchTitle"></button>
+            <button type="button" id="favorites-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="favorites-panel" tabindex="-1" data-i18n="favoritesTitle"></button>
           </div>
           <label class="version-selector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label>
         </div>
@@ -44,6 +45,10 @@
           <nav id="search-pagination" class="search-pagination" hidden data-i18n-aria-label="selectPage">
             <button id="search-previous" type="button" data-i18n="previous"></button><span id="search-page"></span><button id="search-next" type="button" data-i18n="next"></button>
           </nav>
+        </div>
+        <div id="favorites-panel" role="tabpanel" aria-labelledby="favorites-tab" hidden>
+          <p id="favorites-status" role="status"></p>
+          <div id="favorites-list" class="search-list"></div>
         </div>
       </section>
     </section>

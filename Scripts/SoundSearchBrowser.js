@@ -1,3 +1,5 @@
+import { showToast } from './Toast.js';
+import { Favorites } from './Favorites.js';
 import { Text } from './Text.js';
 import { SearchWaveforms } from './SearchWaveforms.js';
 import { SoundSearchResource } from './SoundSearchResource.js';
@@ -12,6 +14,9 @@ export class SoundSearchBrowser
     constructor(outputArea, paths)
     {
         this.outputArea = outputArea;
+        try { this.favorites = new Favorites(); }
+        catch (error) { console.error(error); this.favorites = null; }
+
         this.resource = new SoundSearchResource(paths);
         this.requestId = 0;
         this.page = 0;
@@ -37,7 +42,7 @@ export class SoundSearchBrowser
 
         this.element = id => document.getElementById(`search-${id}`);
         this.form = this.element('form');
-        this.waveforms = new SearchWaveforms(this.element('panel'));
+        this.waveforms = new SearchWaveforms(document.querySelector('.browser-panel'));
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
         this.form.addEventListener('input', () => {
             ++this.requestId;
@@ -49,6 +54,10 @@ export class SoundSearchBrowser
             this.search();
         });
         document.getElementById('search-tab').addEventListener('click', () => this.load());
+        document.getElementById('favorites-tab').addEventListener('click', async () => {
+            await this.load();
+            this.renderFavorites();
+        });
         this.element('retry').addEventListener('click', () => { this.index = null; this.load(); });
         this.element('clear').addEventListener('click', () => { this.element('form-container').reset(); this.search(); });
         this.element('previous').addEventListener('click', () => { this.page--; this.render(); });
@@ -86,6 +95,7 @@ export class SoundSearchBrowser
             }
             this.form.disabled = false;
             await this.search();
+            this.renderFavorites();
         } catch (error) {
             this.index = null;
             this.resource.dispose();
@@ -149,6 +159,7 @@ export class SoundSearchBrowser
     render()
     {
         this.waveforms.clear();
+        this.renderFavorites();
         const list = this.element('list');
         this.candidatePopover.hidePopover();
         list.replaceChildren(); list.scrollTop = 0;
@@ -170,7 +181,36 @@ export class SoundSearchBrowser
                 tags: this.index.audioTags[candidate.hash], count: baseline.candidates.length });
         }
         for (const entry of entries) {
-            const candidates = this.index.events.find(event => event.name === entry.name).candidates;
+            this.appendRow(entry, entry.name === this.resultBase ? basePreview : list);
+        }
+    }
+
+    updateFavoriteButton(button) {
+        const saved = this.favorites?.names.has(button.dataset.favorite) ?? false;
+        button.textContent = saved ? '★' : '☆';
+        button.setAttribute('aria-pressed', String(saved));
+        button.title = saved ? Text.favoritesRemove : Text.favoritesAdd;
+        button.setAttribute('aria-label', `${button.title}: ${button.dataset.favorite}`);
+        button.disabled = !this.favorites;
+    }
+
+    renderFavorites() {
+        const list = document.getElementById('favorites-list');
+        list.querySelectorAll('canvas').forEach(canvas => this.waveforms.unobserve(canvas));
+        list.replaceChildren();
+        document.getElementById('favorites-status').textContent = !this.favorites ? Text.favoritesFailure :
+            !this.index ? Text.searchLoading : this.favorites.names.size ? '' : Text.favoritesEmpty;
+        if (!this.index || !this.favorites) return;
+        for (const name of this.favorites.names) {
+            const event = this.index.events.find(event => event.name === name);
+            const candidate = event?.candidates[0];
+            this.appendRow({ name, candidate, count: event?.candidates.length ?? 0,
+                score: null, sameAudio: false, tags: candidate ? this.index.audioTags[candidate.hash] : [] }, list);
+        }
+    }
+
+    appendRow(entry, container) {
+            const candidates = this.index.events.find(event => event.name === entry.name)?.candidates ?? [];
             const row = document.createElement('div'); row.className = 'search-row';
             const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'search-preview';
             const name = document.createElement('span'); name.textContent = entry.name;
@@ -180,8 +220,10 @@ export class SoundSearchBrowser
                 entry.sameAudio ? Text.searchSameAudio : ''].filter(Boolean).join(' · ');
             const metadata = document.createElement('span'); metadata.className = 'search-row-metadata';
             if (detail.textContent) metadata.append(detail);
-            metadata.append(this.createTagBadges(entry.tags));
+            if (candidates.length) metadata.append(this.createTagBadges(entry.tags));
+            else metadata.textContent = Text.favoritesUnavailable;
             preview.append(name);
+            preview.disabled = !candidates.length;
             const playCandidate = (candidate, button) => {
                 const manager = SoundManager.Instance;
                 const command = new MCCommandSound(entry.name, manager.GetSource(), MCCommandSelector.All, manager.GetVolume(), manager.GetPitch(), manager.GetMinVolume());
@@ -189,21 +231,23 @@ export class SoundSearchBrowser
                 this.outputArea.SetText(command.ToString());
                 HistoryManager.Instance.Register(command);
                 HistoryManager.Instance.ScrollToBottom();
-                this.element('panel').querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
+                document.querySelector('.browser-panel').querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
                 this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
                 button.classList.add('selected');
             };
             preview.addEventListener('click', () => playCandidate(null, preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;
+            similar.disabled = !candidates.length;
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
             similar.addEventListener('click', () => {
                 clearTimeout(this.timer);
                 this.element('form-container').reset();
                 this.element('base').value = entry.name;
+                document.getElementById('search-tab').click();
                 this.search();
             });
             const main = document.createElement('div'); main.className = 'search-row-main';
-            main.classList.toggle('search-row-base', entry.name === this.resultBase);
+            main.classList.toggle('search-row-base', entry.name === this.resultBase && !document.getElementById('favorites-panel').contains(container));
             main.addEventListener('click', event => {
                 if (event.target.closest('button')) return;
                 preview.click();
@@ -213,7 +257,17 @@ export class SoundSearchBrowser
             heading.append(preview);
             content.append(heading, metadata);
             const actions = document.createElement('div'); actions.className = 'search-row-actions';
-            actions.append(similar);
+            const favorite = document.createElement('button'); favorite.type = 'button';
+            favorite.dataset.favorite = entry.name;
+            this.updateFavoriteButton(favorite);
+            favorite.addEventListener('click', () => {
+                try {
+                    this.favorites.toggle(entry.name);
+                    document.querySelectorAll('[data-favorite]').forEach(button => this.updateFavoriteButton(button));
+                    this.renderFavorites();
+                } catch (error) { console.error(error); showToast(Text.favoritesFailure); }
+            });
+            actions.append(favorite, similar);
             const waveform = document.createElement('canvas');
             waveform.className = 'search-row-waveform';
             waveform.setAttribute('aria-hidden', 'true');
@@ -251,8 +305,7 @@ export class SoundSearchBrowser
                 trigger.className = 'search-candidate-trigger';
                 heading.append(trigger);
             }
-            (entry.name === this.resultBase ? basePreview : list).append(row);
-            this.waveforms.observe(waveform, candidates.map(candidate => candidate.hash), entry.candidate.hash);
-        }
+            container.append(row);
+            if (entry.candidate) this.waveforms.observe(waveform, candidates.map(candidate => candidate.hash), entry.candidate.hash);
     }
 }
