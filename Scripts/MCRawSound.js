@@ -1,4 +1,4 @@
-import { MCSoundHashResource } from "./MCSoundHashResource.js";
+import { SoundResourcePaths } from "./Constants/SoundResourcePaths.js";
 
 /**
  * アセットとして存在しているサウンドを表すクラス。
@@ -43,12 +43,9 @@ export class MCRawSound
         return this._volume;
     }
 
-    /**
-     * リソースサーバーへのリンクを生成する。
-     * @returns https://resources.download.minecraft.net/1f/1feb74db490a786a656387fc2ac8d682730228e2みたいな形式
-     */
+    /** サイト内に保存した音声ファイルの参照先を返す。 */
     CreateLink(soundHashResource) {
         let hash = soundHashResource.NameToHash(this._rawSoundName);
-        return `https://resources.download.minecraft.net/${hash.slice(0, 2)}/${hash}`;
+        return SoundResourcePaths.Audio(hash);
     }
 }

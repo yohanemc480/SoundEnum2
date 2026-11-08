@@ -6,11 +6,13 @@ from pathlib import Path
 import re
 import sys
 from tempfile import NamedTemporaryFile
+import time
 from urllib.request import urlopen
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_URL = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"
+ASSET_BASE_URL = "https://resources.download.minecraft.net"
 
 
 def download_json(url, sha1=None):
@@ -84,6 +86,67 @@ def save_resource_files(files):
         print(f"Saved resource/{target.name}")
 
 
+def collect_audio_assets(index_bytes):
+    """音声だけを抽出し、同じハッシュのファイルをまとめる。"""
+    objects = json.loads(index_bytes)["objects"]
+    assets = {}
+    for name, asset in objects.items():
+        if name.startswith("minecraft/sounds/") and name.endswith(".ogg"):
+            if not re.fullmatch(r"[0-9a-f]{40}", asset["hash"]):
+                raise ValueError("Invalid audio hash")
+            assets[asset["hash"]] = asset["size"]
+    if not assets:
+        raise ValueError("No audio assets found")
+    return assets
+
+
+def audio_file_is_valid(path, sha1, size):
+    """保存済み音声のサイズとハッシュを確認し、再取得の要否を判定する。"""
+    if not path.is_file() or path.stat().st_size != size:
+        return False
+    digest = hashlib.sha1()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest() == sha1
+
+
+def download_audio_file(target, sha1, size):
+    """一時ファイルに音声を取得し、検証が成功した場合だけ保存する。"""
+    temporary = None
+    try:
+        with urlopen(f"{ASSET_BASE_URL}/{sha1[:2]}/{sha1}", timeout=30) as response:
+            with NamedTemporaryFile(dir=target.parent, suffix=".tmp", delete=False) as output:
+                temporary = Path(output.name)
+                for chunk in iter(lambda: response.read(1024 * 1024), b""):
+                    output.write(chunk)
+        if not audio_file_is_valid(temporary, sha1, size):
+            raise ValueError(f"Audio validation failed: {sha1}")
+        temporary.replace(target)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
+
+def save_audio_files(root, index_bytes):
+    """未取得・破損した音声だけを順番に取得する。中断後も再実行で続行できる。"""
+    assets = collect_audio_assets(index_bytes)
+    directory = root / "resource" / "audio"
+    directory.mkdir(parents=True, exist_ok=True)
+    pending = [
+        (directory / f"{sha1}.ogg", sha1, size)
+        for sha1, size in assets.items()
+        if not audio_file_is_valid(directory / f"{sha1}.ogg", sha1, size)
+    ]
+    print(f"Audio: {len(pending)} to download, {len(assets) - len(pending)} cached", flush=True)
+    for number, (target, sha1, size) in enumerate(pending, 1):
+        # 並列取得や自動再試行は行わず、リクエストの間隔を空ける。
+        if number > 1:
+            time.sleep(0.2)
+        download_audio_file(target, sha1, size)
+        print(f"Audio {number}/{len(pending)}: {target.name}", flush=True)
+
+
 def replace_definition_file(definition, content):
     """一時ファイルへの書き込みが完了してからSoundResourcePaths.jsを差し替える。"""
     temporary = None
@@ -108,7 +171,8 @@ def update(root=ROOT):
     updated = build_updated_references(original, version)
     files = find_new_resource_files(root, version, resources)
 
-    # 書き込み前にすべて検証し、両方のファイルを保存してから参照先を切り替える。
+    # 全音声とJSONを保存してから参照先を切り替える。
+    save_audio_files(root, resources["hash"])
     save_resource_files(files)
     if updated != original:
         replace_definition_file(definition, updated)
