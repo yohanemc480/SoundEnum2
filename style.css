@@ -117,7 +117,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 #command-settings input:not([type="range"]), #command-settings select { height: 32px; padding: 5px 8px; }
 #command-settings select { padding-right: 34px; }
 #command-settings #select-source select { grid-column: 2 / -1; }
-.app-settings-popover { inset: 72px 24px auto auto; }
 .app-settings-popover > button { width: 100%; text-align: left; }
 .confirm-dialog { width: min(420px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; margin: auto; padding: 24px; border: 1px solid #42634d; border-radius: 12px; background: var(--panel); color: var(--text); box-shadow: 0 16px 48px #0008; }
 .confirm-dialog::backdrop { background: #0009; }
