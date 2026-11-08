@@ -302,8 +302,8 @@ export class SoundSearchBrowser
                     panel.replaceChildren();
                     const heading = document.createElement('div'); heading.className = 'section-heading';
                     const title = document.createElement('h2'); title.textContent = entry.name;
-                    const close = document.createElement('button'); close.type = 'button'; close.className = 'settings-button';
-                    close.textContent = Text.close;
+                    const close = document.createElement('button'); close.type = 'button'; close.className = 'settings-button close-button';
+                    close.setAttribute('aria-label', Text.close);
                     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
                     heading.append(title, close); panel.append(heading);
                     const event = this.index.events.find(event => event.name === entry.name);
