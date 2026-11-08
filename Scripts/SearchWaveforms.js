@@ -5,6 +5,7 @@ export class SearchWaveforms
 {
     constructor(list)
     {
+        this.rotation = new Map();
         this.cache = new Map();
         this.items = new Map();
         this.queue = [];
@@ -28,6 +29,9 @@ export class SearchWaveforms
 
     clear()
     {
+        clearInterval(this.timer);
+        this.timer = null;
+        this.rotation.clear();
         this.observer.disconnect();
         this.resize.disconnect();
         this.items.clear();
@@ -35,11 +39,27 @@ export class SearchWaveforms
         this.queue = [];
     }
 
-    observe(canvas, hash)
+    observe(canvas, hashes, hash = hashes[0])
     {
         this.items.set(canvas, hash);
+        this.rotation.set(canvas, { hashes: [...new Set(hashes)], next: Date.now() + 500 });
+        this.timer ??= setInterval(() => this.rotate(), 500);
         this.observer.observe(canvas);
         this.resize.observe(canvas);
+    }
+
+    rotate()
+    {
+        if (document.hidden || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        for (const canvas of this.visible) {
+            const state = this.rotation.get(canvas);
+            if (!state || state.hashes.length < 2 || !canvas.clientWidth) continue;
+            if (Date.now() < state.next) continue;
+            const index = state.hashes.indexOf(this.items.get(canvas));
+            this.items.set(canvas, state.hashes[(index + 1) % state.hashes.length]);
+            state.next = Date.now() + 500;
+            this.enqueue(canvas);
+        }
     }
 
     enqueue(canvas)
@@ -65,7 +85,7 @@ export class SearchWaveforms
                         this.cache.set(hash, peaks);
                         if (this.cache.size > 128) this.cache.delete(this.cache.keys().next().value);
                     }
-                    if (this.items.has(canvas) && canvas.isConnected) this.draw(canvas, peaks);
+                    if (this.items.get(canvas) === hash && canvas.isConnected) this.draw(canvas, peaks);
                 } catch {
                     // 波形を取得できなくても短冊の試聴操作は維持する。
                 }

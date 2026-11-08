@@ -156,6 +156,7 @@ export class SoundSearchBrowser
         this.element('page').textContent = Text.searchPage(this.page + 1, pages);
         this.element('status').textContent = this.results.length ? Text.searchResults(this.results.length, this.page * 50 + 1, Math.min((this.page + 1) * 50, this.results.length)) : Text.searchEmpty;
         for (const entry of this.results.slice(this.page * 50, (this.page + 1) * 50)) {
+            const candidates = this.index.events.find(event => event.name === entry.name).candidates;
             const row = document.createElement('div'); row.className = 'search-row';
             const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'search-preview';
             const name = document.createElement('span'); name.textContent = entry.name;
@@ -177,7 +178,7 @@ export class SoundSearchBrowser
                 this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
                 button.classList.add('selected');
             };
-            preview.addEventListener('click', () => playCandidate(entry.candidate, preview));
+            preview.addEventListener('click', () => playCandidate(candidates[Math.floor(Math.random() * candidates.length)], preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
             similar.addEventListener('click', () => {
@@ -235,7 +236,7 @@ export class SoundSearchBrowser
                 heading.append(trigger);
             }
             list.append(row);
-            this.waveforms.observe(waveform, entry.candidate.hash);
+            this.waveforms.observe(waveform, candidates.map(candidate => candidate.hash), entry.candidate.hash);
         }
     }
 }
