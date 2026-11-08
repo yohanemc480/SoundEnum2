@@ -37,7 +37,7 @@ export class SoundSearchBrowser
 
         this.element = id => document.getElementById(`search-${id}`);
         this.form = this.element('form');
-        this.waveforms = new SearchWaveforms(this.element('list'));
+        this.waveforms = new SearchWaveforms(this.element('panel'));
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
         this.form.addEventListener('input', () => {
             ++this.requestId;
@@ -62,6 +62,8 @@ export class SoundSearchBrowser
         ++this.requestId;
         this.waveforms.clear();
         this.element('list').replaceChildren();
+        this.element('base-preview').replaceChildren();
+        this.element('base-preview').hidden = true;
         this.element('pagination').hidden = true;
         this.form.disabled = true;
         this.element('retry').hidden = true;
@@ -100,12 +102,9 @@ export class SoundSearchBrowser
         const id = ++this.requestId;
         this.waveforms.clear();
         this.element('list').replaceChildren();
+        this.element('base-preview').replaceChildren();
+        this.element('base-preview').hidden = true;
         this.element('pagination').hidden = true;
-        const min = this.element('min').value === '' ? 0 : this.element('min').valueAsNumber;
-        const max = this.element('max').value === '' ? Infinity : this.element('max').valueAsNumber;
-        if (!this.element('min').validity.valid || !this.element('max').validity.valid || !Number.isFinite(min) || Number.isNaN(max) || min > max) {
-            this.element('status').textContent = Text.searchInvalidRange; return;
-        }
         const base = this.element('base').value.trim();
         if (base && !this.index.events.some(event => event.name === base)) {
             this.element('status').textContent = Text.searchInvalidBase; return;
@@ -113,12 +112,12 @@ export class SoundSearchBrowser
         this.element('status').textContent = Text.searchRunning;
         try {
             const { results } = await this.resource.request({ type: 'search', options: {
-                query: this.element('query').value, base, min, max,
+                query: this.element('query').value, base,
                 excludeMultiple: this.element('exclude-multiple').checked,
                 tags: [...this.element('tags').querySelectorAll('input:checked')].map(input => input.value)
             } });
             if (id !== this.requestId) return;
-            this.results = results; this.page = 0; this.render();
+            this.results = results.filter(entry => entry.name !== base); this.resultBase = base; this.page = 0; this.render();
         } catch (error) {
             if (id !== this.requestId) return;
             this.element('status').textContent = Text.searchFailure;
@@ -153,6 +152,10 @@ export class SoundSearchBrowser
         const list = this.element('list');
         this.candidatePopover.hidePopover();
         list.replaceChildren(); list.scrollTop = 0;
+        const basePreview = this.element('base-preview');
+        basePreview.replaceChildren();
+        const baseline = this.index.events.find(event => event.name === this.resultBase);
+        basePreview.hidden = !baseline;
         const pages = Math.ceil(this.results.length / 50);
         this.page = Math.max(0, Math.min(this.page, pages - 1));
         this.element('previous').disabled = this.page === 0;
@@ -160,7 +163,13 @@ export class SoundSearchBrowser
         this.element('pagination').hidden = !pages;
         this.element('page').textContent = Text.searchPage(this.page + 1, pages);
         this.element('status').textContent = this.results.length ? Text.searchResults(this.results.length, this.page * 50 + 1, Math.min((this.page + 1) * 50, this.results.length)) : Text.searchEmpty;
-        for (const entry of this.results.slice(this.page * 50, (this.page + 1) * 50)) {
+        const entries = this.results.slice(this.page * 50, (this.page + 1) * 50);
+        if (baseline) {
+            const candidate = baseline.candidates[0];
+            entries.unshift({ name: baseline.name, candidate, score: null, sameAudio: false,
+                tags: this.index.audioTags[candidate.hash], count: baseline.candidates.length });
+        }
+        for (const entry of entries) {
             const candidates = this.index.events.find(event => event.name === entry.name).candidates;
             const row = document.createElement('div'); row.className = 'search-row';
             const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'search-preview';
@@ -180,7 +189,7 @@ export class SoundSearchBrowser
                 this.outputArea.SetText(command.ToString());
                 HistoryManager.Instance.Register(command);
                 HistoryManager.Instance.ScrollToBottom();
-                list.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
+                this.element('panel').querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
                 this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
                 button.classList.add('selected');
             };
@@ -194,6 +203,7 @@ export class SoundSearchBrowser
                 this.search();
             });
             const main = document.createElement('div'); main.className = 'search-row-main';
+            main.classList.toggle('search-row-base', entry.name === this.resultBase);
             main.addEventListener('click', event => {
                 if (event.target.closest('button')) return;
                 preview.click();
@@ -241,7 +251,7 @@ export class SoundSearchBrowser
                 trigger.className = 'search-candidate-trigger';
                 heading.append(trigger);
             }
-            list.append(row);
+            (entry.name === this.resultBase ? basePreview : list).append(row);
             this.waveforms.observe(waveform, candidates.map(candidate => candidate.hash), entry.candidate.hash);
         }
     }

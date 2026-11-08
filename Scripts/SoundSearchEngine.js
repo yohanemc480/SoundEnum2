@@ -20,7 +20,7 @@ export function searchSounds(index, vectors, { query = '', tags = [], min = 0, m
     const result = [];
     for (const event of index.events) {
         if (excludeMultiple && event.candidates.length > 1) continue;
-        if (event.name === base || !event.name.includes(query.trim().toLowerCase())) continue;
+        if (!event.name.includes(query.trim().toLowerCase())) continue;
         if (!event.candidates.every(c => c.duration >= min && c.duration <= max)) continue;
         const candidates = event.candidates.filter(c => tags.every(tag => index.audioTags[c.hash].includes(tag)));
         if (!candidates.length) continue;
@@ -30,7 +30,7 @@ export function searchSounds(index, vectors, { query = '', tags = [], min = 0, m
             sameAudio: baseRows.has(candidate.row), tags: index.audioTags[candidate.hash],
             count: event.candidates.length });
     }
-    return result.sort((a, b) => (baseline ? b.score - a.score : 0) || a.name.localeCompare(b.name));
+    return result.sort((a, b) => (baseline ? Number(b.name === base) - Number(a.name === base) || b.score - a.score : 0) || a.name.localeCompare(b.name));
 }
 
 export function validateSearchData(index, vectors, version)

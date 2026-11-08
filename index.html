@@ -26,10 +26,8 @@
               <div class="search-filters">
                 <label><span data-i18n="soundName"></span><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"></label>
                 <label><span data-i18n="searchBase"></span><input id="search-base" list="search-choices" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><datalist id="search-choices"></datalist></label>
-                <label><span data-i18n="searchDurationMin"></span><input id="search-min" type="number" min="0" step="any" placeholder="0"></label>
-                <label><span data-i18n="searchDurationMax"></span><input id="search-max" type="number" min="0" step="any" data-i18n-placeholder="noLimit"></label>
+                <div class="search-tags-field"><span data-i18n="searchTags"></span><div id="search-tags" class="search-tags" role="group" data-i18n-aria-label="searchTags"></div></div>
               </div>
-              <p data-i18n="searchTags"></p><div id="search-tags" class="search-tags" role="group" data-i18n-aria-label="searchTags"></div>
               <div class="search-options-row">
                 <label class="search-option"><input id="search-exclude-multiple" type="checkbox"><span data-i18n="searchExcludeMultiple"></span></label>
                 <button id="search-clear" type="button" data-i18n="searchClear"></button>
@@ -39,6 +37,7 @@
           <!-- <p class="section-note" data-i18n="searchNote"></p> -->
           <p id="search-status" role="status"></p>
           <button id="search-retry" type="button" hidden data-i18n="retry"></button>
+          <div id="search-base-preview" data-i18n-aria-label="searchBase" role="region" hidden></div>
           <div id="search-list" class="search-list"></div>
           <nav id="search-pagination" class="search-pagination" hidden data-i18n-aria-label="selectPage">
             <button id="search-previous" type="button" data-i18n="previous"></button><span id="search-page"></span><button id="search-next" type="button" data-i18n="next"></button>

@@ -63,7 +63,8 @@ try {
     for (const base of representatives.filter(name => name in sounds)) {
         const started = performance.now();
         const result = await resource.request({ type: 'search', options: { base } });
-        assert.ok(result.results.every(row => row.name !== base && Number.isFinite(row.score)));
+        assert.equal(result.results[0].name, base);
+        assert.ok(result.results.every(row => Number.isFinite(row.score)));
         for (let i = 1; i < result.results.length; i++) assert.ok(result.results[i - 1].score >= result.results[i].score);
         reports.push({ base, milliseconds: Math.round(performance.now() - started),
             top: result.results.slice(0, 5).map(row => ({ name: row.name, score: +row.score.toFixed(3) })) });

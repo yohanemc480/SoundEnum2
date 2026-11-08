@@ -35,10 +35,12 @@ test('event aliases preserve nested pitch and volume without changing the source
 test('AND matches one candidate, not a union across an event', () => {
     assert.deepEqual(searchSounds(fixture(), vectors, { tags: ['water', 'metal'] }).map(x => x.name), ['both']);
 });
-test('similarity excludes self, marks shared audio, and chooses matching candidate', () => {
+test('similarity puts the base first, marks shared audio, and chooses matching candidate', () => {
     const rows = searchSounds(fixture(), vectors, { base: 'base' });
-    assert.equal(rows[0].name, 'shared'); assert.equal(rows[0].sameAudio, true);
-    assert.equal(rows[0].score, 1); assert.ok(!rows.some(x => x.name === 'base'));
+    assert.equal(rows[0].name, 'base'); assert.equal(rows[0].score, 1);
+    assert.equal(rows.find(x => x.name === 'shared').sameAudio, true);
+    const sharedBase = searchSounds(fixture(), vectors, { base: 'shared' });
+    assert.equal(sharedBase[0].name, 'shared');
     const filtered = searchSounds(fixture(), vectors, { base: 'base', tags: ['metal'] });
     assert.equal(filtered[0].name, 'both');
     assert.equal(filtered.find(x => x.name === 'split').candidate.row, 1);
