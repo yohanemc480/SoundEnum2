@@ -10,6 +10,34 @@ export class SelectMasterVolumeArea
     _slider;
     constructor(appendTarget)
     {
+        const control = document.querySelector('.preview-volume-control');
+        const button = document.querySelector('#preview-volume-toggle');
+        const panel = document.querySelector(appendTarget);
+        const setOpen = open => {
+            panel.hidden = !open;
+            button.setAttribute('aria-expanded', String(open));
+        };
+        // アイコンからスライダーへ移動しても閉じず、タッチとキーボードでも操作できる。
+        control.addEventListener('pointerenter', event => {
+            if (event.pointerType !== 'touch') setOpen(true);
+        });
+        control.addEventListener('pointerleave', () => {
+            if (!control.contains(document.activeElement)) setOpen(false);
+        });
+        control.addEventListener('focusin', () => setOpen(true));
+        control.addEventListener('focusout', event => {
+            if (!control.contains(event.relatedTarget)) setOpen(false);
+        });
+        button.addEventListener('click', () => setOpen(true));
+        document.addEventListener('pointerdown', event => {
+            if (!control.contains(event.target)) setOpen(false);
+        });
+        control.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                button.focus();
+                setOpen(false);
+            }
+        });
         $(document).ready(() =>
         {
             let $textHolder = $("<div>",
@@ -20,6 +48,8 @@ export class SelectMasterVolumeArea
             let $slider = $("<input>",
             {
                 type: "range",
+                id: "preview-volume",
+                "aria-label": "試聴音量",
                 min: SettingDefine.MinMasterVolume,
                 max: SettingDefine.MaxMasterVolume,
                 step: "0.01", 

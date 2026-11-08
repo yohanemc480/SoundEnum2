@@ -1,4 +1,5 @@
 import { DurationBrowser } from "./DurationBrowser.js";
+import { PreviewPlayer } from "./PreviewPlayer.js";
 console.log("main.jsの読み込みを始めました");
 import { SoundGenreTree } from "./SoundGenreTree.js";
 import { MCSoundHashResource } from "./MCSoundHashResource.js";
@@ -32,6 +33,7 @@ playsoundCommandParamResouce.ParseResource();
 
 new ResourceManager(playsoundCommandParamResouce, soundHashResource);
 new SoundManager();
+new PreviewPlayer(SoundManager.Instance.GetAudio());
 new HistoryManager();
 
 let outputArea = new OutputArea(".output", "コマンド出力エリア");

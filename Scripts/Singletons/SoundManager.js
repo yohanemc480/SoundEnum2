@@ -7,6 +7,9 @@ import { SingletonBase } from "./SingletonBase.js";
 export class SoundManager extends SingletonBase
 {
     _audio;
+    _soundVolume = 1;
+    _audioUrl;
+    _loadController;
     _masterVolume = SettingDefine.DefaultMasterVolume;
     _source = MCCommandSoundSource.Master;
     _pitch = MCCommandSound.DefaultPitch;
@@ -16,10 +19,20 @@ export class SoundManager extends SingletonBase
     constructor()
     {
         super();
+        this._audio = new Audio();
+        this._audio.preservesPitch = false;
     }
 
-    Play(commandSound)
+    GetAudio()
     {
+        return this._audio;
+    }
+
+    async Play(commandSound)
+    {
+        this._loadController?.abort();
+        const controller = new AbortController();
+        this._loadController = controller;
         if (this._audio != null)
         {
             this._audio.pause();
@@ -27,20 +40,37 @@ export class SoundManager extends SingletonBase
 
         var soundHashResource = ResourceManager.Instance.GetSoundHashResouce();
         var rawSound = commandSound.GetRawSoundRandomly();
-        this._audio = new Audio(rawSound.CreateLink(soundHashResource));
+        this._audio.removeAttribute('src');
+        this._audio.load();
+        if (this._audioUrl) URL.revokeObjectURL(this._audioUrl);
+        this._audioUrl = null;
+        this._audio.dispatchEvent(new Event('loadstart'));
+        // 音声全体を保持し、配信サーバーの Range 対応に依存せずシークする。
+        try {
+            const response = await fetch(rawSound.CreateLink(soundHashResource), { signal: controller.signal });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const blob = await response.blob();
+            if (controller.signal.aborted) return;
+            this._audioUrl = URL.createObjectURL(blob);
+            this._audio.src = this._audioUrl;
+        } catch (error) {
+            if (!controller.signal.aborted) this._audio.dispatchEvent(new Event('previewerror'));
+            return;
+        }
         this._audio.preservesPitch = false;
         this._audio.playbackRate = commandSound.GetPitch() * rawSound.GetPitch();
-        this._audio.volume = this._masterVolume * commandSound.GetVolume() * rawSound.GetVolume();
-        // メディアの読み込みが完了した時に流さないとエラーが出る。
-        this._audio.addEventListener("canplay", () =>
-        {
-            this._audio.play();
+        this._soundVolume = commandSound.GetVolume() * rawSound.GetVolume();
+        this._audio.volume = Math.min(1, Math.max(0, this._masterVolume * this._soundVolume));
+        // 読み込み後に再生する。切り替えや一時停止による中断は無視する。
+        this._audio.play().catch(error => {
+            if (error.name !== "AbortError") this._audio.dispatchEvent(new Event("previewerror"));
         });
     }
 
     SetMasterVolume(volume)
     {
         this._masterVolume = volume;
+        this._audio.volume = Math.min(1, Math.max(0, volume * this._soundVolume));
     }
 
     SetPitch(pitch)
