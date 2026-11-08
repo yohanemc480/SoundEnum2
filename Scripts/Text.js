@@ -26,7 +26,6 @@ export const Text = Object.freeze({
     play: "再生",
     preview: "試聴",
     previewAndHistory: "試聴と履歴",
-    previewBadge: "PREVIEW",
     previewLoadFailure: "音声を読み込めませんでした。",
     previewRetry: "再生できませんでした。再生ボタンで再試行してください。",
     previewSelectAgain: "再生できませんでした。音声を選び直してください。",

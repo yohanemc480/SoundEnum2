@@ -7,6 +7,7 @@ export class PreviewPlayer
         const button = document.querySelector('#preview-toggle');
         const seek = document.querySelector('#preview-seek');
         const time = document.querySelector('#preview-time');
+        const soundId = document.querySelector('#preview-sound-id');
         const status = document.querySelector('#preview-status');
         const loading = document.querySelector('#preview-loading');
         let dragging = false;
@@ -16,6 +17,11 @@ export class PreviewPlayer
             return `${Math.floor(value / 60)}:${(value % 60).toFixed(1).padStart(4, '0')}`;
         };
         const update = () => {
+            const currentSoundId = audio.dataset.soundId ?? '';
+            if (soundId.textContent !== currentSoundId) {
+                soundId.textContent = currentSoundId;
+                soundId.title = currentSoundId;
+            }
             const ready = Number.isFinite(audio.duration) && audio.duration > 0 && !audio.error;
             button.disabled = !audio.getAttribute('src') || !!audio.error;
             const playing = !audio.paused && !audio.ended;

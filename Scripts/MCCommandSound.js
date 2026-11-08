@@ -41,6 +41,11 @@ export class MCCommandSound
         this._minVolume = minVolume;
     }
 
+    GetSoundName()
+    {
+        return this._soundName;
+    }
+
     GetPitch()
     {
         return this._pitch;

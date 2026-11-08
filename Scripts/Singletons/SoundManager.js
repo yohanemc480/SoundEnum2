@@ -40,6 +40,7 @@ export class SoundManager extends SingletonBase
 
         var soundHashResource = ResourceManager.Instance.GetSoundHashResouce();
         var rawSound = selectedRawSound ?? commandSound.GetRawSoundRandomly();
+        this._audio.dataset.soundId = commandSound.GetSoundName();
         this._audio.removeAttribute('src');
         this._audio.load();
         if (this._audioUrl) URL.revokeObjectURL(this._audioUrl);
