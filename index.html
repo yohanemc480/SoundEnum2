@@ -15,21 +15,35 @@
   </header>
   <main class="workspace">
     <section class="main" aria-label="サウンド選択">
-      <section class="panel settings-panel">
-        <div class="section-heading"><h2>コマンド設定</h2><span>PLAY SOUND</span></div>
-        <div class="params">
-          <label class="param" id="select-source"><span class="param-label">ソース</span></label>
-          <label class="param" id="select-sound-volume"><span class="param-label">音量</span></label>
-          <div class="param" id="select-pitch" role="group" aria-label="ピッチ"><span class="param-label">ピッチ</span></div>
-          <div class="param" id="select-min-volume" role="group" aria-label="最低音量"><span class="param-label">最低音量</span></div>
-        </div>
-      </section>
       <section class="panel browser-panel">
-        <div class="section-heading"><h2>サウンドを探す</h2><span>左から順に選択</span></div>
+        <div class="section-heading"><h2>サウンドを探す</h2></div>
+        <div class="browser-tabs" role="tablist" aria-label="探し方">
+          <button type="button" id="category-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="category-panel">カテゴリ</button>
+          <button type="button" id="duration-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="duration-panel" tabindex="-1">再生時間</button>
+        </div>
+        <div id="category-panel" role="tabpanel" aria-labelledby="category-tab">
         <div class="sound-genres-list">
           <section class="genre-column"><h3><span>01</span> カテゴリ</h3><div class="sound-genres" id="sound-genres-first"></div></section>
           <section class="genre-column"><h3><span>02</span> 対象</h3><div class="sound-genres" id="sound-genres-second"></div></section>
           <section class="genre-column"><h3><span>03</span> サウンド</h3><div class="sound-genres" id="sound-genres-third"></div></section>
+        </div>
+        </div>
+        <div id="duration-panel" role="tabpanel" aria-labelledby="duration-tab" hidden>
+          <div class="duration-filters">
+            <label>サウンド名<input id="duration-query" type="search" placeholder="例：bell、ambient"></label>
+            <label>最小（秒）<input id="duration-min" type="number" min="0" step="any" placeholder="0"></label>
+            <label>最大（秒）<input id="duration-max" type="number" min="0" step="any" placeholder="上限なし"></label>
+            <label>並び順<select id="duration-sort"><option value="asc">短い順（最短時間）</option><option value="desc">長い順（最長時間）</option></select></label>
+          </div>
+          <p class="section-note">ピッチ設定1での時間。複数候補は最短〜最長で表示し、全候補が指定範囲に収まるものを検索します。クリックでランダムに試聴。</p>
+          <p id="duration-status" role="status"></p>
+          <button id="duration-retry" type="button" hidden>再読み込み</button>
+          <div id="duration-list" class="duration-list"></div>
+          <nav id="duration-pagination" class="duration-pagination" aria-label="再生時間検索のページ" hidden>
+            <button id="duration-previous" type="button">前へ</button>
+            <select id="duration-page" aria-label="ページを選択"></select>
+            <button id="duration-next" type="button">次へ</button>
+          </nav>
         </div>
       </section>
     </section>
@@ -39,7 +53,8 @@
         <div class="param" id="select-master-volume" role="group" aria-label="試聴音量"></div>
       </section>
       <section class="panel command-panel">
-        <div class="section-heading"><h2>コマンド</h2><span>クリックでコピー</span></div>
+        <div class="section-heading"><h2>コマンド</h2><button type="button" id="command-settings-button" class="settings-button" popovertarget="command-settings">設定</button></div>
+        <p class="section-note">クリックでコピー</p>
         <div class="output" aria-live="polite"></div>
       </section>
       <section class="panel history-panel">
@@ -49,6 +64,16 @@
       </section>
     </aside>
   </main>
+  <section id="command-settings" class="settings-popover" popover="auto" aria-labelledby="command-settings-title">
+    <div class="section-heading"><h2 id="command-settings-title">コマンド設定</h2><button type="button" class="settings-button" popovertarget="command-settings" popovertargetaction="hide" aria-label="コマンド設定を閉じる">閉じる</button></div>
+        <div class="params">
+          <label class="param" id="select-source"><span class="param-label">ソース</span></label>
+          <label class="param" id="select-sound-volume"><span class="param-label">音量</span></label>
+          <div class="param" id="select-pitch" role="group" aria-label="ピッチ"><span class="param-label">ピッチ</span></div>
+          <div class="param" id="select-min-volume" role="group" aria-label="最低音量"><span class="param-label">最低音量</span></div>
+        </div>
+  </section>
+  <script src="Scripts/CommandSettingsPopover.js" type="module"></script>
   <script src="Scripts/Main.js" type="module"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@ import re
 import sys
 from tempfile import NamedTemporaryFile
 import time
+from build_durations import build_durations
 from urllib.request import urlopen
 
 
@@ -173,6 +174,7 @@ def update(root=ROOT):
 
     # 全音声とJSONを保存してから参照先を切り替える。
     save_audio_files(root, resources["hash"])
+    build_durations(root, version, resources["hash"])
     save_resource_files(files)
     if updated != original:
         replace_definition_file(definition, updated)

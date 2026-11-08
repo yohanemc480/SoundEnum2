@@ -14,3 +14,9 @@ python tools/update_sounds.py
 初回は26.3で約377 MB・4,961音声の取得が必要です。JSON取得の4リクエストに加え、必要な音声ごとに1リクエスト発生します。
 
 ローカル再生の前にこのコマンドを実行し、公開時は `resource/audio/` も配置してください。再生時にMojangへアクセスするフォールバックはありません。
+
+再生時間もOGGから集計し、`resource/<バージョン>durations.json` に保存します。保存済み音声だけから再集計する場合（通信なし）：
+
+```powershell
+python tools/build_durations.py
+```

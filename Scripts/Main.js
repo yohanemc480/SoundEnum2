@@ -1,3 +1,4 @@
+import { DurationBrowser } from "./DurationBrowser.js";
 console.log("main.jsの読み込みを始めました");
 import { SoundGenreTree } from "./SoundGenreTree.js";
 import { MCSoundHashResource } from "./MCSoundHashResource.js";
@@ -48,3 +49,4 @@ new SelectMinVolumeArea("#select-min-volume");
 GenreButtonGenerator.GenerateButtonsFromNodes(root.GetChildren(), outputArea);
 
 new SelectMasterVolumeArea("#select-master-volume");
+new DurationBrowser(playsoundCommandParamResouce, soundHashResource, outputArea);
