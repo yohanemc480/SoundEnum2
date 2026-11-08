@@ -47,7 +47,7 @@ new ResourceManager(playsoundCommandParamResouce, soundHashResource);
 new SoundManager();
 new PreviewPlayer(SoundManager.Instance.GetAudio());
 
-let outputArea = new OutputArea(".output", Text.commandOutput);
+let outputArea = new OutputArea(".output");
 
 // 各パラメータ選択エリアの追加
 mountSoundSettings(document.getElementById('command-settings'), {
