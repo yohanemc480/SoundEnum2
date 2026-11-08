@@ -3,6 +3,7 @@ import { SoundGenreTree } from "./SoundGenreTree.js";
 import { MCSoundHashResource } from "./MCSoundHashResource.js";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.js";
 import { NetworkFileLoader } from "./NetworkFileLoader.js";
+import { SoundResourcePaths } from "./Constants/SoundResourcePaths.js";
 import { GenreButtonGenerator } from "./GenreButtonGenerator.js";
 import { SoundManager } from "./Singletons/SoundManager.js";
 import { OutputArea } from "./OutputArea.js";
@@ -18,11 +19,11 @@ import { ResourceManager } from "./Singletons/ResourceManager.js";
 
 // リソースの読み込み
 const soundHashResource = await new MCSoundHashResource(
-    await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/1.21.4hash.json').FetchData()
+    await new NetworkFileLoader(SoundResourcePaths.Hash).FetchData()
 )
 
 const playsoundCommandParamResouce = await new MCPlaysoundCommandParamResource(
-    await new NetworkFileLoader('https://raw.githubusercontent.com/yohanemc480/SoundEnum2/main/resource/1.21.4sounds.json').FetchData()
+    await new NetworkFileLoader(SoundResourcePaths.Sounds).FetchData()
 )
 
 soundHashResource.ParseResource();
