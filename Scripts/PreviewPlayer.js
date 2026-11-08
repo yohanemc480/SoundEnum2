@@ -1,4 +1,5 @@
 import { Text } from "./Text.js";
+import { PreviewWaveform } from "./PreviewWaveform.js";
 /** 試聴中の音声と再生ボタン・シークバーを同期する。 */
 export class PreviewPlayer
 {
@@ -6,6 +7,7 @@ export class PreviewPlayer
     {
         const button = document.querySelector('#preview-toggle');
         const seek = document.querySelector('#preview-seek');
+        const waveform = new PreviewWaveform(audio, document.querySelector('#preview-waveform'));
         const time = document.querySelector('#preview-time');
         const soundId = document.querySelector('#preview-sound-id');
         const status = document.querySelector('#preview-status');
@@ -34,6 +36,7 @@ export class PreviewPlayer
             if (!dragging) seek.value = ready ? audio.currentTime : 0;
             time.textContent = `${format(dragging ? Number(seek.value) : audio.currentTime)} / ${format(audio.duration)}`;
             seek.setAttribute('aria-valuetext', time.textContent);
+            waveform.setProgress(ready ? Number(seek.value) / audio.duration : 0);
         };
         button.addEventListener('click', async () => {
             if (!audio.paused && !audio.ended) {
