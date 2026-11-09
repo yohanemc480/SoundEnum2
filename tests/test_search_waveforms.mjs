@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SearchWaveforms } from '../Scripts/View/Search/SearchWaveforms.ts';
 
-test('waveform loading uses the injected source and ignores results for removed canvases', async t => {
+test('注入した取得元から波形を読み込み、削除済みCanvasへの結果を無視する', async t => {
     class Observer { observe() {} unobserve() {} disconnect() {} }
     const original = { IntersectionObserver: globalThis.IntersectionObserver, ResizeObserver: globalThis.ResizeObserver };
     globalThis.IntersectionObserver = Observer; globalThis.ResizeObserver = Observer;
@@ -25,7 +25,7 @@ test('waveform loading uses the injected source and ignores results for removed 
     assert.equal(waves.running, false);
 });
 
-test('waveforms cycle visible candidates independently of playback', () => {
+test('再生とは独立して表示中の波形候補を順番に切り替える', () => {
     globalThis.document = { hidden: false };
     globalThis.window = { matchMedia: () => ({ matches: false }) };
     try {

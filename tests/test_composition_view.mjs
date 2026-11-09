@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HtmlCompositionView } from '../Scripts/View/Composition/HtmlCompositionView.ts';
 
-test('composition view retains settings elements, reports validity and releases popover listeners', () => {
+test('設定入力欄を維持し、入力の有効性を通知してポップオーバーの購読を解放する', () => {
     const oldDocument = globalThis.document, oldWindow = globalThis.window, oldOption = globalThis.Option;
     class Element extends EventTarget {
         constructor(tag = 'div') { super(); this.tag = tag; }

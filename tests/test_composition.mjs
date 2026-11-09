@@ -33,7 +33,7 @@ function audioFixture(t) {
         requests: () => requests, closed: () => closed };
 }
 
-test('all buffers prepare before aligned playback; volume, duration and cleanup remain correct', async t => {
+test('全音源の準備後に同時再生し、音量・再生時間・解放処理を維持する', async t => {
     const f = audioFixture(t);
     await f.playback.play(f.rows);
     assert.equal(f.requests(), 1);
@@ -54,7 +54,7 @@ test('all buffers prepare before aligned playback; volume, duration and cleanup 
     f.playback.dispose(); f.playback.dispose(); assert.equal(f.closed(), 1);
 });
 
-test('stopping or disposing during download prevents late sources and unsubscribes notifications', async t => {
+test('ダウンロード中の停止・破棄後は再生せず、通知の購読を解除する', async t => {
     const f = audioFixture(t); let finish;
     f.fetchMock.mock.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
     let notifications = 0; const unsubscribe = f.playback.subscribe(() => notifications++);
@@ -68,7 +68,7 @@ test('stopping or disposing during download prevents late sources and unsubscrib
     assert.equal(f.sources.length, 0); assert.equal(notifications, before); assert.equal(f.frames.size, 0);
 });
 
-test('failed fetch and decode report errors; completion releases gains and frame callbacks', async t => {
+test('取得・デコード失敗を通知し、再生終了時に音量ノードと描画予約を解放する', async t => {
     const f = audioFixture(t);
     f.fetchMock.mock.mockImplementation(async () => ({ ok: false, status: 404 }));
     await f.playback.play(f.rows); assert.equal(f.playback.read().phase, 'error'); assert.equal(f.sources.length, 0);
@@ -82,7 +82,7 @@ test('failed fetch and decode report errors; completion releases gains and frame
     assert.ok(f.gains.every(gain => gain.disconnected));
 });
 
-test('superseded decoding cannot start old sources after the new composition is playing', async t => {
+test('新しい組み合わせの再生後に古いデコード結果で再生しない', async t => {
     const f = audioFixture(t); let finishDecode;
     const decode = t.mock.method(f.context, 'decodeAudioData', () => new Promise(resolve => { finishDecode = resolve; }));
     const oldPlay = f.playback.play(f.rows);
@@ -94,14 +94,14 @@ test('superseded decoding cannot start old sources after the new composition is 
     assert.equal(f.playback.read().rows[0].name, 'new'); assert.equal(f.playback.read().duration, 4);
 });
 
-test('stopping during context resume prevents even the first fetch', async t => {
+test('音声処理の再開待ちで停止した場合は音源取得を開始しない', async t => {
     const f = audioFixture(t); let finishResume;
     t.mock.method(f.context, 'resume', () => new Promise(resolve => { finishResume = resolve; }));
     const pending = f.playback.play(f.rows); f.playback.stop(); finishResume(); await pending;
     assert.equal(f.requests(), 0); assert.equal(f.sources.length, 0);
 });
 
-test('composition keeps duplicates and precision, rejecting invalid settings', () => {
+test('組み合わせの重複と数値精度を保持し、不正な設定を拒否する', () => {
     const row = { name: 'a', source: 'block', volume: 2.3, pitch: .75, minVolume: .35 };
     assert.deepEqual(normalizeComposition([row, row]), [row, row]);
     for (const patch of [{ pitch: 0 }, { volume: NaN }, { source: 'invalid' }, { minVolume: -1 }, { minVolume: 1.1 }, { minVolume: NaN }])

@@ -27,7 +27,7 @@ npm run build
 npm run preview
 ```
 
-- `test`: Nodeテスト。層間の依存方向と循環参照も検査します。専用ローダーで.css.tsのファイルスコープを設定し、実際のクラス名exportを読み込みます。CSSの描画は行わず、CSS生成はViteビルドで検証します。
+- `test`: `tests/` 配下のNodeテスト。層間の依存方向と循環参照も検査します。専用ローダーで.css.tsのファイルスコープを設定し、実際のクラス名exportを読み込みます。CSSの描画は行わず、CSS生成はViteビルドで検証します。
 - `verify:data`: 先頭バージョンの実データを使い、検索・Worker・チェックサムを検証します。
 - `typecheck`: アプリ・Worker・ツールを検査し、Model・Presenter・ContractsはDOMライブラリなしでも型チェックします。
 - `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。Pythonによるデータ生成は実行しません。
@@ -50,3 +50,13 @@ Node.jsは型を除去して実行するだけなので、テスト成功は型�
 ## 起動時の表示
 
 HTML内に初回描画用の最小CSSを置き、暗い背景と読み込み表示を先に出します。Scripts/App/Bootstrap.tsがモジュールとUIの初期化完了後に画面を表示します。失敗時は再読み込みボタンを表示します。検索インデックスの読み込みは従来どおり画面内で継続します。
+
+## テストの配置
+
+テストケースとNode用CSSローダーは `tests/` にまとめています。テスト名は日本語で記述し、実行結果にも確認内容を表示します。データ生成・更新ツールは引き続き `tools/` に置きます。
+
+Nodeテストは `npm test`、Pythonの更新・検索データ生成テストは次で実行します。Python側は `tools/requirements-clap.txt` の依存環境を使用します。
+
+```powershell
+python -m unittest discover -s tests -p "test_*.py" -v
+```

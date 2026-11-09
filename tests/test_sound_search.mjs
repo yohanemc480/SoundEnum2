@@ -18,7 +18,7 @@ function fixture() {
             { name: 'split', candidates: [candidate(0), candidate(1)] }, { name: 'both', candidates: [candidate(2)] }] };
 }
 const vectors = new Float32Array([1, 0, 0, 1, .6, .8]);
-test('event aliases preserve nested pitch and volume without changing the source', () => {
+test('イベント参照の入れ子でも音量・ピッチを保持し、元データを変更しない', () => {
     const events = { root: { sounds: [{ name: 'middle', type: 'event', pitch: 2 }] },
         middle: { sounds: [{ name: 'leaf', type: 'event', volume: .5 }] },
         leaf: { sounds: [{ name: 'minecraft:raw', pitch: .75 }] } };
@@ -32,10 +32,10 @@ test('event aliases preserve nested pitch and volume without changing the source
     assert.throws(() => resolveSoundEventReferences({ a: { sounds: [{ name: 'a', type: 'event' }] } }), /Circular/);
     assert.throws(() => resolveSoundEventReferences({ a: { sounds: [{ name: 'missing', type: 'event' }] } }), /Missing/);
 });
-test('AND matches one candidate, not a union across an event', () => {
+test('AND条件はイベント全体の候補の寄せ集めではなく、同じ候補で満たす', () => {
     assert.deepEqual(searchSounds(fixture(), vectors, { tags: ['water', 'metal'] }).map(x => x.name), ['both']);
 });
-test('similarity puts the base first, marks shared audio, and chooses matching candidate', () => {
+test('類似検索は基準音を先頭にし、共有音源を示して条件に合う候補を選ぶ', () => {
     const rows = searchSounds(fixture(), vectors, { referenceSoundName: 'base' });
     assert.equal(rows[0].name, 'base'); assert.equal(rows[0].score, 1);
     assert.equal(rows.find(x => x.name === 'shared').sameAudio, true);
@@ -45,30 +45,30 @@ test('similarity puts the base first, marks shared audio, and chooses matching c
     assert.equal(filtered[0].name, 'both');
     assert.equal(filtered.find(x => x.name === 'split').candidate.vectorRow, 1);
 });
-test('unknown base fails', () => {
+test('存在しない基準音では失敗する', () => {
     assert.throws(() => searchSounds(fixture(), vectors, { referenceSoundName: 'missing' }));
 });
-test('tag filtering still finds a result beyond the first twenty neighbors', () => {
+test('類似度上位20件の外でもタグ条件に合う結果を見つける', () => {
     const index = fixture();
     for (let i = 0; i < 30; i++) index.events.push({ name: `extra${i}`, candidates: [index.events[0].candidates[0]] });
     assert.equal(searchSounds(index, vectors, { referenceSoundName: 'base', tags: ['water', 'metal'] })[0].name, 'both');
 });
-test('data validation rejects wrong versions, invalid vectors and references', () => {
+test('不正なバージョン・ベクトル・参照をデータ検証で拒否する', () => {
     validateSearchData(fixture(), vectors, 'test');
     assert.throws(() => validateSearchData(fixture(), vectors, 'other'));
     assert.throws(() => validateSearchData(fixture(), new Float32Array(6), 'test'));
     const broken = fixture(); broken.events[0].candidates[0].vectorRow = 99;
     assert.throws(() => validateSearchData(broken, vectors, 'test'));
 });
-test('UI text keys are ordered and HTML/tag labels exist', () => {
+test('辞書キーが整列され、HTMLとタグで使う文言が存在する', () => {
     assert.deepEqual(Object.keys(Text), Object.keys(Text).sort());
     const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
     for (const [, key] of html.matchAll(/data-i18n(?:-[a-z-]+)?="([^"]+)"/g)) assert.ok(key in Text, key);
-    const tags = JSON.parse(readFileSync(new URL('./sound-tags.json', import.meta.url), 'utf8'));
+    const tags = JSON.parse(readFileSync(new URL('../tools/sound-tags.json', import.meta.url), 'utf8'));
     for (const tag of tags) assert.equal(typeof Text[tag.textKey], 'string');
 });
 
-test('worker initializes little-endian vectors, searches and reports errors', async () => {
+test('Workerがリトルエンディアンのベクトルを読み込み、検索とエラー通知を行う', async () => {
     const messages = [];
     globalThis.self = { postMessage: message => messages.push(message) };
     try {
@@ -102,7 +102,7 @@ function encodeFixture() {
     return binary;
 }
 
-test('binary identifies vectors and rejects corrupt headers, lengths and duplicates', () => {
+test('バイナリの識別情報を検証し、壊れたヘッダー・長さ・重複を拒否する', () => {
     const decoded = decodeSearchVectors(encodeFixture());
     assert.deepEqual(decoded.hashes, fixture().hashes);
     assert.deepEqual(decoded.vectors, vectors);
@@ -115,7 +115,7 @@ test('binary identifies vectors and rejects corrupt headers, lengths and duplica
     assert.throws(() => decodeSearchVectors(duplicate));
 });
 
-test('search candidates derive nested settings and durations from source resources', () => {
+test('元リソースの入れ子設定と再生時間を検索候補へ反映する', () => {
     const hash = 'a'.repeat(40);
     const sounds = { root: { sounds: [{ name: 'leaf', type: 'event', pitch: 2, volume: .5, weight: 3 }] },
         leaf: { sounds: [{ name: 'minecraft:raw', pitch: .5, volume: .4, weight: 2 }] }, empty: {} };
@@ -129,7 +129,7 @@ test('search candidates derive nested settings and durations from source resourc
     assert.throws(() => buildSearchSounds(sounds, hashes, {}));
 });
 
-test('version selection accepts only generated versions and falls back to default', () => {
+test('生成済みのバージョンだけを選択し、該当しなければ既定値へ戻す', () => {
     assert.equal(selectResourceVersion(['26.3'], null), '26.3');
     assert.equal(selectResourceVersion(['26.4', '26.3'], '26.3'), '26.3');
     assert.equal(selectResourceVersion(['26.4', '26.3'], '../other'), '26.4');
@@ -138,7 +138,7 @@ test('version selection accepts only generated versions and falls back to defaul
     assert.throws(() => selectResourceVersion(['26.3', '26.3'], null));
 });
 
-test('resource providers keep versions isolated and immutable', () => {
+test('リソースの参照先をバージョンごとに分離し、変更できないようにする', () => {
     const first = new ResourcePathProvider('26.3');
     const second = new ResourcePathProvider('26.4');
     assert.equal(first.Sounds, 'resource/26.3/sound-events.json');
@@ -148,7 +148,7 @@ test('resource providers keep versions isolated and immutable', () => {
     assert.throws(() => new ResourcePathProvider('../other'));
 });
 
-test('exclude multiple checks original candidates before tag filtering', () => {
+test('複数候補の除外はタグ絞り込み前の候補数で判断する', () => {
     const index = fixture();
     assert.ok(searchSounds(index, vectors, { tags: ['metal'] }).some(r => r.name === 'split'));
     assert.deepEqual(searchSounds(index, vectors, { tags: ['metal'], excludeMultipleCandidates: true }).map(r => r.name), ['both']);

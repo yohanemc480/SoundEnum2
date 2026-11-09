@@ -5,7 +5,7 @@ import { LocalStorageKey } from '../Scripts/Infrastructure/Storage/LocalStorageK
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-test('favorites persist names with the existing key and survive new instances', () => {
+test('既存の保存キーでお気に入りを保存し、別インスタンスで復元する', () => {
     let value = null; const keys = [];
     const storage = new LocalStorage({ getItem: key => { keys.push(key); return value; }, setItem: (key, next) => { keys.push(key); value = next; } });
     const store = new LocalFavoriteSoundsStore(storage), model = new FavoriteSounds();
@@ -20,7 +20,7 @@ test('favorites persist names with the existing key and survive new instances', 
     assert.ok(keys.every(key => key === LocalStorageKey.Favorites));
 });
 
-test('favorite model copies values and rejects invalid data without changing state', () => {
+test('お気に入りの値をコピーし、不正なデータでは状態を変更しない', () => {
     const model = new FavoriteSounds(); const input = ['a', 'a', 'b']; model.replace(input);
     input.push('c'); const copy = model.read(); copy.push('d');
     assert.deepEqual(model.read(), ['a', 'b']);

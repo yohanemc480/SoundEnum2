@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DisposalScope } from '../Scripts/App/DisposalScope.ts';
 import { fetchTextResource } from '../Scripts/Infrastructure/Resources/FetchTextResource.ts';
 
-test('startup cleanup releases registered resources in reverse order exactly once', () => {
+test('登録済みリソースを逆順に一度だけ解放する', () => {
     const scope = new DisposalScope(), order = [];
     scope.defer(() => order.push('listeners'));
     const audio = { dispose: () => order.push('audio') }; assert.equal(scope.own(audio), audio);
@@ -11,7 +11,7 @@ test('startup cleanup releases registered resources in reverse order exactly onc
     assert.deepEqual(order, ['view', 'audio', 'listeners']); assert.throws(() => scope.throwIfDisposed(), /disposed/);
 });
 
-test('one broken disposer does not prevent other resources from being released', () => {
+test('一つの解放処理が失敗しても残りの解放を続ける', () => {
     const scope = new DisposalScope(), order = [];
     scope.defer(() => order.push('first'));
     scope.defer(() => { throw new Error('cleanup'); });
@@ -20,7 +20,7 @@ test('one broken disposer does not prevent other resources from being released',
     assert.deepEqual(order, ['last', 'first']); assert.doesNotThrow(() => scope.dispose());
 });
 
-test('a resource arriving after shutdown is immediately released and cannot continue initialization', async () => {
+test('終了後に届いたリソースを即座に解放し、初期化を続けない', async () => {
     const scope = new DisposalScope(); let finish, released = 0;
     const pending = new Promise(resolve => { finish = resolve; });
     const initialization = pending.then(resource => scope.own(resource));
@@ -28,7 +28,7 @@ test('a resource arriving after shutdown is immediately released and cannot cont
     await assert.rejects(initialization, /disposed/); assert.equal(released, 1);
 });
 
-test('startup resource fetch preserves text, rejects HTTP errors and supports shutdown cancellation', async t => {
+test('起動時の取得内容を維持し、HTTPエラーと終了時の通信中断を扱う', async t => {
     const controller = new AbortController();
     const mock = t.mock.method(globalThis, 'fetch', async (path, options) => {
         assert.equal(path, 'resource/example.json'); assert.equal(options.signal, controller.signal);

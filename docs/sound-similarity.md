@@ -73,8 +73,8 @@ pipが`No matching distribution found`を表示した場合、それだけでは
 ## テスト
 
 ```powershell
-python -m unittest discover -s tools -p test_sound_search.py
-node --test tools/test_sound_search.mjs
+python -m unittest discover -s tests -p test_sound_search.py
+node --import ./tests/register_css_tests.mjs --test tests/test_sound_search.mjs
 
 # 全件生成後、Webローダー・Workerで実データを検証
 node tools/verify_search_data.mjs

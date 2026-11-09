@@ -40,7 +40,7 @@ function setup(overrides = {}) {
     return { state, service, presenter, change, run };
 }
 
-test('presenter restores valid conditions and paginates without DOM globals', async () => {
+test('DOMなしで有効な検索条件を復元し、ページを切り替える', async () => {
     const h = setup({ options: { ...options, tags: ['metal', 'removed'], referenceSoundName: 'reference' },
         service: { search: async () => [result('reference'), ...Array.from({ length: 101 }, (_, i) => result(`sound${i}`))] } });
     await h.presenter.load();
@@ -54,7 +54,7 @@ test('presenter restores valid conditions and paginates without DOM globals', as
     h.presenter.dispose();
 });
 
-test('typing invalidates pending responses before debounce and ignores reversed responses', async () => {
+test('入力時に保留応答を無効化し、待機時間や応答順の逆転で古い結果を表示しない', async () => {
     const h = setup(); await h.presenter.load();
     const first = deferred(), second = deferred();
     h.service.search = value => value.query === 'first' ? first.promise : second.promise;
@@ -76,7 +76,7 @@ test('typing invalidates pending responses before debounce and ignores reversed 
     h.presenter.dispose();
 });
 
-test('load failure is retryable and invalid reference never reaches search service', async () => {
+test('読込失敗を再試行でき、不正な基準音を検索サービスへ渡さない', async () => {
     let loads = 0, searches = 0;
     const h = setup({ service: { load: async () => { if (++loads === 1) throw new Error('missing'); return index; },
         search: async () => { searches++; return []; } } });
@@ -88,7 +88,7 @@ test('load failure is retryable and invalid reference never reaches search servi
     h.presenter.dispose();
 });
 
-test('search failure retries and clear resets all conditions', async () => {
+test('検索失敗を再試行でき、クリア操作で全条件をリセットする', async () => {
     let fail = true;
     const h = setup({ service: { search: async () => { if (fail) throw new Error('failed'); return []; } } });
     await h.presenter.load(); assert.equal(h.state.statuses.at(-1), 'failure');
@@ -99,7 +99,7 @@ test('search failure retries and clear resets all conditions', async () => {
     h.presenter.dispose();
 });
 
-test('similar search, composition and preview pass values instead of elements', async () => {
+test('類似検索・組み合わせ追加・試聴にはDOM要素ではなく値を渡す', async () => {
     const h = setup(); await h.presenter.searchSimilar('reference');
     assert.equal(h.state.activated, true);
     assert.equal(h.state.saved.at(-1).referenceSoundName, 'reference');
@@ -110,7 +110,7 @@ test('similar search, composition and preview pass values instead of elements', 
     h.presenter.dispose();
 });
 
-test('favorite cancellation and storage failures preserve displayed state', async () => {
+test('お気に入り操作の取消や保存失敗では表示状態を維持する', async () => {
     const favorites = { read: () => ['reference'], save() { throw new Error('storage'); } };
     const confirmation = deferred();
     const h = setup({ favorites, confirm: () => confirmation.promise }); await h.presenter.load();
@@ -122,7 +122,7 @@ test('favorite cancellation and storage failures preserve displayed state', asyn
     h.presenter.dispose();
 });
 
-test('favorite read failures disable only favorites and prevent overwriting corrupt data', async () => {
+test('お気に入りの読込失敗は他機能を妨げず、破損データを上書きしない', async () => {
     let writes = 0;
     const h = setup({ favorites: { read() { throw new Error('corrupt'); }, save() { writes++; } } });
     await h.presenter.load();
@@ -132,7 +132,7 @@ test('favorite read failures disable only favorites and prevent overwriting corr
     h.presenter.dispose();
 });
 
-test('favorite changes persist before display, keep unavailable names and ignore late confirmations', async () => {
+test('お気に入りは保存成功後に表示し、不明な音も保持して古い確認結果を無視する', async () => {
     let saved = ['unavailable']; const confirmation = deferred();
     const h = setup({ favorites: { read: () => saved, save: value => { saved = [...value]; } }, confirm: () => confirmation.promise });
     await h.presenter.load(); assert.equal(h.state.favorites.at(-1).rows[0].candidateCount, 0);
@@ -144,7 +144,7 @@ test('favorite changes persist before display, keep unavailable names and ignore
     assert.deepEqual(saved, ['unavailable', 'reference']);
 });
 
-test('dispose cancels waiting work and prevents late load or search from updating view', async () => {
+test('破棄時に待機処理を取り消し、遅れた読込・検索結果を表示しない', async () => {
     const loading = deferred(); const h = setup({ service: { load: () => loading.promise } });
     const pending = h.presenter.load(); h.presenter.dispose(); loading.resolve(index); await pending;
     assert.equal(h.state.initialOptions, undefined); assert.equal(h.state.unbound, true);

@@ -5,7 +5,7 @@ import { CommandSettingsPresenter } from '../Scripts/Presenter/CommandSettingsPr
 import { createCommandSettingsView } from '../Scripts/View/Settings/CommandSettingsView.ts';
 import { LocalStorageSchema } from '../Scripts/Infrastructure/Storage/LocalStorageSchema.ts';
 
-test('shared settings preserve precision and reset only their own saved values', () => {
+test('共通設定の数値精度を維持し、リセットは対象の保存値だけを変更する', () => {
     const oldDocument = globalThis.document, oldOption = globalThis.Option;
     class Element {
         children = []; listeners = {};

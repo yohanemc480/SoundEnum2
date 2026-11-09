@@ -11,7 +11,7 @@ class FakeAudio extends EventTarget {
 }
 const request = { soundName: 'event', hash: 'a', url: '/audio', pitch: 1, volume: 1.5 };
 
-test('playback keeps pitch and volume, ignores superseded downloads and reports errors', async () => {
+test('音量・ピッチを維持し、古い取得結果を無視してエラーを通知する', async () => {
     const previous = { fetch: globalThis.fetch, requestAnimationFrame: globalThis.requestAnimationFrame, cancelAnimationFrame: globalThis.cancelAnimationFrame };
     const requests = []; const audio = new FakeAudio();
     globalThis.requestAnimationFrame = () => 1; globalThis.cancelAnimationFrame = () => {};
@@ -35,7 +35,7 @@ test('playback keeps pitch and volume, ignores superseded downloads and reports 
     } finally { playback.dispose(); Object.assign(globalThis, previous); }
 });
 
-test('pause and disposal prevent late audio; allocated URLs are released', async () => {
+test('一時停止・破棄後は遅れて届いた音源を再生せず、生成したURLを解放する', async () => {
     const oldFetch = globalThis.fetch, oldRevoke = URL.revokeObjectURL;
     let finish; const revoked = []; const audio = new FakeAudio();
     globalThis.fetch = () => new Promise(resolve => { finish = resolve; });
@@ -56,7 +56,7 @@ test('pause and disposal prevent late audio; allocated URLs are released', async
     } finally { playback.dispose(); globalThis.fetch = oldFetch; URL.revokeObjectURL = oldRevoke; }
 });
 
-test('missing audio hashes fail before forming an invalid audio URL', () => {
+test('音源ハッシュがない場合は不正なURLを作る前に失敗する', () => {
     const resources = new SoundPlaybackResources({ event: { sounds: ['missing'] } }, {});
     assert.throws(() => resources.candidates('event'), /Missing audio hash/);
 });

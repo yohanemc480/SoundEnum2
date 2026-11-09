@@ -99,7 +99,7 @@ Toast固有のクラス化・共有インスタンス化は今回の対象外。
 - `ResourcePathProvider.js`、`SharedAudioPaths`、`VersionSelector.js`にリソースパスがある。
 - `SoundSearchResource.js`はURLを変数に格納・加工してWorkerを生成する。Viteの静的解析に合う形へ変更が必要。
 - WorkerのURLと`SoundSearchEngine.js`のimportにキャッシュ回避用のrevisionがある。
-- `tools/test_*.mjs`はNodeのテストランナーとJSへの直接importを使用する。`verify_search_data.mjs`はNode Workerで実データを検証する。
+- `tests/test_*.mjs`はNodeのテストランナーとJSへの直接importを使用する。`verify_search_data.mjs`はNode Workerで実データを検証する。
 - Pythonによる音源・検索データの生成は、フロントエンドのビルドとは独立している。
 
 ## 採用する構成

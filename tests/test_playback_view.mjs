@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { HtmlPlaybackView } from '../Scripts/View/Playback/HtmlPlaybackView.ts';
 
-test('player preserves drag position, commits once and cancels drag on sound change', () => {
+test('ドラッグ位置を維持して一度だけ確定し、音源変更時にドラッグを取り消す', () => {
     const previous = { document: globalThis.document, window: globalThis.window, ResizeObserver: globalThis.ResizeObserver };
     class Element extends EventTarget {
         value = '0'; disabled = false; clientWidth = 0; clientHeight = 0;

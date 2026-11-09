@@ -28,7 +28,7 @@ function press(tab, key) {
     tab.dispatchEvent(event); return event;
 }
 
-test('tabs restore selection and change only the tab preference with accessible panel state', t => {
+test('保存したタブを復元し、表示状態とタブ設定だけを更新する', t => {
     const f = fixture(t);
     assert.equal(f.tabs[1].getAttribute('aria-selected'), 'true'); assert.equal(f.panels['favorites-tab-panel'].hidden, false);
     assert.equal(globalThis.document.activeElement, null);
@@ -38,7 +38,7 @@ test('tabs restore selection and change only the tab preference with accessible 
     assert.deepEqual(Object.values(f.panels).map(panel => panel.hidden), [true, true, false]);
 });
 
-test('arrow keys wrap and Home/End move focus while notifying existing click subscribers', t => {
+test('矢印キーで循環移動し、Home・Endでフォーカスと選択を切り替える', t => {
     const f = fixture(t, 'search-tab'); let activations = 0;
     f.tabs.forEach(tab => tab.addEventListener('click', () => activations++));
     assert.equal(press(f.tabs[0], 'ArrowLeft').defaultPrevented, true); assert.equal(f.state.tab, 'compositions-tab');
@@ -49,7 +49,7 @@ test('arrow keys wrap and Home/End move focus while notifying existing click sub
     assert.equal(press(f.tabs[0], 'Escape').defaultPrevented, false); assert.equal(activations, 4);
 });
 
-test('unknown saved tabs fall back to search and disposed views no longer move focus or write', t => {
+test('不明なタブは検索へ戻し、破棄後はフォーカスや保存値を変更しない', t => {
     const f = fixture(t, 'unknown'); assert.equal(f.state.tab, 'search-tab');
     const writes = f.writes(); f.presenter.dispose(); f.view.dispose();
     f.tabs[1].click(); const event = press(f.tabs[0], 'End');

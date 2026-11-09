@@ -5,7 +5,7 @@ import { SoundPlaybackResources } from '../Scripts/Infrastructure/Resources/Soun
 const hash = 'a'.repeat(40);
 const hashes = { 'minecraft/sounds/example.ogg': hash };
 
-test('playback resources resolve aliases, combine settings and preserve candidate defaults', () => {
+test('イベント参照を展開し、設定を合成して候補の既定値を保持する', () => {
     const resources = new SoundPlaybackResources({
         base: { sounds: ['minecraft:example', { name: 'example', pitch: 2, volume: 0, weight: 3 }] },
         alias: { sounds: [{ name: 'minecraft:base', type: 'event', pitch: 0.5, volume: 0.8, weight: 2 }] },
@@ -24,7 +24,7 @@ test('playback resources resolve aliases, combine settings and preserve candidat
     assert.throws(() => resources.candidates('toString'), /Missing sound event/);
 });
 
-test('playback resources reject malformed data and broken event references during construction', () => {
+test('生成時に不正なデータと壊れたイベント参照を拒否する', () => {
     assert.throws(() => new SoundPlaybackResources([], hashes), /Invalid sound events/);
     assert.throws(() => new SoundPlaybackResources({}, { example: 'invalid' }), /Invalid audio hash/);
     assert.throws(() => new SoundPlaybackResources({ event: { sounds: [{ name: 'missing', type: 'event' }] } }, hashes), /Missing sound event/);

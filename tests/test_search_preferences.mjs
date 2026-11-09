@@ -12,7 +12,7 @@ const savePreferences = changes => preferences.update(changes);
 const saveSearchOptions = options => searchPreferences.save(options);
 const restoreSearchPreferences = (saved, index) => restoreSearchOptions(toSearchOptions(normalizePreferences(saved)), index);
 
-test('renamed search options preserve stored keys, version and active tab', () => {
+test('検索項目の改名後も保存キー・バージョン・選択タブを維持する', () => {
     let value = JSON.stringify({ version: '26.3', query: 'bell', base: 'old', tags: ['metal'],
         excludeMultiple: true, tab: 'favorites-tab' });
     globalThis.localStorage = { getItem: () => value, setItem: (_, next) => { value = next; } };
@@ -26,7 +26,7 @@ test('renamed search options preserve stored keys, version and active tab', () =
     } finally { delete globalThis.localStorage; }
 });
 
-test('preferences persist all fields and partial updates preserve search conditions', () => {
+test('全設定を保存し、部分更新でも検索条件を維持する', () => {
     let value = null;
     globalThis.localStorage = { getItem: () => value, setItem: (_, next) => { value = next; } };
     try {
@@ -37,7 +37,7 @@ test('preferences persist all fields and partial updates preserve search conditi
         assert.deepEqual(readPreferences(), { ...state, version: '1.7.10' });
     } finally { delete globalThis.localStorage; }
 });
-test('restoration removes unavailable base and tags while retaining other preferences', () => {
+test('復元時に利用できない基準音とタグを除き、他の設定は維持する', () => {
     const restored = restoreSearchPreferences({ query: 'bell', base: 'missing', tags: ['metal', 'old'], excludeMultiple: true, tab: 'favorites-tab' }, { events: [{ name: 'base' }], tags: [{ id: 'metal' }] });
     assert.equal(restored.referenceSoundName, '');
     assert.deepEqual(restored.tags, ['metal']);
@@ -45,12 +45,12 @@ test('restoration removes unavailable base and tags while retaining other prefer
     assert.equal(restored.excludeMultipleCandidates, true);
     assert.equal(restoreSearchPreferences({ base: 'base' }, { events: [{ name: 'base' }], tags: [] }).referenceSoundName, 'base');
 });
-test('malformed fields fall back to safe defaults', () => {
+test('不正な設定項目は安全な既定値へ戻す', () => {
     assert.deepEqual(normalizePreferences(null), normalizePreferences());
     assert.deepEqual(normalizePreferences({ query: 1, tags: 'metal', tab: 'missing', excludeMultiple: 'true' }), normalizePreferences());
 });
 
-test('preference storage failures keep search usable and report warnings without changing saved data', t => {
+test('設定の保存に失敗しても検索でき、保存データを変えずに警告する', t => {
     const warnings = []; t.mock.method(console, 'warn', (...args) => warnings.push(args));
     let value = '{', failWrite = false;
     const store = new LocalBrowserPreferencesStore(new LocalStorage({

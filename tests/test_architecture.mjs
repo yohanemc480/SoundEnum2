@@ -53,7 +53,7 @@ function layerOf(path) {
     return relative(root, path).split(/[\\/]/)[0];
 }
 
-test('application imports follow MVP boundaries and have no cycles including type references', () => {
+test('型参照を含む依存がMVPの境界を守り、循環参照や孤立ファイルがない', () => {
     const files = filesIn(root);
     const graph = new Map();
     for (const file of files) {

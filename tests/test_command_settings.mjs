@@ -4,7 +4,7 @@ import { CommandSettings, normalizeCommandSettings } from '../Scripts/Model/Comm
 import { CommandSettingsPresenter } from '../Scripts/Presenter/CommandSettingsPresenter.ts';
 import { LocalCommandSettingsStore } from '../Scripts/Infrastructure/Storage/LocalCommandSettingsStore.ts';
 
-test('command settings restore and persist precise values across instances', () => {
+test('設定値の精度を保って保存し、別インスタンスで復元する', () => {
     let saved = JSON.stringify({ source: 'block', volume: 3.25, pitch: 1.23, minVolume: .37 });
     globalThis.localStorage = { getItem: () => saved, setItem: (_, value) => { saved = value; } };
     try {
@@ -20,12 +20,12 @@ test('command settings restore and persist precise values across instances', () 
     } finally { delete globalThis.localStorage; }
 });
 
-test('command settings reject invalid values and clamp bounded controls', () => {
+test('不正な設定値を拒否し、範囲付きの値を上下限に収める', () => {
     assert.deepEqual(normalizeCommandSettings({ source: 'invalid', volume: Infinity, pitch: 9, minVolume: -1 }),
         { source: 'master', volume: 1, pitch: 2, minVolume: 0 });
 });
 
-test('failed settings writes preserve model and displayed values', () => {
+test('保存に失敗してもModelと表示値を維持する', () => {
     const model = new CommandSettings(); let actions, displayed, failures = 0;
     const initial = { source: 'block', volume: 3, pitch: 1.5, minVolume: .2 };
     new CommandSettingsPresenter(model, { bind: value => { actions = value; }, show: value => { displayed = value; } },

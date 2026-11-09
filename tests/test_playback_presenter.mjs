@@ -8,7 +8,7 @@ const candidate = { name: 'raw', hash: 'a', pitch: .5, volume: .5, weight: 1 };
 const deferred = () => { let resolve; const promise = new Promise(yes => { resolve = yes; }); return { promise, resolve }; };
 const flush = async () => { for (let i = 0; i < 4; i++) await Promise.resolve(); };
 
-test('playback presenter composes multipliers and commands and rejects stale waveform results', async () => {
+test('音量・ピッチの倍率とコマンドを組み立て、古い波形結果を無視する', async () => {
     let state = { revision: 0, hash: '', playing: false }, listener, actions, command, request, seeks = [], pauses = 0;
     const peaks = [], loading = new Map(); let unsubscribed = false, unbound = false;
     const playback = {
@@ -37,7 +37,7 @@ test('playback presenter composes multipliers and commands and rejects stale wav
     assert.equal(peaks.length, count); assert.equal(unsubscribed, true); assert.equal(unbound, true);
 });
 
-test('playback resource adapter resolves injected data and preserves candidate weights', () => {
+test('注入したデータから再生候補を解決し、候補の重みを保持する', () => {
     const hash = 'a'.repeat(40);
     const resources = new SoundPlaybackResources({ event: { sounds: [{ name: 'raw', pitch: .75, volume: .2, weight: 3 }] } },
         { 'minecraft/sounds/raw.ogg': hash });

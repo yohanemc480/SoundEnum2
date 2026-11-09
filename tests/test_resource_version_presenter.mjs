@@ -15,7 +15,7 @@ function fixture(requested = null, load = async () => ['new', 'old']) {
     return { state, presenter };
 }
 
-test('version selection prioritizes URL over saved values and only navigates to listed versions', async () => {
+test('保存値よりURLのバージョンを優先し、一覧にある版だけへ遷移する', async () => {
     for (const [requested, expected] of [[null, 'old'], ['new', 'new'], ['unknown', 'new'], ['', 'new']]) {
         const { state, presenter } = fixture(requested);
         const pending = presenter.load(); assert.equal(presenter.load(), pending); assert.equal(await pending, expected);
@@ -26,7 +26,7 @@ test('version selection prioritizes URL over saved values and only navigates to 
     }
 });
 
-test('version failures can retry and malformed lists never reach storage', async () => {
+test('バージョン取得を再試行でき、不正な一覧を保存しない', async () => {
     let fail = true; const { state, presenter } = fixture(null, async () => fail ? ['same', 'same'] : ['new']);
     await assert.rejects(presenter.load(), /Invalid/); assert.equal(state.failures, 1); assert.equal(state.saved.length, 0);
     fail = false; assert.equal(await presenter.load(), 'new'); presenter.dispose();
@@ -34,14 +34,14 @@ test('version failures can retry and malformed lists never reach storage', async
     await assert.rejects(failed.presenter.load(), /offline/); assert.equal(failed.state.failures, 1); failed.presenter.dispose();
 });
 
-test('disposal cancels the service and prevents late display and writes', async () => {
+test('破棄時に取得を中止し、遅れて届いた結果で表示や保存を更新しない', async () => {
     let finish; const { state, presenter } = fixture(null, () => new Promise(resolve => { finish = resolve; }));
     const pending = presenter.load(); presenter.dispose(); presenter.dispose(); finish(['new']);
     await assert.rejects(pending, /disposed/); assert.equal(state.disposed, 1);
     assert.equal(state.saved.length, 0); assert.equal(state.shown.length, 0); assert.equal(state.failures, 0);
 });
 
-test('version navigation preserves other query values and the fragment', () => {
+test('バージョン変更時も他のクエリとフラグメントを保持する', () => {
     const old = globalThis.location; let destination;
     globalThis.location = { href: 'https://example.test/path?other=1&version=old#part', assign: value => { destination = value; } };
     try {
@@ -50,7 +50,7 @@ test('version navigation preserves other query values and the fragment', () => {
     } finally { if (old === undefined) delete globalThis.location; else globalThis.location = old; }
 });
 
-test('version requests bypass cache, report HTTP failure and expose an abortable request', async t => {
+test('一覧取得はキャッシュを使わず、HTTPエラーを通知して中断できる', async t => {
     let options;
     t.mock.method(globalThis, 'fetch', async (url, request) => { assert.equal(url, 'resource/available-versions.json'); options = request; return { ok: false, status: 404 }; });
     const resources = new FetchResourceVersions(); await assert.rejects(resources.load(), /404/);

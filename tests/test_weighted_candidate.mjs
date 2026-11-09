@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { selectWeightedCandidate } from '../Scripts/Model/Playback/SelectWeightedCandidate.ts';
 
-test('selection respects weights including boundaries', () => {
+test('境界値を含めて重みに従って候補を選ぶ', () => {
     const sounds = [{name: 'a', weight: 1}, {name: 'b', weight: 3}];
     const choose = n => selectWeightedCandidate(sounds, s => s.weight, () => n);
     assert.equal(choose(0), sounds[0]);

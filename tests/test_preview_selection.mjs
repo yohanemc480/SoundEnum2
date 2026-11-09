@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { selectSoundPreview } from '../Scripts/View/Components/SelectSoundPreview.ts';
 import { selected } from '../Scripts/View/Components/SoundPreviewRow.css.ts';
 
-test('preview selection clears other surfaces and keeps only the latest target selected', () => {
+test('別画面の試聴選択を解除し、最後に選んだ対象だけを選択状態にする', () => {
     const previous = globalThis.document;
     const buttons = Array.from({ length: 3 }, () => {
         const classes = new Set([selected]);

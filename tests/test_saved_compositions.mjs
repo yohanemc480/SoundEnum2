@@ -8,7 +8,7 @@ import { normalizeSavedCompositions } from '../Scripts/Model/Composition/Composi
 import { normalizePreferences } from '../Scripts/Model/Search/SearchPreferences.ts';
 import { normalizeCompositionName } from '../Scripts/Model/Composition/CompositionData.ts';
 
-test('saved compositions copy settings, retain duplicate sounds and validate limits', () => {
+test('保存した組み合わせの設定をコピーし、音の重複を保持して件数上限を検証する', () => {
     const row = { name: 'block.anvil.destroy', source: 'block', volume: .35, pitch: 1.2, minVolume: .1 };
     const input = [{ id: 'one', name: '  Test  ', sounds: [row, row] }];
     const saved = normalizeSavedCompositions(input);
@@ -23,14 +23,14 @@ test('saved compositions copy settings, retain duplicate sounds and validate lim
     assert.equal(normalizePreferences({ tab: 'compositions-tab' }).tab, 'compositions-tab');
 });
 
-test('composition names allow Japanese labels but reject markup and controls', () => {
+test('組み合わせ名は日本語を許可し、マークアップと制御文字を拒否する', () => {
     assert.equal(normalizeCompositionName('a'.repeat(20)), 'a'.repeat(20));
     assert.equal(normalizeCompositionName(' 爆発・サウンド_Ａ（１） '), '爆発・サウンド_A(1)');
     for (const name of ['<script>', 'a\nb', 'a\tb', 'a\u202Eb', 'a\u200Bb', ' ', 'a'.repeat(21)])
         assert.throws(() => normalizeCompositionName(name));
 });
 
-test('automatic names use the smallest available number including normalized names', () => {
+test('自動命名は正規化した名前も考慮して最小の空き番号を使う', () => {
     assert.equal(nextCompositionName([]), '組み合わせ(1)');
     assert.equal(nextCompositionName([{ name: '組み合わせ（1）' }, { name: '組み合わせ(3)' }, { name: '効果音' }]), '組み合わせ(2)');
     assert.equal(nextCompositionName([{ name: '組み合わせ(2)' }]), '組み合わせ(1)');

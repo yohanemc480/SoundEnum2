@@ -5,7 +5,7 @@ import { SavedCompositionsModel, nextCompositionName } from '../Scripts/Model/Co
 
 const row = { name: 'a', source: 'block', volume: 1.23, pitch: .75, minVolume: .1 };
 
-test('composition edits are independent proposals, preserving duplicate rows and limits', () => {
+test('行編集は独立した変更案を返し、重複と件数制限を維持する', () => {
     const model = new CompositionModel();
     model.replace([row, row]);
     const changed = model.withSettings(1, { ...row, pitch: 1.5 });
@@ -27,7 +27,7 @@ test('composition edits are independent proposals, preserving duplicate rows and
     assert.equal(model.read().length, 10);
 });
 
-test('saved model isolates copies, normalizes names and preserves identity on overwrite', () => {
+test('保存データのコピーを分離し、名前を正規化して上書き時のIDを維持する', () => {
     const model = new SavedCompositionsModel();
     const sounds = [{ ...row }, { ...row }];
     const added = model.withAdded('one', ' Ａ ', '26.3', sounds);
@@ -49,7 +49,7 @@ test('saved model isolates copies, normalizes names and preserves identity on ov
     assert.equal(nextCompositionName([{ name: '組み合わせ（1）' }], n => `組み合わせ(${n})`), '組み合わせ(2)');
 });
 
-test('saved limits reject growth while permitting repair of legacy oversized lists', () => {
+test('件数超過データの修復は許可し、新たな件数増加を拒否する', () => {
     const model = new SavedCompositionsModel();
     model.replace(Array.from({ length: 31 }, (_, i) => ({ id: String(i), name: `item${i}`, version: '', sounds: [row] })));
     assert.throws(() => model.withAdded('new', 'new', '', [row]));

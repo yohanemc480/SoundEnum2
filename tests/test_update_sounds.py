@@ -1,4 +1,9 @@
-"""Version selection and publication ordering for resource updates."""
+import sys
+from pathlib import Path
+
+# 単体実行とunittestの自動検出の両方で更新ツールを読み込む。
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+
 import io
 import threading
 from contextlib import redirect_stdout
@@ -6,14 +11,13 @@ import json
 import subprocess
 import tempfile
 import unittest
-from pathlib import Path
 from unittest.mock import patch
 
 import update_sounds as updater
 
 
 class UpdateTests(unittest.TestCase):
-    def test_parallel_download_progress_and_cache(self):
+    def test_並列取得の進捗を表示し取得済み音源を再利用する(self):
         hashes = [f"{i:040x}" for i in range(5)]
         barrier = threading.Barrier(4)
         downloaded = []
@@ -38,7 +42,7 @@ class UpdateTests(unittest.TestCase):
             for sha1 in hashes:
                 self.assertNotIn(sha1, output.getvalue())
 
-    def test_download_failure_propagates(self):
+    def test_ダウンロードの失敗を呼び出し元へ伝える(self):
         with tempfile.TemporaryDirectory(dir=updater.ROOT) as directory:
             root = Path(directory).resolve()
             assert root.is_relative_to(updater.ROOT.resolve())
@@ -49,7 +53,7 @@ class UpdateTests(unittest.TestCase):
                 with self.assertRaises(OSError):
                     updater.save_audio_files(root, b'{}')
 
-    def test_versions_follow_release_dates_not_generation_or_name_order(self):
+    def test_生成順や名前順ではなく公開日時でバージョンを並べる(self):
         entries = [
             {'id': '1.7.10', 'releaseTime': '2014-06-26T00:00:00+00:00'},
             {'id': '26.3', 'releaseTime': '2026-09-01T00:00:00+00:00'},
@@ -60,7 +64,7 @@ class UpdateTests(unittest.TestCase):
             self.assertEqual(updater.sort_available_versions(['1.7.10', '1.9', '26.3', '1.10']),
                              ['26.3', '1.10', '1.9', '1.7.10'])
 
-    def test_explicit_version(self):
+    def test_指定したバージョンを取得する(self):
         entries = [{"id": "26.3"}, {"id": "26.4"}]
         with patch.object(updater, "download_json", return_value=({"versions": entries}, b"")):
             self.assertEqual(updater.fetch_version("26.3"), entries[0])
@@ -71,7 +75,7 @@ class UpdateTests(unittest.TestCase):
                 updater.fetch_version("../escape")
             download.assert_not_called()
 
-    def test_switch_only_after_search_success(self):
+    def test_検索データ生成の成功後だけ参照バージョンを切り替える(self):
         for fails in (False, True):
             with self.subTest(fails=fails), tempfile.TemporaryDirectory(dir=updater.ROOT) as directory:
                 root = Path(directory).resolve()

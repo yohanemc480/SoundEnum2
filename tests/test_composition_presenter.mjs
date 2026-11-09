@@ -43,7 +43,7 @@ function fixture(options = {}) {
     };
 }
 
-test('composition presenter persists edits without rebuilding inputs and restores failed changes', () => {
+test('入力欄を作り直さず設定を保存し、失敗時は元の値を表示する', () => {
     const f = fixture();
     assert.equal(f.displayed.loading, true);
     f.presenter.setEvents([{ name: 'a', candidates: [candidate] }]);
@@ -65,7 +65,7 @@ test('composition presenter persists edits without rebuilding inputs and restore
     f.presenter.dispose();
 });
 
-test('read failures prevent overwrites and row limits prevent additions', () => {
+test('読込失敗時は上書きを禁止し、件数上限では追加しない', () => {
     const broken = fixture({ readFailure: true });
     assert.equal(broken.displayed.status, 'failure');
     assert.equal(broken.presenter.save([row]), false); assert.equal(broken.writes, 0);
@@ -74,7 +74,7 @@ test('read failures prevent overwrites and row limits prevent additions', () => 
     assert.equal(full.writes, 0); assert.equal(full.notifications.at(-1), 'limit'); full.presenter.dispose();
 });
 
-test('validity, availability, preparation and mutual playback stopping are coordinated by values', async () => {
+test('入力の有効性と音源の利用可否を反映し、単音と組み合わせの再生を相互停止する', async () => {
     const f = fixture();
     await f.presenter.play(); assert.equal(f.calls.length, 0);
     f.presenter.setEvents([{ name: 'a', candidates: [candidate] }]);
@@ -91,7 +91,7 @@ test('validity, availability, preparation and mutual playback stopping are coord
     const afterDispose = f.stops; f.previewState({ playing: true }); assert.equal(f.stops, afterDispose);
 });
 
-test('out-of-order waveforms and disposal cannot overwrite the current composition', async () => {
+test('応答順が逆転した波形や破棄後の結果で現在の表示を上書きしない', async () => {
     const pending = [];
     const f = fixture({ waveform: hash => new Promise(resolve => pending.push({ hash, resolve })) });
     f.presenter.setEvents([{ name: 'a', candidates: [candidate] }]);
@@ -106,7 +106,7 @@ test('out-of-order waveforms and disposal cannot overwrite the current compositi
     assert.equal(f.waveforms, current);
 });
 
-test('editor change subscriptions notify successful edits and resource loading, and can be detached', () => {
+test('保存成功と音源読込を購読先へ通知し、購読解除後は通知しない', () => {
     const f = fixture(); let changes = 0;
     const unsubscribe = f.presenter.subscribeChanges(() => changes++);
     f.presenter.setEvents([{ name: 'a', candidates: [candidate] }]); assert.equal(changes, 1);
@@ -118,7 +118,7 @@ test('editor change subscriptions notify successful edits and resource loading, 
 });
 
 
-test('editor snapshots are isolated and replacement renders only after successful persistence', () => {
+test('編集状態のコピーを分離し、保存成功時だけ置換した行を再描画する', () => {
     const f = fixture();
     assert.equal(f.presenter.read().soundNames, null);
     f.presenter.setEvents([{ name: 'a', candidates: [candidate] }]);

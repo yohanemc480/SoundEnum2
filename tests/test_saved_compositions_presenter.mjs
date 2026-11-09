@@ -37,7 +37,7 @@ function fixture(options = {}) {
     };
 }
 
-test('save, rename, overwrite and remove preserve identity, version and independent sound copies', async () => {
+test('保存・改名・上書き・削除でIDとバージョンを維持し、音設定のコピーを分離する', async () => {
     const f = fixture();
     assert.equal(f.shown.items[0].commands.length, 2);
     assert.match(f.shown.items[0].commands[0], /playsound minecraft:a block @a/);
@@ -53,7 +53,7 @@ test('save, rename, overwrite and remove preserve identity, version and independ
     f.presenter.dispose();
 });
 
-test('write failure preserves displayed data, read failure blocks overwrite, and limits block growth', async () => {
+test('書込失敗時は表示を維持し、読込失敗時は上書き、上限到達時は追加を禁止する', async () => {
     const f = fixture({ writeFailure: true });
     const before = f.shown;
     f.actions.rename('one'); await flush(); assert.equal(f.shown, before); assert.equal(f.notices.at(-1), 'failure');
@@ -66,7 +66,7 @@ test('write failure preserves displayed data, read failure blocks overwrite, and
     full.actions.remove('0'); await flush(); full.actions.save(); assert.equal(full.saved.length, 30); full.presenter.dispose();
 });
 
-test('load checks availability, asks only before replacing nonempty rows, and leaves saved data independent', async () => {
+test('呼び出す音の利用可否を確認し、編集中の行がある場合だけ確認して保存データを分離する', async () => {
     const f = fixture({ soundNames: null });
     assert.equal(f.shown.items[0].canLoad, false); assert.equal(f.shown.items[0].missing, false);
     f.actions.load('one'); await flush(); assert.equal(f.replaces, 0);
@@ -81,7 +81,7 @@ test('load checks availability, asks only before replacing nonempty rows, and le
     f.presenter.dispose();
 });
 
-test('cancelled dialogs and changed editor state cannot overwrite or replace newer edits', async () => {
+test('ダイアログの取消や編集中の変更があれば、新しい編集内容を上書きしない', async () => {
     const f = fixture({ confirm: () => false, rename: () => null });
     f.actions.rename('one'); f.actions.remove('one'); f.actions.overwrite('one'); f.actions.load('one'); await flush();
     assert.equal(f.writes, 0); assert.equal(f.replaces, 0);
@@ -93,7 +93,7 @@ test('cancelled dialogs and changed editor state cannot overwrite or replace new
     assert.equal(f.replaces, 0); f.presenter.dispose();
 });
 
-test('list changes and disposal invalidate pending dialogs and detach both subscriptions', async () => {
+test('一覧の変更・破棄時は確認待ちを無効化し、両方の購読を解除する', async () => {
     let finish;
     const f = fixture({ rename: () => new Promise(resolve => { finish = resolve; }) });
     f.actions.rename('one'); f.actions.remove('one'); await flush();
@@ -104,7 +104,7 @@ test('list changes and disposal invalidate pending dialogs and detach both subsc
     assert.equal(f.writes, before); assert.equal(f.shown, displayed); assert.equal(f.actions, undefined); assert.equal(f.subscribed, false);
 });
 
-test('storage adapter retains the existing key, legacy defaults and corrupt-data rejection', () => {
+test('既存の保存キーと旧形式の既定値を維持し、破損データを拒否する', () => {
     const oldStorage = globalThis.localStorage;
     let saved = JSON.stringify([{ id: 'legacy', name: '旧形式', sounds: [{ name: 'a', volume: .5, pitch: 1 }] }]);
     const keys = [];

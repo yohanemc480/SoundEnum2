@@ -4,7 +4,7 @@ import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from 
 import { WorkerSearchService } from '../Scripts/Infrastructure/Search/WorkerSearchService.ts';
 import { ResourcePathProvider } from '../Scripts/Infrastructure/Resources/ResourcePathProvider.ts';
 
-test('resource parsers reject malformed JSON shapes before search or playback', () => {
+test('検索・再生の前に不正なJSON構造を拒否する', () => {
     assert.throws(() => parseSoundEvents({ event: { sounds: [{ name: 1 }] } }), /Invalid/);
     assert.throws(() => parseSoundEvents({ event: { sounds: [{ name: 'a', pitch: '2' }] } }), /Invalid/);
     const events = { event: { subtitle: 'label', sounds: ['a', { name: 'b', stream: true }] } };
@@ -18,7 +18,7 @@ test('resource parsers reject malformed JSON shapes before search or playback', 
     assert.throws(() => parseSearchTags({ ...tags, audioTags: { a: [1] } }), /Invalid/);
 });
 
-test('worker disposal rejects outstanding requests and ignores no pending work', async () => {
+test('Worker破棄時に保留中の要求を失敗させ、保留がなくても正常に終了する', async () => {
     const resource = new WorkerSearchService(new ResourcePathProvider('test'));
     let stopped = false;
     resource.worker = { postMessage() {}, terminate() { stopped = true; } };
@@ -30,7 +30,7 @@ test('worker disposal rejects outstanding requests and ignores no pending work',
     await assert.rejects(resource.search({}), /Worker unavailable/);
 });
 
-test('failed worker sends remove pending requests', async () => {
+test('Workerへの送信に失敗した要求を保留一覧から除去する', async () => {
     const resource = new WorkerSearchService(new ResourcePathProvider('test'));
     resource.worker = { postMessage() { throw new Error('clone failed'); } };
     await assert.rejects(resource.search({}), /clone failed/);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LocalStorage } from '../Scripts/Infrastructure/Storage/LocalStorage.ts';
 
-test('JSON round trip, missing values and full clear', () => {
+test('JSONを保存・復元し、未保存の値と全件削除を扱う', () => {
     const data = new Map();
     const store = new LocalStorage({ getItem: key => data.get(key) ?? null,
         setItem: (key, value) => data.set(key, value), clear: () => data.clear() });
@@ -16,7 +16,7 @@ test('JSON round trip, missing values and full clear', () => {
     assert.equal(data.size, 0);
 });
 
-test('malformed JSON and storage failures propagate to the caller', () => {
+test('不正なJSONとストレージエラーを呼び出し元へ伝える', () => {
     assert.throws(() => new LocalStorage({ getItem: () => '{' }).read('bad'), SyntaxError);
     const store = new LocalStorage({ setItem: () => { throw new Error('quota'); }, clear: () => { throw new Error('denied'); } });
     assert.throws(() => store.write('key', []), /quota/);
@@ -24,7 +24,7 @@ test('malformed JSON and storage failures propagate to the caller', () => {
 });
 
 
-test('schema validates both reads and writes without replacing valid data on failure', async () => {
+test('読込・書込の両方で形式を検証し、失敗時に有効なデータを置き換えない', async () => {
     const { LocalStorageSchema } = await import('../Scripts/Infrastructure/Storage/LocalStorageSchema.ts');
     let value = null;
     const store = new LocalStorage({ getItem: () => value, setItem: (_, next) => { value = next; } });
