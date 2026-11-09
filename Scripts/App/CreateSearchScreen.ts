@@ -1,7 +1,8 @@
 import { HtmlSearchView } from '../View/Search/HtmlSearchView.ts';
 import { SearchPresenter } from '../Presenter/SearchPresenter.ts';
 import { WorkerSearchService } from '../Infrastructure/Search/WorkerSearchService.ts';
-import { readPreferences, saveSearchOptions, toSearchOptions } from '../SearchPreferences.ts';
+import { StoredSearchPreferences } from '../Infrastructure/Storage/StoredSearchPreferences.ts';
+import type { BrowserPreferencesStore } from '../Contracts/Services/BrowserPreferencesStore.ts';
 import { LocalFavoriteSoundsStore } from '../Infrastructure/Storage/LocalFavoriteSoundsStore.ts';
 import { confirmAction } from '../ConfirmDialog.ts';
 import { showToast } from '../Toast.ts';
@@ -11,11 +12,9 @@ import type { CompositionActions } from '../Contracts/Services/CompositionAction
 import type { SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
 
 /** 検索のMVPを生成する。再生サービスはAppから注入し、検索側では実装を知らない。 */
-export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService) {
+export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService, preferences: BrowserPreferencesStore) {
     const view = new HtmlSearchView();
-    const presenter = new SearchPresenter(view, new WorkerSearchService(paths), {
-        read: () => toSearchOptions(readPreferences()), save: saveSearchOptions,
-    }, composition, preview, new LocalFavoriteSoundsStore(), {
+    const presenter = new SearchPresenter(view, new WorkerSearchService(paths), new StoredSearchPreferences(preferences), composition, preview, new LocalFavoriteSoundsStore(), {
         schedule: (callback, milliseconds) => {
             const timer = setTimeout(callback, milliseconds);
             return () => clearTimeout(timer);

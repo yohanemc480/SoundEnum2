@@ -1,3 +1,4 @@
+import { LocalBrowserPreferencesStore } from './Infrastructure/Storage/LocalBrowserPreferencesStore.ts';
 import { BrowserAudioPlayback } from './Infrastructure/Audio/BrowserAudioPlayback.ts';
 import { SoundPlaybackResources } from './Infrastructure/Resources/SoundPlaybackResources.ts';
 import { LocalCommandSettingsStore } from './Infrastructure/Storage/LocalCommandSettingsStore.ts';
@@ -47,7 +48,8 @@ requireElement('clear-local-storage').addEventListener('click', async () => {
         window.alert(Text.clearLocalStorageFailure);
     }
 });
-const paths = new ResourcePathProvider(await initializeVersionSelector());
+const browserPreferences = new LocalBrowserPreferencesStore();
+const paths = new ResourcePathProvider(await initializeVersionSelector(browserPreferences));
 
 // リソースの読み込み
 const soundHashResource = await new MCSoundHashResource(
@@ -76,13 +78,13 @@ const playbackPresenter = new PlaybackPresenter(playback, playbackView,
 const masterVolumeControl = new SelectMasterVolumeArea('#select-master-volume', {
     value: playback.read().masterVolume, onChange: value => playbackPresenter.setMasterVolume(value),
 });
-initializeBrowserTabs();
+initializeBrowserTabs(browserPreferences);
 const compositionScreen = createCompositionScreen(playback, commandSettings,
     button => searchScreen.view.selectPreviewButton(button),
     row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
     name => { void searchScreen.presenter.searchSimilar(name); });
 const composition = compositionScreen.presenter;
-const searchScreen = createSearchScreen(paths, composition, playbackPresenter);
+const searchScreen = createSearchScreen(paths, composition, playbackPresenter, browserPreferences);
 const savedCompositionsScreen = createSavedCompositionsScreen({
     read: () => ({ rows: composition.rows, soundNames: composition.events ? [...composition.events.keys()] : null }),
     subscribeChanges: listener => composition.subscribeChanges(listener),

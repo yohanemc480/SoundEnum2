@@ -1,3 +1,6 @@
+import { normalizePreferences } from './Model/Search/SearchPreferences.ts';
+export { normalizePreferences };
+export type { SearchPreferencesValue } from './Model/Search/SearchPreferences.ts';
 import { normalizeFavoriteSounds } from './Model/Favorites/FavoriteSounds.ts';
 import { normalizeComposition, normalizeSavedCompositions } from './Model/Composition/CompositionData.ts';
 export { normalizeComposition, normalizeSavedCompositions, normalizeCompositionName } from './Model/Composition/CompositionData.ts';
@@ -8,37 +11,7 @@ export { normalizeCommandSettings };
 export type { CommandSettingsValue };
 import { LocalStorageKey } from './Constants/LocalStorageKey.ts';
 
-export interface SearchPreferencesValue {
-    version: string;
-    query: string;
-    base: string;
-    tags: string[];
-    excludeMultiple: boolean;
-    tab: 'search-tab' | 'favorites-tab' | 'compositions-tab';
-}
-
 export type FavoriteSoundIds = string[];
-
-/** 検証対象がオブジェクトか判定する。 */
-function isRecord(value: unknown): value is Record<string, unknown> {
-    return value !== null && typeof value === 'object';
-}
-function isTab(value: unknown): value is SearchPreferencesValue['tab'] {
-    return value === 'search-tab' || value === 'favorites-tab' || value === 'compositions-tab';
-}
-
-
-export function normalizePreferences(input: unknown = {}): SearchPreferencesValue {
-    const value = isRecord(input) ? input : {};
-    return {
-        version: typeof value.version === 'string' ? value.version : '',
-        query: typeof value.query === 'string' ? value.query : '',
-        base: typeof value.base === 'string' ? value.base : '',
-        tags: Array.isArray(value.tags) ? [...new Set(value.tags.filter(tag => typeof tag === 'string'))] : [],
-        excludeMultiple: value.excludeMultiple === true,
-        tab: isTab(value.tab) ? value.tab : 'search-tab',
-    };
-}
 
 export const LocalStorageSchema = Object.freeze({
     CommandSettings: Object.freeze({

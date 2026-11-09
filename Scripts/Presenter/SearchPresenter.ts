@@ -1,3 +1,4 @@
+import { restoreSearchOptions } from '../Model/Search/SearchPreferences.ts';
 import { FavoriteSounds } from '../Model/Favorites/FavoriteSounds.ts';
 import type { FavoriteSoundsStore } from '../Contracts/Services/FavoriteSoundsStore.ts';
 import type { SearchOptions, SearchResult, SearchSourceIndex } from '../Model/Search/SearchTypes.ts';
@@ -83,8 +84,7 @@ export class SearchPresenter {
             const index = await this.searchService.load();
             if (this.disposed) return;
             const saved = this.preferences.read();
-            this.options = { ...saved, tags: saved.tags.filter(id => index.tags.some(tag => tag.id === id)),
-                referenceSoundName: index.events.some(sound => sound.name === saved.referenceSoundName) ? saved.referenceSoundName : '' };
+            this.options = restoreSearchOptions(saved, index);
             this.index = index;
             this.composition.setEvents(index.events);
             this.view.initialize(index, this.options);
