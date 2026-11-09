@@ -7,6 +7,8 @@ import type { BrowserPreferencesStore } from '../../Contracts/Services/BrowserPr
 export class StoredSearchPreferences implements SearchPreferencesStore {
     private readonly preferences: BrowserPreferencesStore;
     constructor(preferences: BrowserPreferencesStore) { this.preferences = preferences; }
+    readQueryHistory(): string[] { return this.preferences.read().queryHistory ?? []; }
+    saveQueryHistory(queries: string[]): void { this.preferences.update({ queryHistory: queries }); }
     read(): Required<SearchOptions> { return toSearchOptions(this.preferences.read()); }
     save(options: Required<SearchOptions>): void { this.preferences.update(toStoredSearchOptions(options)); }
 }

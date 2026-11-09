@@ -5,6 +5,8 @@ import type { SoundCommand } from '../../Model/Command/FormatSoundCommand.ts';
 export interface SoundPreviewRequest {
     name: string;
     candidate: SearchCandidate | null;
+    /** 明示的に選択した候補の0始まりの番号。 */
+    candidateIndex?: number;
     settings?: SoundCommand;
 }
 

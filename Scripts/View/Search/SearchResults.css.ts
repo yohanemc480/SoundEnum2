@@ -1,5 +1,5 @@
 import { selected } from '../Components/SoundPreviewRow.css.ts';
-import { globalStyle, style } from '@vanilla-extract/css';
+import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 export const compositionAdd = style({});
 
@@ -75,6 +75,8 @@ export const soundCandidatesPopover = style({
     "position": "fixed",
     "inset": "auto",
     "margin": "0",
+    "height": "fit-content",
+    "boxSizing": "border-box",
     "width": "min(440px, calc(100vw - 24px))",
     "maxHeight": "min(520px, calc(100dvh - 24px))",
     "overflowY": "auto",
@@ -145,26 +147,12 @@ globalStyle(`.${soundCandidatesPopover} h2`, {
     "flex": "1"
 });
 globalStyle(`.${soundCandidatesPopover} .${soundTagCandidate}`, {
-    "border": "1px solid var(--line)",
-    "borderRadius": "6px",
-    "background": "var(--surface)",
-    "color": "var(--text)",
-    "padding": "10px",
-    "cursor": "pointer",
-    "font": "inherit",
-    "display": "flex",
-    "flexDirection": "column",
-    "gap": "6px",
-    "width": "100%",
-    "marginTop": "6px",
-    "textAlign": "left",
-    "overflowWrap": "anywhere",
-    "fontSize": "12px"
+    border: 0, background: 'transparent', color: 'var(--text)', padding: '8px 10px',
+    cursor: 'pointer', font: 'inherit', display: 'flex', flexDirection: 'column',
+    gap: '6px', minWidth: 0, width: '100%', textAlign: 'left',
+    overflowWrap: 'anywhere', fontSize: '12px', borderRadius: '6px',
 });
-globalStyle(`.${soundCandidatesPopover} .${soundTagCandidate}:hover, .${soundCandidatesPopover} .${soundTagCandidate}.${selected}`, {
-    "background": "#283f33",
-    "borderColor": "#42634d"
-});
+
 globalStyle(`.${searchRowActions}`, {
     "@media": {
         "(max-width: 560px)": {
@@ -189,8 +177,69 @@ globalStyle(`.${searchRow} button[data-favorite][aria-pressed="true"]`, {
     "color": "#f5c451"
 });
 globalStyle(`.${searchRow} button.${compositionAdd}`, {
-    "fontSize": "20px",
-    "lineHeight": "18px",
-    "width": "34px",
-    "padding": "6px"
+    position: 'relative', width: '34px', minHeight: '32px', padding: '6px',
+});
+// フォントの字面やベースラインに左右されず、プラス記号をボタン中央に描く。
+globalStyle(`.${compositionAdd}::before, .${compositionAdd}::after`, {
+    content: '""', position: 'absolute', left: '50%', top: '50%',
+    transform: 'translate(-50%, -50%)', background: 'currentColor', pointerEvents: 'none',
+});
+globalStyle(`.${compositionAdd}::before`, { width: '14px', height: '2px' });
+globalStyle(`.${compositionAdd}::after`, { width: '2px', height: '14px' });
+
+export const candidateRow = style({
+    display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center',
+    gap: '8px', marginTop: '6px', paddingRight: '6px',
+    border: '1px solid var(--line)', borderRadius: '6px', background: 'var(--surface)',
+});
+export const candidateSearch = style({
+    border: '1px solid var(--line)', borderRadius: '6px', background: 'var(--surface)',
+    color: 'var(--text)', padding: '6px 10px', font: 'inherit', fontSize: '12px', cursor: 'pointer',
+    whiteSpace: 'nowrap',
+});
+globalStyle(`.${candidateRow}:hover, .${candidateRow}:has(.${soundTagCandidate}.${selected})`, {
+    background: '#283f33', borderColor: '#42634d',
+});
+
+const referenceBounce = keyframes({
+    '0%': { transform: 'scaleX(0.86)', opacity: 0.65 },
+    '45%': { transform: 'scaleX(1.012)', opacity: 1 },
+    '72%': { transform: 'scaleX(0.996)' },
+    '100%': { transform: 'scaleX(1)', opacity: 1 },
+});
+export const referenceArrival = style({
+    animation: `${referenceBounce} 380ms ease-out`,
+    transformOrigin: 'center',
+    '@media': { '(prefers-reduced-motion: reduce)': { animation: 'none' } },
+});
+
+export const candidateProbabilityList = style({
+    listStyle: 'none', margin: 0, padding: 0,
+});
+export const candidateProbabilityPreview = style({
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
+    width: '100%', border: 0, borderRadius: '6px', padding: '8px 6px',
+    background: 'transparent', color: 'var(--text)', font: 'inherit', fontSize: '12px',
+    textAlign: 'left', overflowWrap: 'anywhere', cursor: 'pointer',
+    selectors: {
+        '&:hover': { background: '#283f33' },
+        [`&.${selected}`]: { background: '#283f33' },
+    },
+});
+export const candidateProbability = style({
+    flexShrink: 0, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', color: 'var(--muted)',
+});
+
+export const similarSearchButton = style({
+    position: 'relative',
+});
+// 候補数はレイアウトに含めず、単一候補のボタンと同じ寸法を保つ。
+export const similarSearchCandidateBadge = style({
+    position: 'absolute', top: '-8px', right: '-5px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    boxSizing: 'border-box', minWidth: '18px', height: '18px', padding: '0 4px',
+    border: '2px solid var(--surface)', borderRadius: '999px',
+    background: 'var(--line)', color: 'var(--muted)',
+    fontSize: '10px', fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+    pointerEvents: 'none',
 });

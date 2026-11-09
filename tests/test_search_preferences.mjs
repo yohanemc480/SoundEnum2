@@ -66,3 +66,32 @@ test('設定の保存に失敗しても検索でき、保存データを変え�
     const copy = search.read(); copy.tags.push('changed');
     assert.deepEqual(search.read().tags, ['metal']);
 });
+
+test('検索履歴を再読込でき、検索条件の更新でも保持する', () => {
+    let value = null;
+    globalThis.localStorage = { getItem: () => value, setItem: (_, next) => { value = next; } };
+    try {
+        searchPreferences.saveQueryHistory([' bell ', '', 'bell', 'stone']);
+        saveSearchOptions({ query: 'new', tags: [], referenceSoundName: '', excludeMultipleCandidates: false });
+        const restored = new StoredSearchPreferences(new LocalBrowserPreferencesStore());
+        assert.deepEqual(restored.readQueryHistory(), ['bell', 'stone']);
+        assert.deepEqual(normalizePreferences({ queryHistory: [null, 4, ...Array.from({ length: 10 }, (_, i) => `q${i}`)] }).queryHistory,
+            ['q0', 'q1', 'q2', 'q3', 'q4', 'q5', 'q6']);
+    } finally { delete globalThis.localStorage; }
+});
+
+test('単音の検索基準を保存し、候補が消失した場合は基準を解除する', () => {
+    let value = null;
+    globalThis.localStorage = { getItem: () => value, setItem: (_, next) => { value = next; } };
+    try {
+        saveSearchOptions({ query: '', tags: [], referenceSoundName: 'base', referenceCandidateIndex: 1, excludeMultipleCandidates: false });
+        const saved = searchPreferences.read();
+        assert.equal(saved.referenceCandidateIndex, 1);
+        assert.equal(restoreSearchOptions(saved, { events: [{ name: 'base', candidates: [{}, {}] }], tags: [] }).referenceCandidateIndex, 1);
+        const missing = restoreSearchOptions(saved, { events: [{ name: 'base', candidates: [{}] }], tags: [] });
+        assert.equal(missing.referenceSoundName, '');
+        assert.equal(missing.referenceCandidateIndex, null);
+        saveSearchOptions({ ...saved, referenceCandidateIndex: null });
+        assert.equal(searchPreferences.read().referenceCandidateIndex, null);
+    } finally { delete globalThis.localStorage; }
+});

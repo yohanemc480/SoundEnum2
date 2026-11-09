@@ -42,7 +42,7 @@ export class BrowserAudioPlayback implements AudioPlayback {
         this.releaseSource();
         const generation = ++this.generation;
         const controller = new AbortController(); this.controller = controller;
-        this.state = { ...this.state, revision: this.state.revision + 1, soundName: request.soundName, hash: request.hash,
+        this.state = { ...this.state, revision: this.state.revision + 1, soundName: request.soundName, candidateNumber: request.candidateNumber, hash: request.hash,
             loading: true, error: null, currentTime: 0, duration: 0, ready: false, playing: false };
         this.requestVolume = request.volume;
         this.publish();

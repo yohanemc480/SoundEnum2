@@ -60,7 +60,9 @@ export class HtmlPlaybackView implements PlaybackView {
     /** 状態からボタン・読み込み・時刻を更新し、ドラッグ中の選択位置を優先する。 */
     private render(): void {
         const state = this.state; if (!state) return;
-        this.soundId.textContent = state.soundName; this.soundId.title = state.soundName;
+        const soundLabel = state.candidateNumber === undefined ? state.soundName
+            : Text.previewSelectedCandidate(state.soundName, state.candidateNumber);
+        this.soundId.textContent = soundLabel; this.soundId.title = soundLabel;
         this.button.disabled = !state.ready || state.error === 'load';
         const label = state.playing ? Text.pause : Text.play;
         this.button.classList.toggle(playingClass, state.playing);

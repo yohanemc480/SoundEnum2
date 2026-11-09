@@ -43,9 +43,11 @@ export interface SearchOptions {
     query?: string;
     tags?: string[];
     referenceSoundName?: string;
+    /** 基準イベント内の候補番号。nullまたは省略時は全候補を比較する。 */
+    referenceCandidateIndex?: number | null;
     excludeMultipleCandidates?: boolean;
 }
-/** イベント単位の検索結果。candidateは条件に合う代表候補、candidateCountは元の候補数。 */
+/** イベント単位の検索結果。candidateは条件に合う代表候補、candidateCountは元の候補数。scoreは全再生候補の類似度の中央値。 */
 export interface SearchResult {
     name: string;
     candidate: IndexedCandidate;
