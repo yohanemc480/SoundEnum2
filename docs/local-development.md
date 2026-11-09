@@ -84,6 +84,8 @@ GitHub Actionsは同じビルド手順で圧縮し、容量チェックを通っ
 
 ## GitHub Pagesへの公開
 
+設定ボタンの上に、`Build:` に続けてビルド元のコミットハッシュを8桁で表示します。文字は小さく、色は通常の本文色に揃えます。リンクは付けず、ホバーで完全なハッシュを確認できます。Actionsでは `GITHUB_SHA`、ローカルではビルド時の `git rev-parse HEAD` をHTMLに埋め込むため、公開後にブランチが進んでも表示は変わりません。ローカルの未コミット変更はハッシュに含まれません。開発サーバーでは起動時のハッシュを使うため、コミット後に表示を更新するにはサーバーを再起動してください。
+
 `.github/workflows/deploy-pages.yml` がmainへのpush（PRのマージを含む）で実行されます。Node.jsは `.node-version` に合わせ、依存インストール、Nodeテスト、検索データ検証、型チェック、本番ビルドの成功後に `dist/` を公開します。公開用音声はビルド時にPythonで圧縮します。Actionsが必要な依存を準備し、圧縮結果をキャッシュします。CLAP推論は不要です。
 
 初回はGitHubのリポジトリで **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定してください。Environmentの公開ブランチ制限を設定している場合は、`github-pages` でmainを許可します。独自のシークレットやアクセストークンは不要です。

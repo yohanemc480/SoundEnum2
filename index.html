@@ -29,9 +29,12 @@
     </div>
     <div data-layout-style="appHeaderActions">
       <p data-i18n="appTagline"></p>
-      <button type="button" data-settings-style="settingsButton appSettingsButton" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 2h4l.5 3 1.4.8 2.8-1 2 3.4-2.3 2v1.6l2.3 2-2 3.4-2.8-1-1.4.8-.5 3h-4l-.5-3-1.4-.8-2.8 1-2-3.4 2.3-2v-1.6l-2.3-2 2-3.4 2.8 1 1.4-.8Z" transform="translate(0 1)"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div data-layout-style="settingsControl">
+        <span id="build-commit" data-layout-style="buildCommit" title="__BUILD_COMMIT_SHA__"><span data-i18n="buildCommitLabel">Build:</span> __BUILD_COMMIT_SHORT__</span>
+        <button type="button" data-settings-style="settingsButton appSettingsButton" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 2h4l.5 3 1.4.8 2.8-1 2 3.4-2.3 2v1.6l2.3 2-2 3.4-2.8-1-1.4.8-.5 3h-4l-.5-3-1.4-.8-2.8 1-2-3.4 2.3-2v-1.6l-2.3-2 2-3.4 2.8 1 1.4-.8Z" transform="translate(0 1)"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
     </div>
   </header>
   <section id="app-settings" data-settings-style="settingsPopover appSettingsPopover" popover="auto" aria-labelledby="app-settings-title">

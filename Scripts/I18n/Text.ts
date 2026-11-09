@@ -5,6 +5,7 @@ export const Text = Object.freeze({
     appTagline: "音を探して、聴いて、コマンドに。",
     appTitle: "Minecraft Sound Browser",
     browserTabs: "探し方",
+    buildCommitLabel: "Build:",
     cancel: "キャンセル",
     clearLocalStorage: "保存データを削除",
     clearLocalStorageConfirm: "このサイトのローカルストレージをすべて削除します。お気に入りも削除されます。よろしいですか？",
