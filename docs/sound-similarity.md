@@ -64,7 +64,7 @@ pipが`No matching distribution found`を表示した場合、それだけでは
 
 ## タグの調整
 
-`tools/sound-tags.json`にタグID、`Text.js`の表示キー、英語説明文、閾値を定義します。UIの英語対応は不要です。同じCLAPモデルのテキスト特徴を正規化・平均し、音声との類似度で複数タグを付けます。該当なしも許容します。
+`tools/sound-tags.json`にタグID、`Scripts/I18n/Text.ts`の表示キー、英語説明文、閾値を定義します。UIの英語対応は不要です。同じCLAPモデルのテキスト特徴を正規化・平均し、音声との類似度で複数タグを付けます。該当なしも許容します。
 
 `tools/sound-tag-overrides.json`で音声ハッシュごとに`add`と`remove`配列を指定できます。除外は自動判定に優先します。未定義タグ、追加・除外の重複はエラーです。タグ変更後は全件生成を再実行しますが、音声ベクトルは再利用できます。
 
@@ -73,8 +73,8 @@ pipが`No matching distribution found`を表示した場合、それだけでは
 ## テスト
 
 ```powershell
-python -m unittest discover -s tools -p test_sound_search.py
-node --test tools/test_sound_search.mjs
+python -m unittest discover -s tests -p test_sound_search.py
+node --import ./tests/register_css_tests.mjs --test tests/test_sound_search.mjs
 
 # 全件生成後、Webローダー・Workerで実データを検証
 node tools/verify_search_data.mjs
