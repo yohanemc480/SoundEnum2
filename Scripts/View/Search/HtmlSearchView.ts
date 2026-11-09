@@ -68,7 +68,11 @@ export class HtmlSearchView implements SearchView {
             // 候補一覧内のスクロールは維持し、背後が動いたら選択を閉じる。
             if (!(event.target instanceof Node && this.candidatePopover.contains(event.target))) closeCandidates();
         }, { capture: true, signal: this.lifecycle.signal });
-        document.querySelectorAll('[data-browser-tab]').forEach(tab => tab.addEventListener('click', closeCandidates, { signal: this.lifecycle.signal }));
+        document.querySelectorAll('[data-browser-tab]').forEach(tab => tab.addEventListener('click', () => {
+            closeCandidates();
+            // 非表示から戻ったときにCSSアニメーションが再開しないよう、途中でも解除する。
+            this.element('base-preview').firstElementChild?.classList.remove(styles.referenceArrival);
+        }, { signal: this.lifecycle.signal }));
 
         this.form = this.element('form');
         this.element('base').addEventListener('input', () => { this.referenceCandidateIndex = null; }, { signal: this.lifecycle.signal });
@@ -215,7 +219,12 @@ export class HtmlSearchView implements SearchView {
         const referenceKey = page.baseline ? JSON.stringify([page.baseline.name, page.baseline.referenceCandidateIndex ?? null]) : '';
         if (page.baseline) {
             this.appendRow(page.baseline, basePreview);
-            if (referenceKey !== this.displayedReferenceKey) basePreview.firstElementChild?.classList.add(styles.referenceArrival);
+            const referenceRow = basePreview.firstElementChild;
+            if (referenceRow && referenceKey !== this.displayedReferenceKey) {
+                referenceRow.classList.add(styles.referenceArrival);
+                // 完了後にクラスを残すと、タブの再表示で同じ演出が再実行される。
+                referenceRow.addEventListener('animationend', () => referenceRow.classList.remove(styles.referenceArrival), { once: true });
+            }
         }
         this.displayedReferenceKey = referenceKey;
         for (const row of page.rows) this.appendRow(row, list);
