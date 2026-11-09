@@ -27,11 +27,6 @@
 .preview-heading h2, .preview-heading .preview-indicator { flex-shrink: 0; }
 #preview-status { margin: 0; color: var(--muted); font-size: 11px; }
 #preview-status:not(:empty) { margin-top: 6px; }
-.preview-volume-control { display: flex; align-items: center; justify-self: start; width: 40px; max-width: 100%; height: 40px; min-width: 0; overflow: hidden; border: 1px solid #42634d; border-radius: 6px; background: #283f33; transition: width .18s ease; }
-.preview-volume-control > button { width: 38px; height: 38px; flex: 0 0 38px; border: 0; background: transparent; }
-.preview-volume-control > button:focus-visible { outline-offset: -3px; }
-.preview-volume-control .param { display: flex; flex: 1; min-width: 0; margin: 0; padding: 0 8px 0 2px; opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility .18s; }
-@media (prefers-reduced-motion: reduce) { .preview-volume-control, .preview-volume-control .param { transition: none; } }
 #preview-time { justify-self: end; text-align: right; white-space: nowrap; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 "Segoe UI", "Yu Gothic UI", sans-serif; }
@@ -65,10 +60,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 
 .preview-command { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
 .preview-command .section-heading { margin-bottom: 8px; }
-.output { display: grid; grid-template-columns: minmax(0, 1fr) 42px; overflow: hidden; position: relative; border: 1px solid #3b5748; border-radius: 7px; background: #14221b; }
-.output-text { width: 100%; height: 44px; padding: 11px 10px 11px 14px; color: #bfe6ce; font: 12px/22px Consolas, monospace; overflow: hidden; cursor: pointer; }
-.output-line { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.output:hover { border-color: var(--accent); }
 .section-note { color: var(--muted); font-size: 11px; margin-bottom: 14px; }
 @media (min-width: 1400px) { .params { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
 @media (max-width: 1000px) { .workspace { grid-template-columns: minmax(0, 1fr); } .sub { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; } .composition-panel { grid-column: 1 / -1; } }
@@ -170,7 +161,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 
 .composition-command { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
 .composition-command .section-heading { margin-bottom: 8px; }
-#composition-output .output-text { height: 88px; overflow-y: auto; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: #4c6059 transparent; }
 
 
 @media (max-width: 400px) {

@@ -1,3 +1,4 @@
+import * as styles from './OutputArea.css.ts';
 import { copyCommand } from "./CopyCommand.ts";
 import { createCopyButton } from "./CopyButton.ts";
 
@@ -11,9 +12,10 @@ export class OutputArea
     {
         const target = document.querySelector<HTMLElement>(appendTarget);
         if (!target) throw new Error(`Missing command output element: ${appendTarget}`);
+        target.classList.add(styles.output);
         this.value = '';
         this.text = document.createElement('div');
-        this.text.className = 'output-text';
+        this.text.className = styles.text;
         this.copyButton = createCopyButton(() => this.value);
         this.copyButton.disabled = true;
         this.text.addEventListener('click', () => {
@@ -28,7 +30,7 @@ export class OutputArea
         const lines = text.split('\n');
         this.text.replaceChildren(...lines.map(line => {
             const element = document.createElement('div');
-            element.className = 'output-line';
+            element.className = styles.line;
             element.textContent = line;
             element.title = line;
             return element;

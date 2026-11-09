@@ -26,8 +26,9 @@ export class SelectMasterVolumeArea
         slider.addEventListener('input', () => this.OnUpdateValue(slider.value));
         panel.replaceChildren(slider);
         this._slider = slider;
-        const control = panel.closest<HTMLElement>('.preview-volume-control');
+        const control = panel.closest<HTMLElement>('[data-volume-control]');
         if (!control) throw new Error('Missing volume control');
+        control.classList.add(styles.control);
         const button = control.querySelector('button');
         if (!button) throw new Error('Missing volume button');
         const setOpen = (open: boolean) => {

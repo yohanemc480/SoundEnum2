@@ -1,3 +1,4 @@
+import { output } from './OutputArea.css.ts';
 import { style } from '@vanilla-extract/css';
 
 export const button = style({
@@ -20,7 +21,7 @@ export const button = style({
             "background": "#283f33",
             "borderColor": "#42634d"
         },
-        ".output > &": {
+        [`${output} > &`]: {
             "position": "static",
             "width": "42px",
             "height": "auto",
@@ -29,7 +30,7 @@ export const button = style({
             "borderLeft": "1px solid #3b5748",
             "borderRadius": "0"
         },
-        ".output > &:focus-visible": {
+        [`${output} > &:focus-visible`]: {
             "outlineOffset": "-3px"
         }
     },

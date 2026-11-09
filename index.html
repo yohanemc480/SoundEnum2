@@ -76,7 +76,7 @@
             <svg class="preview-play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
             <svg class="preview-pause-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
           </button>
-          <div class="preview-volume-control">
+          <div data-volume-control>
             <button id="preview-volume-toggle" type="button" class="transport-button" data-i18n-aria-label="previewVolume" aria-controls="select-master-volume" aria-expanded="false">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 9v6h4l5 4V5L7 9H3zm12-1v8a5 5 0 0 0 0-8zm0-4v2a7 7 0 0 1 0 12v2a9 9 0 0 0 0-16z"/></svg>
             </button>
@@ -91,7 +91,7 @@
         <p id="preview-status" role="status"></p>
         <div class="preview-command">
           <div class="section-heading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" data-settings-style="settingsButton" popovertarget="command-settings" data-i18n="settings"></button></div>
-          <div class="output" aria-live="polite"></div>
+          <div id="preview-output" aria-live="polite"></div>
         </div>
       </section>
       <section id="composition-panel" class="panel composition-panel" aria-labelledby="composition-title">
@@ -101,7 +101,7 @@
             <svg class="composition-play-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
             <svg class="composition-stop-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6h12v12H6z"/></svg>
           </button>
-          <div class="preview-volume-control">
+          <div data-volume-control>
             <button id="composition-volume-toggle" type="button" class="transport-button" data-i18n-aria-label="previewVolume" aria-controls="composition-volume" aria-expanded="false">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 9v6h4l5 4V5L7 9H3zm12-1v8a5 5 0 0 0 0-8zm0-4v2a7 7 0 0 1 0 12v2a9 9 0 0 0 0-16z"/></svg>
             </button>
@@ -115,7 +115,7 @@
         <div class="composition-save-actions"><button id="save-composition" type="button" data-settings-style="settingsButton" data-i18n="savedCompositionSave" disabled></button></div>
         <div class="composition-command">
           <div class="section-heading"><h2 data-i18n="command"></h2></div>
-          <div id="composition-output" class="output" aria-live="polite"></div>
+          <div id="composition-output" aria-live="polite"></div>
         </div>
       </section>
     </aside>
