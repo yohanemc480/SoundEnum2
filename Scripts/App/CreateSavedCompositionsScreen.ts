@@ -6,7 +6,7 @@ import { normalizeCompositionName } from '../Model/Composition/CompositionData.t
 import type { CompositionEditor } from '../Contracts/Services/CompositionEditor.ts';
 import { confirmAction, promptText } from '../View/Components/ConfirmDialog/ConfirmDialog.ts';
 import { showToast } from '../View/Components/Toast/Toast.ts';
-import { Text } from '../Text.ts';
+import { Text } from '../I18n/Text.ts';
 
 /** 保存一覧の各層と、既存の確認ダイアログ・通知を接続する。 */
 export function createSavedCompositionsScreen(editor: CompositionEditor, version: string) {

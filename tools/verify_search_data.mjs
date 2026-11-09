@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { WorkerSearchService } from '../Scripts/Infrastructure/Search/WorkerSearchService.ts';
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
-import { Text } from '../Scripts/Text.ts';
+import { Text } from '../Scripts/I18n/Text.ts';
 import { resolveSoundEventReferences } from '../Scripts/Model/Search/ResolveSoundEventReferences.ts';
 
 // HTTPの代わりに同じURLをローカルファイルへ対応付ける。推論やデータは偽装しない。

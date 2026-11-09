@@ -5,7 +5,7 @@ import { LocalCompositionStore } from '../Infrastructure/Storage/LocalCompositio
 import { getWaveform } from '../Infrastructure/Audio/WaveformResource.ts';
 import { SharedAudioPaths } from '../ResourcePathProvider.ts';
 import { CompositionModel } from '../Model/Composition/CompositionModel.ts';
-import { Text } from '../Text.ts';
+import { Text } from '../I18n/Text.ts';
 import { showToast } from '../View/Components/Toast/Toast.ts';
 import type { AudioPlayback } from '../Contracts/Services/AudioPlayback.ts';
 import type { CommandSettings } from '../Model/Command/CommandSettings.ts';

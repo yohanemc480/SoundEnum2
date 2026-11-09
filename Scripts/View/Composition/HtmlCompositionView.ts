@@ -6,7 +6,7 @@ import { OutputArea } from '../Components/OutputArea/OutputArea.ts';
 import { SelectMasterVolumeArea } from '../Components/VolumeControl/SelectMasterVolumeArea.ts';
 import { revealAddedItem } from '../Components/RevealAddedItem.ts';
 import { bindSettingsPopover } from '../Components/BindSettingsPopover.ts';
-import { Text } from '../../Text.ts';
+import { Text } from '../../I18n/Text.ts';
 import { createCommandSettingsView } from '../Settings/CommandSettingsView.ts';
 import { CompositionWaveform } from './CompositionWaveform.ts';
 import type { CommandSettingsView } from '../../Contracts/Views/CommandSettingsView.ts';

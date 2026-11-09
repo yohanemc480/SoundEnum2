@@ -1,5 +1,5 @@
 import { playing as playingClass } from './Playback.css.ts';
-import { Text } from '../../Text.ts';
+import { Text } from '../../I18n/Text.ts';
 import { PreviewWaveform } from './PreviewWaveform.ts';
 import type { PlaybackActions, PlaybackView } from '../../Contracts/Views/PlaybackView.ts';
 import type { AudioPlaybackState } from '../../Contracts/Services/AudioPlayback.ts';

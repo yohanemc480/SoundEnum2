@@ -1,5 +1,5 @@
 import { nextCompositionName as findNextCompositionName } from '../Scripts/Model/Composition/SavedCompositionsModel.ts';
-import { Text } from '../Scripts/Text.ts';
+import { Text } from '../Scripts/I18n/Text.ts';
 /** 画面の日本語文言で採番する。 */
 const nextCompositionName = items => findNextCompositionName(items, Text.savedCompositionDefaultName);
 import test from 'node:test';

@@ -1,4 +1,4 @@
-import { Text } from "./Text.ts";
+import { Text } from "../I18n/Text.ts";
 
 /** HTML の文言と表示用属性を日本語辞書から設定する。子要素を持つ箇所では専用の span に指定する。 */
 export function applyText(root: ParentNode = document): void
@@ -16,6 +16,7 @@ export function applyText(root: ParentNode = document): void
     }
 }
 
+/** HTMLの指定が辞書自身に存在するキーか判定する。 */
 function isTextKey(key: string | null): key is keyof typeof Text {
     return key !== null && Object.hasOwn(Text, key);
 }

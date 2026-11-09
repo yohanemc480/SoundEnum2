@@ -1,6 +1,6 @@
 import * as settingsStyles from '../../Settings/Settings.css.ts';
 import * as styles from './ConfirmDialog.css.ts';
-import { Text } from '../../../Text.ts';
+import { Text } from '../../../I18n/Text.ts';
 
 /** 確定ボタンの表示指定。 */
 interface ConfirmOptions { acceptLabel?: string }

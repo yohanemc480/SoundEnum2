@@ -5,7 +5,7 @@ import { decodeSearchVectors } from '../Scripts/Model/Search/SearchVectors.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { searchSounds, validateSearchData } from '../Scripts/Model/Search/SoundSearchEngine.ts';
-import { Text } from '../Scripts/Text.ts';
+import { Text } from '../Scripts/I18n/Text.ts';
 import { readFileSync } from 'node:fs';
 import { resolveSoundEventReferences } from '../Scripts/Model/Search/ResolveSoundEventReferences.ts';
 

@@ -1,6 +1,6 @@
 import { field } from '../InputFields.css.ts';
 import * as styles from './VolumeControl.css.ts';
-import { Text } from "../../../Text.ts";
+import { Text } from "../../../I18n/Text.ts";
 import { SettingDefine } from "../../../Constants/SettingDefine.ts";
 
 /**

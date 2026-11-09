@@ -1,4 +1,4 @@
-import { Text } from "./Text.ts";
+import { Text } from "./I18n/Text.ts";
 import { showToast } from "./View/Components/Toast/Toast.ts";
 
 /** コピーの結果を、レイアウトを動かさない通知で伝える。 */

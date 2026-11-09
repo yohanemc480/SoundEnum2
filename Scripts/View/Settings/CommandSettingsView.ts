@@ -4,7 +4,7 @@ import * as settingsStyles from './Settings.css.ts';
 import type { CommandSettingsValue } from '../../Model/Command/CommandSettings.ts';
 import type { CommandSettingsView, CommandSettingsActions } from '../../Contracts/Views/CommandSettingsView.ts';
 import { MCCommandSoundSource } from '../../Constants/MCCommandSoundSource.ts';
-import { Text } from '../../Text.ts';
+import { Text } from '../../I18n/Text.ts';
 
 type NumericSetting = 'volume' | 'pitch' | 'minVolume';
 

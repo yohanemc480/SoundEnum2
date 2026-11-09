@@ -1,5 +1,5 @@
 import type { ResourceVersionView } from '../../Contracts/Views/ResourceVersionView.ts';
-import { Text } from '../../Text.ts';
+import { Text } from '../../I18n/Text.ts';
 
 /** バージョン選択欄と失敗メッセージを表示する。 */
 export class HtmlResourceVersionView implements ResourceVersionView {

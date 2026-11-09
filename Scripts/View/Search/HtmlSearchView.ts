@@ -4,7 +4,7 @@ import { compositionRow } from '../Composition/Compositions.css.ts';
 import * as styles from './SearchResults.css.ts';
 import { SoundAutocomplete } from './SoundAutocomplete.ts';
 import { SearchWaveforms } from './SearchWaveforms.ts';
-import { Text } from '../../Text.ts';
+import { Text } from '../../I18n/Text.ts';
 import type { SearchCandidate, SearchOptions, SearchSourceIndex } from '../../Model/Search/SearchTypes.ts';
 import type { SearchView, SearchViewActions, SearchRow, SearchPage, SearchStatus } from '../../Contracts/Views/SearchView.ts';
 const searchElementTypes = {
