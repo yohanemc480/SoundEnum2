@@ -15,7 +15,7 @@ import { createCompositionScreen } from './App/CreateCompositionScreen.ts';
 import { mountSoundSettings } from './App/MountSoundSettings.ts';
 import { confirmAction } from './ConfirmDialog.ts';
 import { localStorageStore } from './LocalStorage.ts';
-import { initializeVersionSelector } from './VersionSelector.ts';
+import { createResourceVersionSelector } from './App/CreateResourceVersionSelector.ts';
 import { applyText } from "./ApplyText.ts";
 import { Text } from "./Text.ts";
 import { initializeBrowserTabs } from "./BrowserTabs.ts";
@@ -49,7 +49,11 @@ requireElement('clear-local-storage').addEventListener('click', async () => {
     }
 });
 const browserPreferences = new LocalBrowserPreferencesStore();
-const paths = new ResourcePathProvider(await initializeVersionSelector(browserPreferences));
+const versionSelector = createResourceVersionSelector(browserPreferences);
+// 起動途中で失敗した場合にも、選択欄の購読と通信を破棄できるよう先に登録する。
+window.addEventListener('pagehide', event => { if (!event.persisted) versionSelector.dispose(); });
+if (import.meta.hot) import.meta.hot.dispose(() => versionSelector.dispose());
+const paths = new ResourcePathProvider(await versionSelector.load());
 
 // リソースの読み込み
 const soundHashResource = await new MCSoundHashResource(
