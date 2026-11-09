@@ -1,6 +1,8 @@
 /** 再生サービスに渡す音源と倍率。URL解決は呼び出し前に行う。 */
 export interface AudioPlaybackRequest {
     soundName: string;
+    /** 候補一覧と対応する1始まりの番号。未指定なら表示しない。 */
+    candidateNumber?: number;
     hash: string;
     url: string;
     pitch: number;
@@ -10,6 +12,8 @@ export interface AudioPlaybackRequest {
 export interface AudioPlaybackState {
     revision: number;
     soundName: string;
+    /** 候補一覧と対応する1始まりの番号。未指定なら表示しない。 */
+    candidateNumber?: number;
     hash: string;
     currentTime: number;
     duration: number;

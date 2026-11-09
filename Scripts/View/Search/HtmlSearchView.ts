@@ -335,12 +335,12 @@ export class HtmlSearchView implements SearchView {
             const button = document.createElement('button');
             button.type = 'button'; button.className = styles.candidateProbabilityPreview;
             button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
-            const label = document.createElement('span'); label.textContent = candidate.name;
+            const label = document.createElement('span'); label.textContent = `${i + 1}. ${candidate.name}`;
             const probability = document.createElement('span');
             probability.className = styles.candidateProbability;
             probability.textContent = Text.searchCandidateProbability(candidate.weight / totalWeight);
             button.append(label, probability);
-            button.addEventListener('click', () => { selectSoundPreview(button); this.actions?.preview({ name, candidate }); });
+            button.addEventListener('click', () => { selectSoundPreview(button); this.actions?.preview({ name, candidate, candidateIndex: i }); });
             row.append(button); list.append(row);
         });
         panel.append(list);
@@ -358,7 +358,7 @@ export class HtmlSearchView implements SearchView {
             label.textContent = Text.searchCandidateName(i + 1, candidate.name, candidate.pitch);
             button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
             button.append(label, this.createTagBadges(this.index?.audioTags[candidate.hash] ?? []));
-            button.addEventListener('click', () => { selectSoundPreview(button); this.actions?.preview({ name, candidate }); });
+            button.addEventListener('click', () => { selectSoundPreview(button); this.actions?.preview({ name, candidate, candidateIndex: i }); });
             const candidateRow = document.createElement('div'); candidateRow.className = styles.candidateRow;
             const find = document.createElement('button'); find.type = 'button'; find.className = styles.candidateSearch;
             find.textContent = Text.searchSimilar;
@@ -397,7 +397,7 @@ export class HtmlSearchView implements SearchView {
             preview.disabled = !candidates.length;
             const playCandidate = (candidate: SearchCandidate | null, button: HTMLButtonElement) => {
                 selectSoundPreview(button);
-                this.actions?.preview({ name: entry.name, candidate });
+                this.actions?.preview({ name: entry.name, candidate, candidateIndex: entry.referenceCandidateIndex });
             };
             preview.addEventListener('click', () => playCandidate(entry.referenceCandidateIndex === undefined ? null : entry.candidate ?? null, preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;

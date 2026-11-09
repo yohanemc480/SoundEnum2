@@ -50,6 +50,7 @@ export const Text = Object.freeze({
     previewLoadFailure: "音声を読み込めませんでした。",
     previewRetry: "再生できませんでした。再生ボタンで再試行してください。",
     previewSelectAgain: "再生できませんでした。音声を選び直してください。",
+    previewSelectedCandidate: (name: string, number: number) => `${name} 候補${number}`,
     previewVolume: "試聴音量",
     previous: "前へ",
     queryPlaceholder: "例：bell、ambient",
