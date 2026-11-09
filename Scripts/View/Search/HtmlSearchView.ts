@@ -32,6 +32,7 @@ function tagLabel(key: string | undefined): string {
 /** 検索画面のDOM・候補一覧・波形を担当し、ユーザー操作を値として通知する。 */
 export class HtmlSearchView implements SearchView {
     private actions?: SearchViewActions;
+    private searchStatusTimer?: ReturnType<typeof setTimeout>;
     private readonly lifecycle = new AbortController();
     private index: SearchSourceIndex | null = null;
     private favoriteNames = new Set<string>();
@@ -153,22 +154,49 @@ export class HtmlSearchView implements SearchView {
         this.querySuggestions.hide();
     }
 
+    /** 検索待ちの表示予約を解除し、完了後に古い通知が出るのを防ぐ。 */
+    private cancelSearchStatus(): void {
+        if (this.searchStatusTimer !== undefined) clearTimeout(this.searchStatusTimer);
+        this.searchStatusTimer = undefined;
+    }
+
+    /** 結果の高さと内容を保ったまま、古い結果へのマウス・キーボード操作を止める。 */
+    private setResultsBusy(busy: boolean): void {
+        for (const id of ['list', 'base-preview', 'pagination'] as const) {
+            const element = this.element(id);
+            element.inert = busy;
+            element.setAttribute('aria-busy', String(busy));
+        }
+    }
+
+    /** 再検索中は前の結果を残し、長く待つ場合だけ既存のステータス欄を更新する。 */
     setStatus(status: SearchStatus): void {
+        this.cancelSearchStatus();
         this.element('retry').hidden = status !== 'failure' && status !== 'missing';
         if (status === 'ready') return;
         this.candidatePopover.hidePopover();
+        if (status === 'searching') {
+            this.setResultsBusy(true);
+            this.searchStatusTimer = setTimeout(() => {
+                this.searchStatusTimer = undefined;
+                this.element('status').textContent = Text.searchRunning;
+            }, 200);
+            return;
+        }
+        this.setResultsBusy(false);
         this.waveforms.clear();
         this.element('list').replaceChildren();
         this.element('base-preview').replaceChildren();
         this.element('base-preview').hidden = true;
         this.element('pagination').hidden = true;
         if (status === 'loading') this.form.disabled = true;
-        const messages = { loading: Text.searchLoading, searching: Text.searchRunning,
-            failure: Text.searchFailure, missing: Text.searchMissing, 'invalid-base': Text.searchInvalidBase };
+        const messages = { loading: Text.searchLoading, failure: Text.searchFailure,
+            missing: Text.searchMissing, 'invalid-base': Text.searchInvalidBase };
         this.element('status').textContent = messages[status];
     }
 
     showPage(page: SearchPage): void {
+        this.cancelSearchStatus();
         this.waveforms.clear();
         this.candidatePopover.hidePopover();
         this.resultBase = page.baseline?.name ?? '';
@@ -183,6 +211,7 @@ export class HtmlSearchView implements SearchView {
         this.element('status').textContent = page.total ? Text.searchResults(page.total, page.pageIndex * 50 + 1, page.pageIndex * 50 + page.rows.length) : Text.searchEmpty;
         if (page.baseline) this.appendRow(page.baseline, basePreview);
         for (const row of page.rows) this.appendRow(row, list);
+        this.setResultsBusy(false);
     }
 
     showFavorites(rows: readonly SearchRow[], available: boolean): void {
@@ -211,6 +240,8 @@ export class HtmlSearchView implements SearchView {
 
     /** グローバル購読、補完UI、波形監視をまとめて解放する。 */
     dispose(): void {
+        this.cancelSearchStatus();
+        this.setResultsBusy(false);
         this.actions = undefined;
         this.lifecycle.abort();
         this.waveforms.clear();
