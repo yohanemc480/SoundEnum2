@@ -2,7 +2,7 @@
 
 ## 目的と範囲
 
-Model・View・Presenterを分離し、HTMLを用意しなくても状態管理と操作の流れを検証できる構成にする。既存の表示、機能、保存データ、リソース形式を維持する。段階1まで実装済み。段階2以降は未着手。
+Model・View・Presenterを分離し、HTMLを用意しなくても状態管理と操作の流れを検証できる構成にする。既存の表示、機能、保存データ、リソース形式を維持する。段階2まで実装済み（ブラウザでの操作確認は未完了）。段階3以降は未着手。
 
 Vite・TypeScript・vanilla-extractを継続する。公開容量の調査、デプロイ、新機能、UIの再設計は対象外。既存のTypeScript移行計画とは別の作業として扱う。
 
@@ -95,12 +95,12 @@ Vite・TypeScript・vanilla-extractを継続する。公開容量の調査、デ
 
 ### 2. 検索画面をMVPに分割
 
-- [ ] `SoundSearchBrowser.ts` からSearchViewとSearchPresenterを抽出する。
-- [ ] 検索条件・ページ状態の所有者を決め、DOMから値を読み返すことを状態管理の代用にしない。
-- [ ] 待機時間、要求番号、再試行、古い結果の無視をPresenterへまとめる。タイマーは必要に応じて注入可能にする。
-- [ ] 組み合わせ追加・プレビューはIDや設定値の通知にする。ボタン要素の受け渡しをやめる。
-- [ ] Search系CSSと表示部品をViewへ移動する。
-- [ ] Appで新しい部品を接続し、旧クラスの置き換えが済んだ処理を削除する。
+- [x] `SoundSearchBrowser.ts` からSearchViewとSearchPresenterを抽出する。
+- [x] 検索条件・ページ状態の所有者を決め、DOMから値を読み返すことを状態管理の代用にしない。
+- [x] 待機時間、要求番号、再試行、古い結果の無視をPresenterへまとめる。タイマーは必要に応じて注入可能にする。
+- [x] 組み合わせ追加・プレビューはIDや設定値の通知にする。ボタン要素の受け渡しをやめる。
+- [x] Search系CSSと表示部品をViewへ移動する。
+- [x] Appで新しい部品を接続し、旧クラスの置き換えが済んだ処理を削除する。
 
 完了条件：検索・フィルター・ページ切り替え・候補表示が維持され、SearchPresenterを偽のViewとサービスで実行できる。失敗・再試行・応答順の逆転を検証する。
 
@@ -169,7 +169,7 @@ npm run verify:data
 - イベント購読、Worker、タイマー、音声の破棄責任を決め、再初期化時の二重登録を防ぐ。
 - コミットは自動で行わない。対応後は毎回、ステージ済み・未ステージ・未追跡を確認し、変更全体に合う日本語のコミットメッセージ案を提示する。
 
-次の実装対象は段階2。検索画面を以降の分割の具体例にする。
+次の実装対象は段階3。段階2のブラウザ確認は接続可能な環境で実施する。
 
 ## 段階1の実施記録（2026-11-09）
 
@@ -198,3 +198,13 @@ Model・ContractsをDOMなしで検査する `tsconfig.model.json` を前倒し�
 ## 命名の見直し
 
 検索対象をSearchSound、Minecraftの元定義をSoundEventDefinitionsと呼び分け、参照展開をresolveSoundEventReferences、Worker実装をWorkerSearchServiceへ改名した。接続用の契約は役割ごとのファイルへ分割した。検索条件のreferenceSoundName・excludeMultipleCandidatesは保存境界で従来のbase・excludeMultipleへ変換し、保存済みデータとの互換性を維持する。候補数はcandidateCount、ベクトル行はvectorRow、表示ページの番号と総数はpageIndex・pageCountに統一した。
+
+## 段階2の実施記録（2026-11-09）
+
+- SoundSearchBrowserをSearchPresenterとHtmlSearchViewに分割。検索条件・120ms待機・要求番号・ページ・保存や他機能との調整をPresenterへ移した。DOM取得、候補一覧、入力補完、波形描画、選択表示はViewが担当する。
+- SearchControls.css.ts、SearchResults.css.ts、入力補完、波形表示、スタイル適用処理をView/Searchへ移動。既存の組み合わせ用CSSとの共通表示は維持する。
+- App/CreateSearchScreen.tsで検索・保存・再生・確認ダイアログ・タイマーを接続。組み合わせ側の旧コールバックから渡されるボタンはMainとViewの間だけで扱い、Presenterにはサウンド名・候補・設定だけを渡す。組み合わせ側そのものの分割は段階4で行う。
+- お気に入りの確認・保存・失敗通知をPresenter経由に変更。保存形式と既存の音声処理は維持する。
+- PresenterをDOMなしの型チェック対象へ追加。破棄時はタイマー、Worker、Viewへの操作通知、window/入力欄の購読、波形監視を解除する。
+- 44件のテストと、PresenterのDOMなし型検査を含む本番ビルドが成功。新たに応答の順序逆転、入力待機中の古い応答、読み込み・検索失敗と再試行、不正な基準、ページ上限、操作の連携、お気に入り保存失敗、破棄後の応答を検証した。
+- 確認用ブラウザからローカルURLへの接続がタイムアウトしたため、表示・実音の手動確認は未完了。

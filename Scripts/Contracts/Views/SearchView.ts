@@ -15,9 +15,10 @@ export interface SearchPage {
     pageCount: number;
 }
 
-/** ViewがPresenterへ通知する操作。段階2で接続し、DOMだけの操作はView内に留める。 */
+/** ViewがPresenterへ通知する操作。DOMだけの操作はView内に留める。 */
 export interface SearchViewActions {
     changeOptions(options: Required<SearchOptions>): void;
+    activate(): void;
     retry(): void;
     clear(): void;
     changePage(delta: -1 | 1): void;
@@ -36,4 +37,5 @@ export interface SearchView {
     setStatus(status: SearchStatus): void;
     showPage(page: SearchPage): void;
     showFavorites(rows: readonly SearchRow[], available: boolean): void;
+    activateSearchTab(): void;
 }

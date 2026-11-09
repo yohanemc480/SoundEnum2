@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SearchWaveforms } from '../Scripts/SearchWaveforms.ts';
+import { SearchWaveforms } from '../Scripts/View/Search/SearchWaveforms.ts';
 
 test('waveforms cycle visible candidates independently of playback', () => {
     globalThis.document = { hidden: false };

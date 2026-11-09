@@ -1,8 +1,9 @@
 import * as styles from './SoundAutocomplete.css.ts';
-import { Text } from './Text.ts';
+import { Text } from '../../Text.ts';
 
 /** 基準音入力専用の候補リスト。フォーカスは入力欄に保持する。 */
 export class SoundAutocomplete {
+    private readonly lifecycle = new AbortController();
     readonly input: HTMLInputElement;
     readonly list: HTMLDivElement;
     names: readonly string[];
@@ -25,9 +26,9 @@ export class SoundAutocomplete {
         input.setAttribute('aria-autocomplete', 'list');
         input.setAttribute('aria-controls', this.list.id);
         input.setAttribute('aria-expanded', 'false');
-        input.addEventListener('input', () => this.show());
+        input.addEventListener('input', () => this.show(), { signal: this.lifecycle.signal });
         input.addEventListener('focus', () => this.show());
-        input.addEventListener('blur', () => this.hide());
+        input.addEventListener('blur', () => this.hide(), { signal: this.lifecycle.signal });
         input.addEventListener('keydown', event => {
             if (event.isComposing) return;
             if (event.key === 'Escape') { this.hide(); event.preventDefault(); return; }
@@ -42,10 +43,16 @@ export class SoundAutocomplete {
             }
         });
         this.list.addEventListener('pointerdown', event => event.preventDefault());
-        window.addEventListener('resize', () => this.hide());
+        window.addEventListener('resize', () => this.hide(), { signal: this.lifecycle.signal });
         window.addEventListener('scroll', event => {
             if (!(event.target instanceof Node) || !this.list.contains(event.target)) this.hide();
-        }, true);
+        }, { capture: true, signal: this.lifecycle.signal });
+    }
+    /** 入力欄とwindowの購読を解除し、補完一覧を取り除く。 */
+    dispose(): void {
+        this.lifecycle.abort();
+        this.hide();
+        this.list.remove();
     }
     setNames(names: readonly string[]): void { this.names = names; }
     hide() {

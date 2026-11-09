@@ -1,5 +1,5 @@
 import { applyLayoutStyles } from './ApplyLayoutStyles.ts';
-import { applySearchStyles } from './ApplySearchStyles.ts';
+import { applySearchStyles } from './View/Search/ApplySearchStyles.ts';
 import { applyPlaybackStyles } from './ApplyPlaybackStyles.ts';
 import { applySettingsStyles } from './ApplySettingsStyles.ts';
 import { SavedCompositions } from './SavedCompositions.ts';
@@ -12,7 +12,7 @@ import { applyText } from "./ApplyText.ts";
 import { Text } from "./Text.ts";
 import { PreviewPlayer } from "./PreviewPlayer.ts";
 import { initializeBrowserTabs } from "./BrowserTabs.ts";
-import { SoundSearchBrowser } from "./SoundSearchBrowser.ts";
+import { createSearchScreen } from './App/CreateSearchScreen.ts';
 import { MCSoundHashResource } from "./MCSoundHashResource.ts";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.ts";
 import { NetworkFileLoader } from "./NetworkFileLoader.ts";
@@ -81,9 +81,13 @@ mountSoundSettings(requireElement('command-settings'), {
 new SelectMasterVolumeArea("#select-master-volume");
 initializeBrowserTabs();
 const composition: SoundComposition = new SoundComposition({
-    onPreview: (row, button) => searchBrowser.previewSound(row.name, null, button, row),
-    onSimilar: name => searchBrowser.searchSimilar(name),
+    onPreview: (row, button) => {
+        searchScreen.view.selectPreviewButton(button);
+        return searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row });
+    },
+    onSimilar: name => { void searchScreen.presenter.searchSimilar(name); },
 });
-const searchBrowser: SoundSearchBrowser = new SoundSearchBrowser(outputArea, paths, composition);
+const searchScreen = createSearchScreen(paths, composition, outputArea);
 new SavedCompositions(composition, paths.Version);
-searchBrowser.load();
+void searchScreen.presenter.load();
+if (import.meta.hot) import.meta.hot.dispose(() => searchScreen.dispose());

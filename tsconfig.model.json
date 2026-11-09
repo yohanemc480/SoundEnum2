@@ -4,6 +4,6 @@
     "lib": ["ES2022"],
     "types": []
   },
-  "include": ["Scripts/Model/**/*.ts", "Scripts/Contracts/**/*.ts"],
+  "include": ["Scripts/Model/**/*.ts", "Scripts/Contracts/**/*.ts", "Scripts/Presenter/**/*.ts"],
   "exclude": []
 }
