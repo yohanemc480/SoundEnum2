@@ -1,4 +1,4 @@
-import { getWaveform } from '../../Infrastructure/Audio/WaveformResource.ts';
+import type { WaveformSource } from '../../Contracts/Services/PlaybackResources.ts';
 
 /** 表示中の短冊に事前生成した波形を描画する。 */
 export class SearchWaveforms
@@ -13,8 +13,11 @@ export class SearchWaveforms
     timer: ReturnType<typeof setInterval> | null = null;
     running = false;
 
-    constructor(list: HTMLElement)
+    private readonly source: WaveformSource;
+
+    constructor(list: HTMLElement, source: WaveformSource)
     {
+        this.source = source;
         this.rotation = new Map();
         this.cache = new Map();
         this.items = new Map();
@@ -106,7 +109,7 @@ export class SearchWaveforms
                 try {
                     let peaks = this.cache.get(hash);
                     if (!peaks) {
-                        peaks = await getWaveform(hash);
+                        peaks = await this.source.load(hash);
                         this.cache.set(hash, peaks);
                         if (this.cache.size > 128) {
                             const oldest = this.cache.keys().next().value;

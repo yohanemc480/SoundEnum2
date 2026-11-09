@@ -1,3 +1,4 @@
+import type { WaveformSource } from '../../Contracts/Services/PlaybackResources.ts';
 import * as layout from '../Layout/Layout.css.ts';
 import * as settingsStyles from '../Settings/Settings.css.ts';
 import { compositionRow } from '../Composition/Compositions.css.ts';
@@ -49,7 +50,7 @@ export class HtmlSearchView implements SearchView {
         return element as InstanceType<(typeof searchElementTypes)[K]>;
     }
 
-    constructor() {
+    constructor(waveformSource: WaveformSource) {
         this.candidatePopover = document.createElement('section');
         this.candidatePopover.className = styles.soundCandidatesPopover;
         this.candidatePopover.popover = 'auto';
@@ -82,7 +83,7 @@ export class HtmlSearchView implements SearchView {
         }
         const browserPanel = document.querySelector<HTMLElement>(`.${layout.browserPanel}`);
         if (!browserPanel) throw new Error('Missing browser panel');
-        this.waveforms = new SearchWaveforms(browserPanel);
+        this.waveforms = new SearchWaveforms(browserPanel, waveformSource);
         this.element('form-container').addEventListener('submit', event => event.preventDefault(), { signal: this.lifecycle.signal });
 
         this.form.addEventListener('input', () => this.actions?.changeOptions(this.readOptions()), { signal: this.lifecycle.signal });

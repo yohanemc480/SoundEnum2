@@ -27,7 +27,7 @@ npm run build
 npm run preview
 ```
 
-- `test`: Nodeテスト。専用ローダーで.css.tsのファイルスコープを設定し、実際のクラス名exportを読み込みます。CSSの描画は行わず、CSS生成はViteビルドで検証します。
+- `test`: Nodeテスト。層間の依存方向と循環参照も検査します。専用ローダーで.css.tsのファイルスコープを設定し、実際のクラス名exportを読み込みます。CSSの描画は行わず、CSS生成はViteビルドで検証します。
 - `verify:data`: 先頭バージョンの実データを使い、検索・Worker・チェックサムを検証します。
 - `typecheck`: アプリ・Worker・ツールを検査し、Model・Presenter・ContractsはDOMライブラリなしでも型チェックします。
 - `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。Pythonによるデータ生成は実行しません。

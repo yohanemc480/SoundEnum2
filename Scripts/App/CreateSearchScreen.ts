@@ -1,3 +1,4 @@
+import { getWaveform } from '../Infrastructure/Audio/WaveformResource.ts';
 import { DisposalScope } from './DisposalScope.ts';
 import { HtmlSearchView } from '../View/Search/HtmlSearchView.ts';
 import { SearchPresenter } from '../Presenter/SearchPresenter.ts';
@@ -16,7 +17,7 @@ import type { SoundPreviewService } from '../Contracts/Services/SoundPreviewServ
 export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService, preferences: BrowserPreferencesStore) {
     const scope = new DisposalScope();
     try {
-        const view = scope.own(new HtmlSearchView());
+        const view = scope.own(new HtmlSearchView({ load: getWaveform }));
         const searchService = scope.own(new WorkerSearchService(paths));
         const presenter = scope.own(new SearchPresenter(view, searchService, new StoredSearchPreferences(preferences), composition, preview, new LocalFavoriteSoundsStore(), {
             schedule: (callback, milliseconds) => {
