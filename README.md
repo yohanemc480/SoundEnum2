@@ -59,7 +59,7 @@ Minecraft Java Editionのサウンドを検索・試聴し、`playsound`コマ�
 
 ## ローカルで動かす
 
-Vite・TypeScriptへの移行を進めています。npmでの起動・検証方法と現在の移行状況は[ローカル確認手順](docs/local-development.md)、全体の手順は[移行計画](docs/typescript-migration-plan.md)を参照してください。
+Vite・TypeScriptへの移行とMVP構成への整理は完了しています。npmでの起動・検証方法と現在の移行状況は[ローカル確認手順](docs/local-development.md)、全体の手順は[移行計画](docs/typescript-migration-plan.md)を参照してください。
 
 
 TypeScriptを含む静的サイトです。Node.js 24.13.0で依存パッケージを取得してから開発サーバーを起動します。CLAPの導入は生成済みリソースの利用には不要です。

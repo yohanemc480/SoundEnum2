@@ -4,7 +4,7 @@
 
 ## Viteへの移行状況
 
-既存50ファイルのTypeScript化とvanilla-extractへのスタイル移行を実装し、旧style.cssを削除しました。MVP構成への整理も進めており、Model・View・Presenter・Infrastructure・Appへ責務を分けています。移行後のブラウザでの見た目・操作・レスポンシブ表示の確認は未完了です。
+既存50ファイルのTypeScript化とvanilla-extractへのスタイル移行を実装し、旧style.cssを削除しました。MVP構成への整理も完了し、Model・View・Presenter・Infrastructure・Appへ責務を分けています。2026-11-09にユーザーの動作確認結果を受け、今回の移行作業を完了しました。検証範囲は[MVP整理計画の完了記録](mvp-refactoring-plan.md#完了記録2026-11-09)を参照してください。
 
 Node.js 24.13.0を使用します（`.node-version`参照）。クローン後の初回は次を実行します。
 
