@@ -1,13 +1,13 @@
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 import { selectResourceVersion } from '../Scripts/VersionSelector.js';
-import { buildSearchEvents } from '../Scripts/BuildSearchEvents.js';
-import { decodeSearchVectors } from '../Scripts/SearchVectors.js';
+import { buildSearchEvents } from '../Scripts/BuildSearchEvents.ts';
+import { decodeSearchVectors } from '../Scripts/SearchVectors.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { searchSounds, validateSearchData } from '../Scripts/SoundSearchEngine.js';
+import { searchSounds, validateSearchData } from '../Scripts/SoundSearchEngine.ts';
 import { Text } from '../Scripts/Text.js';
 import { readFileSync } from 'node:fs';
-import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.js';
+import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.ts';
 
 function fixture() {
     const hashes = ['a', 'b', 'c'].map(x => x.repeat(40));

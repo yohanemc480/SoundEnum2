@@ -1,4 +1,4 @@
-import { buildSearchEvents } from './BuildSearchEvents.js';
+import { buildSearchEvents } from './BuildSearchEvents.ts';
 
 export class SoundSearchResource
 {

@@ -1,4 +1,4 @@
-import { resolveSoundEvents } from "./ResolveSoundEvents.js";
+import { resolveSoundEvents } from "./ResolveSoundEvents.ts";
 import { ResourceBase } from "./ResourceBase.js";
 
 /**

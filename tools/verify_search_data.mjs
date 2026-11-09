@@ -7,7 +7,7 @@ import { performance } from 'node:perf_hooks';
 import { SoundSearchResource } from '../Scripts/SoundSearchResource.js';
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 import { Text } from '../Scripts/Text.js';
-import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.js';
+import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.ts';
 
 // HTTPの代わりに同じURLをローカルファイルへ対応付ける。推論やデータは偽装しない。
 const root = new URL('../', import.meta.url);

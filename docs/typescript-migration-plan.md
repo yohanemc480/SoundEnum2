@@ -10,8 +10,10 @@
 - 配布データのコピーと、公開前に任意実行する容量検査を追加。
 - 既存31テストと実データ検証（1,984イベント・4,941音源）が通過。
 - npm installはregistry.npmjs.orgのENOTFOUNDで失敗。lockfile生成、型チェック、Viteによるビルド・previewは未完了。
+- 検索処理4ファイル（ResolveSoundEvents、BuildSearchEvents、SearchVectors、SoundSearchEngine）をTS化。SearchTypes.tsにイベント・候補音・検索条件・検索結果の共通型を追加。既存ファイル15個を移行済み、型定義の新規ファイルを含めて16個のTSファイル。
+- 検索処理の移行後も既存31テストと実データ検証が通過。Worker側はまだJSであり、外部データ境界の型保証と通信型は後続工程で対応する。型チェックとViteビルドは依存未取得のため未検証。
 - 保存処理4ファイル（LocalStorage、LocalStorageSchema、Favorites、SearchPreferences）をTS化。保存データをunknownで受け取り、実行時検証後に型を確定する。保存キー・JSON形式は維持。
-- 移行済みは計11ファイル。今回も既存31テストと実データ検証が通過。npmレジストリへの接続は引き続き失敗しており、静的型チェック・ブラウザビルドは未検証。
+- この段階で移行済みは計11ファイル。今回も既存31テストと実データ検証が通過。npmレジストリへの接続は引き続き失敗しており、静的型チェック・ブラウザビルドは未検証。
 - 基礎処理7ファイル（Constantsの4ファイル、FormatSoundCommand、SelectWeightedCandidate、ResourcePathProvider）をTS化。定数のリテラル型、コマンドの引数型、抽選のジェネリック、バージョンのreadonlyフィールドを導入。
 - JS/テストのimportを`.ts`へ更新し、Node.js 24の型除去で既存31テスト・実データ検証が通過。これは静的型チェックの代替ではない。
 - NodeテストとViteの両方で同じソースを読めるよう、移行対象のimportには`.ts`を明記し、allowImportingTsExtensionsを設定する（当初の拡張子なし方針を変更）。

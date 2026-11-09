@@ -1,5 +1,5 @@
-import { decodeSearchVectors } from './SearchVectors.js';
-import { searchSounds, validateSearchData } from './SoundSearchEngine.js';
+import { decodeSearchVectors } from './SearchVectors.ts';
+import { searchSounds, validateSearchData } from './SoundSearchEngine.ts';
 let index, vectors;
 self.onmessage = ({ data }) => {
     try {

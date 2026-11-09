@@ -1,12 +1,15 @@
+import type { SearchIndex, SearchOptions, SearchResult } from './SearchTypes.ts';
+
 /** DOMと独立した検索処理。候補音声単位でAND条件を評価する。 */
-export function searchSounds(index, vectors, { query = '', tags = [], base = '', excludeMultiple = false } = {})
+export function searchSounds(index: SearchIndex, vectors: Float32Array, { query = '', tags = [], base = '', excludeMultiple = false }: SearchOptions = {}): SearchResult[]
 {
     const baseline = base ? index.events.find(event => event.name === base) : null;
     if (base && !baseline) throw new Error('Unknown base sound');
     const baseRows = new Set(baseline?.candidates.map(candidate => candidate.row) ?? []);
-    const scores = new Map();
-    const scoreRow = row => {
-        if (scores.has(row)) return scores.get(row);
+    const scores = new Map<number, number>();
+    const scoreRow = (row: number): number => {
+        const cached = scores.get(row);
+        if (cached !== undefined) return cached;
         let score = -Infinity;
         for (const other of baseRows) {
             let dot = 0;
@@ -16,7 +19,7 @@ export function searchSounds(index, vectors, { query = '', tags = [], base = '',
         scores.set(row, score);
         return score;
     };
-    const result = [];
+    const result: SearchResult[] = [];
     for (const event of index.events) {
         if (excludeMultiple && event.candidates.length > 1) continue;
         if (!event.name.includes(query.trim().toLowerCase())) continue;
@@ -28,16 +31,16 @@ export function searchSounds(index, vectors, { query = '', tags = [], base = '',
             sameAudio: baseRows.has(candidate.row), tags: index.audioTags[candidate.hash],
             count: event.candidates.length });
     }
-    return result.sort((a, b) => (baseline ? Number(b.name === base) - Number(a.name === base) || b.score - a.score : 0) || a.name.localeCompare(b.name));
+    return result.sort((a, b) => (baseline ? Number(b.name === base) - Number(a.name === base) || (b.score ?? 0) - (a.score ?? 0) : 0) || a.name.localeCompare(b.name));
 }
 
-export function validateSearchData(index, vectors, version)
+export function validateSearchData(index: SearchIndex, vectors: Float32Array, version: string): void
 {
     if (index.schemaVersion !== 3 || index.version !== version || index.sample ||
         !Number.isInteger(index.dimensions) || index.dimensions < 1 || !Array.isArray(index.hashes) ||
         vectors.length !== index.hashes.length * index.dimensions || Object.keys(index.audioTags).length !== index.hashes.length) throw new Error('Invalid search data');
     const tagIds = new Set(index.tags.map(tag => tag.id));
-    const names = new Set();
+    const names = new Set<string>();
     if (tagIds.size !== index.tags.length || new Set(index.hashes).size !== index.hashes.length) throw new Error('Duplicate data');
     for (let row = 0; row < index.hashes.length; row++) {
         if (!/^[0-9a-f]{40}$/.test(index.hashes[row]) || !Array.isArray(index.audioTags[index.hashes[row]]) ||

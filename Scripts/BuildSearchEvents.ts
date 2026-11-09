@@ -1,7 +1,12 @@
-import { resolveSoundEvents } from './ResolveSoundEvents.js';
+import type { SoundEvents, SearchEvent } from './SearchTypes.ts';
+import { resolveSoundEvents } from './ResolveSoundEvents.ts';
 
 /** 保存済みの定義と共通データから検索用候補を組み立てる。 */
-export function buildSearchEvents(sounds, hashes, durations)
+export function buildSearchEvents(
+    sounds: SoundEvents,
+    hashes: Record<string, string>,
+    durations: Record<string, number>,
+): SearchEvent[]
 {
     return Object.entries(resolveSoundEvents(sounds)).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
         .filter(([, candidates]) => candidates.length)

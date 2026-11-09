@@ -1,5 +1,11 @@
+export interface DecodedSearchVectors {
+    hashes: string[];
+    dimensions: number;
+    vectors: Float32Array;
+}
+
 /** SEVB: little-endian header followed by SHA-1 + Float32 vector records. */
-export function decodeSearchVectors(binary)
+export function decodeSearchVectors(binary: ArrayBuffer): DecodedSearchVectors
 {
     const view = new DataView(binary);
     if (view.byteLength < 16 || view.getUint32(0, false) !== 0x53455642 || view.getUint32(4, true) !== 1)
@@ -9,7 +15,7 @@ export function decodeSearchVectors(binary)
     const stride = 20 + dimensions * 4;
     if (!count || !dimensions || 16 + count * stride !== view.byteLength)
         throw new Error('Invalid vector size');
-    const hashes = [];
+    const hashes: string[] = [];
     const vectors = new Float32Array(count * dimensions);
     for (let row = 0; row < count; row++) {
         const offset = 16 + row * stride;
