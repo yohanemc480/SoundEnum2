@@ -18,7 +18,7 @@ import { localStorageStore } from './LocalStorage.ts';
 import { createResourceVersionSelector } from './App/CreateResourceVersionSelector.ts';
 import { applyText } from "./ApplyText.ts";
 import { Text } from "./Text.ts";
-import { initializeBrowserTabs } from "./BrowserTabs.ts";
+import { createBrowserTabs } from './App/CreateBrowserTabs.ts';
 import { createSearchScreen } from './App/CreateSearchScreen.ts';
 import { MCSoundHashResource } from "./MCSoundHashResource.ts";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.ts";
@@ -82,7 +82,7 @@ const playbackPresenter = new PlaybackPresenter(playback, playbackView,
 const masterVolumeControl = new SelectMasterVolumeArea('#select-master-volume', {
     value: playback.read().masterVolume, onChange: value => playbackPresenter.setMasterVolume(value),
 });
-initializeBrowserTabs(browserPreferences);
+const browserTabs = createBrowserTabs(browserPreferences);
 const compositionScreen = createCompositionScreen(playback, commandSettings,
     button => searchScreen.view.selectPreviewButton(button),
     row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
@@ -96,6 +96,6 @@ const savedCompositionsScreen = createSavedCompositionsScreen({
 }, paths.Version);
 void searchScreen.presenter.load();
 /** アプリ終了時に購読・通信・音声の所有者を順に破棄する。 */
-const dispose = () => { searchScreen.dispose(); savedCompositionsScreen.dispose(); compositionScreen.dispose(); playbackPresenter.dispose(); playbackView.dispose(); masterVolumeControl.dispose(); playback.dispose(); };
+const dispose = () => { browserTabs.dispose(); searchScreen.dispose(); savedCompositionsScreen.dispose(); compositionScreen.dispose(); playbackPresenter.dispose(); playbackView.dispose(); masterVolumeControl.dispose(); playback.dispose(); };
 window.addEventListener('pagehide', event => { if (!event.persisted) dispose(); });
 if (import.meta.hot) import.meta.hot.dispose(dispose);

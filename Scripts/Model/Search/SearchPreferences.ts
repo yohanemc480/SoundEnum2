@@ -1,3 +1,5 @@
+import { isBrowserTab } from '../Navigation/BrowserTab.ts';
+import type { BrowserTab } from '../Navigation/BrowserTab.ts';
 import type { SearchOptions } from "./SearchTypes.ts";
 
 /** 検索条件と選択中のバージョン・タブ。保存済みのフィールド名を維持する。 */
@@ -7,7 +9,7 @@ export interface SearchPreferencesValue {
     base: string;
     tags: string[];
     excludeMultiple: boolean;
-    tab: 'search-tab' | 'favorites-tab' | 'compositions-tab';
+    tab: BrowserTab;
 }
 
 
@@ -16,12 +18,6 @@ export interface SearchPreferencesValue {
 function isRecord(value: unknown): value is Record<string, unknown> {
     return value !== null && typeof value === 'object';
 }
-/** 復元可能なタブIDか判定する。 */
-function isTab(value: unknown): value is SearchPreferencesValue['tab'] {
-    return value === 'search-tab' || value === 'favorites-tab' || value === 'compositions-tab';
-}
-
-
 /** 不正なフィールドを既定値に戻し、配列は複製する。 */
 export function normalizePreferences(input: unknown = {}): SearchPreferencesValue {
     const value = isRecord(input) ? input : {};
@@ -31,7 +27,7 @@ export function normalizePreferences(input: unknown = {}): SearchPreferencesValu
         base: typeof value.base === 'string' ? value.base : '',
         tags: Array.isArray(value.tags) ? [...new Set(value.tags.filter(tag => typeof tag === 'string'))] : [],
         excludeMultiple: value.excludeMultiple === true,
-        tab: isTab(value.tab) ? value.tab : 'search-tab',
+        tab: isBrowserTab(value.tab) ? value.tab : 'search-tab',
     };
 }
 
