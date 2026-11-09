@@ -25,6 +25,16 @@ def file_digest(path, algorithm='sha256'):
     return digest.hexdigest()
 
 
+def cache_identity():
+    """公開先に依存せず、圧縮コード・依存定義・実行時の設定からキャッシュを識別する。"""
+    script = Path(__file__).resolve()
+    digest = hashlib.sha256()
+    for path in (script, script.with_name('requirements-release-audio.txt')):
+        digest.update(path.read_bytes())
+        digest.update(b'\0')
+    return f'v2-{COMPRESSION_LEVEL}-{sf.__version__}-{sf.__libsndfile_version__}-{np.__version__}-{digest.hexdigest()}'
+
+
 def transcode(source, destination, level=COMPRESSION_LEVEL):
     """形式と全サンプルの正常性を検証してから、変換結果を確定する。"""
     info = sf.info(source)
@@ -76,9 +86,8 @@ def build(root=ROOT):
     output = root / 'dist' / 'resource' / 'audio'
     if not (root / 'dist' / 'index.html').is_file():
         raise ValueError('Run the Vite build before preparing release audio')
-    # 設定やエンコーダーが変わったら古い圧縮結果を再利用しない。
-    settings = f'v1-{COMPRESSION_LEVEL}-{sf.__version__}-{sf.__libsndfile_version__}-{np.__version__}'
-    cache = root / '.cache' / 'release-audio' / settings
+    # ホスト側が古いキャッシュを復元しても、コードや設定が違えば再変換する。
+    cache = root / '.cache' / 'release-audio' / cache_identity()
     cache.mkdir(parents=True, exist_ok=True)
     manifest = cache / 'manifest.json'
     previous = {}

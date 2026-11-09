@@ -105,4 +105,6 @@ GitHub ActionsとNetlifyは、同じ `npm run build:deploy`（`tools/build_deplo
 
 Netlifyは `netlify.toml` のコマンドでビルドし、`dist` を公開します。リポジトリルートをBase directoryとして使ってください。Netlifyの環境では公開パスを `/`、GitHub Pagesと通常のローカル環境では `/SoundEnum2/` に切り替えます。Netlify側に個別のPythonバージョン指定がある場合は、`runtime.txt` と競合しないよう解除してください。
 
-音声変換キャッシュのビルド間の保存はGitHub Actionsに設定しています。Netlifyではキャッシュ保存を追加していないため、ビルド環境にキャッシュがなければ全音声を変換します。公開先への反映・デプロイ結果はそれぞれの管理画面で確認してください。
+音声変換キャッシュはGitHub Actions・Netlifyの両方でビルド間に保存します。Netlifyでは `tools/netlify-release-audio-cache/` のローカルプラグインが、ビルド前に `.cache/release-audio/` を復元し、ビルド成功後に保存します。圧縮処理とキャッシュの検証は共通のPython処理を使います。
+
+この設定を導入した初回は全音声を変換します。保存後のビルドではログの `Release audio cache restored.` と、`Release audio: ... (cached: ...)` の再利用件数で確認できます。キャッシュが消去された場合や圧縮コード・依存定義・圧縮設定・ライブラリのバージョンを変更した場合は再変換します。キャッシュの識別には共通のPython処理で `tools/build_release_audio.py` と `tools/requirements-release-audio.txt` の内容ハッシュも含めるため、公開先が古いキャッシュを復元しても再利用されません。この識別方式への移行時も一度全件を再変換します。復元・ハッシュ検証・ファイルのコピーには時間がかかるため、再利用時も処理件数は表示されます。Netlify管理画面でのプラグイン追加は不要です。公開先への反映・デプロイ結果はそれぞれの管理画面で確認してください。

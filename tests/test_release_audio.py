@@ -48,6 +48,32 @@ class ReleaseAudioTests(unittest.TestCase):
             self.assertFalse(release.prepare_audio(self.source, self.cache, metadata)[2])
             convert.assert_called_once()
 
+    def test_ビルドはコードと依存定義が同じ場合だけキャッシュを再利用する(self):
+        audio = self.root / 'resource' / 'audio'
+        audio.mkdir(parents=True)
+        self.source.rename(audio / self.source.name)
+        (self.root / 'dist').mkdir()
+        (self.root / 'dist' / 'index.html').write_text('test')
+        script = self.root / 'build_release_audio.py'
+        script.write_text('first implementation')
+        requirements = self.root / 'requirements-release-audio.txt'
+        requirements.write_text('first dependencies')
+        with patch.object(release, '__file__', str(script)), patch.object(
+            release, 'transcode', wraps=release.transcode,
+        ) as convert:
+            release.build(self.root)
+            self.assertEqual(convert.call_count, 1)
+            release.build(self.root)
+            self.assertEqual(convert.call_count, 1)
+            script.write_text('changed implementation')
+            release.build(self.root)
+            self.assertEqual(convert.call_count, 2)
+            requirements.write_text('changed dependencies')
+            release.build(self.root)
+            self.assertEqual(convert.call_count, 3)
+            release.build(self.root)
+            self.assertEqual(convert.call_count, 3)
+
     def test_大きくなる場合は元音源を使う(self):
         def enlarge(source, destination):
             """サイズが増加する変換結果を模擬する。"""
