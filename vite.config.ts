@@ -3,8 +3,8 @@ import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-// Actionsでは公開対象のSHAを使い、ローカルではチェックアウト中のコミットを使う。
-const commitHash = (process.env.GITHUB_SHA || execFileSync('git', ['rev-parse', 'HEAD'], {
+// 公開環境ではデプロイ対象のSHAを使い、ローカルではチェックアウト中のコミットを使う。
+const commitHash = (process.env.GITHUB_SHA || process.env.COMMIT_REF || execFileSync('git', ['rev-parse', 'HEAD'], {
     cwd: fileURLToPath(new URL('.', import.meta.url)), encoding: 'utf8',
 })).trim();
 if (!/^[0-9a-f]{40,64}$/.test(commitHash)) throw new Error('Invalid build commit hash');
@@ -18,7 +18,7 @@ export default defineConfig({
                 .replaceAll('__BUILD_COMMIT_SHORT__', commitHash.slice(0, 8));
         },
     }],
-    base: '/SoundEnum2/',
+    base: process.env.NETLIFY === 'true' ? '/' : '/SoundEnum2/',
     publicDir: false,
     build: {
         target: 'es2022',

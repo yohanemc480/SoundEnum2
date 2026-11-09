@@ -31,6 +31,7 @@ npm run preview
 - `verify:data`: 先頭バージョンの実データを使い、検索・Worker・チェックサムを検証します。
 - `typecheck`: アプリ・Worker・ツールを検査し、Model・Presenter・ContractsはDOMライブラリなしでも型チェックします。
 - `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。公開用音声の圧縮はPythonで実行します。CLAP推論は実行しません。
+- `build:deploy`: Python依存のインストール、音声圧縮テスト、Nodeテスト、データ検証、`build`を順に実行します。GitHub ActionsとNetlifyで共通の公開ビルドです。
 - `preview`: 生成済みの`dist/`を <http://127.0.0.1:8000/SoundEnum2/> で確認します。ソース変更後は再ビルドが必要です。
 
 生成済み成果物のサイズは、必要に応じて次のコマンドで確認できます。
@@ -69,8 +70,7 @@ python -m unittest discover -s tests -p "test_*.py" -v
 
 ```powershell
 python -m venv .venv
-.venv/Scripts/python.exe -m pip install -r tools/requirements-release-audio.txt
-npm run build
+npm run build:deploy
 npm run preview
 ```
 
@@ -84,7 +84,7 @@ GitHub Actionsは同じビルド手順で圧縮し、容量チェックを通っ
 
 ## GitHub Pagesへの公開
 
-設定ボタンの上に、`Build:` に続けてビルド元のコミットハッシュを8桁で表示します。文字は小さく、色は通常の本文色に揃えます。リンクは付けず、ホバーで完全なハッシュを確認できます。Actionsでは `GITHUB_SHA`、ローカルではビルド時の `git rev-parse HEAD` をHTMLに埋め込むため、公開後にブランチが進んでも表示は変わりません。ローカルの未コミット変更はハッシュに含まれません。開発サーバーでは起動時のハッシュを使うため、コミット後に表示を更新するにはサーバーを再起動してください。
+設定ボタンの上に、`Build:` に続けてビルド元のコミットハッシュを8桁で表示します。文字は小さく、色は通常の本文色に揃えます。リンクは付けず、ホバーで完全なハッシュを確認できます。Actionsでは `GITHUB_SHA`、Netlifyでは `COMMIT_REF`、ローカルではビルド時の `git rev-parse HEAD` をHTMLに埋め込むため、公開後にブランチが進んでも表示は変わりません。ローカルの未コミット変更はハッシュに含まれません。開発サーバーでは起動時のハッシュを使うため、コミット後に表示を更新するにはサーバーを再起動してください。
 
 `.github/workflows/deploy-pages.yml` がmainへのpush（PRのマージを含む）で実行されます。Node.jsは `.node-version` に合わせ、依存インストール、Nodeテスト、検索データ検証、型チェック、本番ビルドの成功後に `dist/` を公開します。公開用音声はビルド時にPythonで圧縮します。Actionsが必要な依存を準備し、圧縮結果をキャッシュします。CLAP推論は不要です。
 
@@ -93,3 +93,16 @@ GitHub Actionsは同じビルド手順で圧縮し、容量チェックを通っ
 公開先は `https://yohanemc480.github.io/SoundEnum2/` です。Viteの基準パス `/SoundEnum2/` をそのまま使用します。NetlifyのPRプレビューとは独立しており、developや作業ブランチへのpushではPagesを更新しません。
 
 再実行は **Actions → GitHub Pagesへ公開 → Run workflow** でmainを選びます。ワークフローをmainへ反映してから実行してください。main以外を選んだ場合は公開をスキップします。
+
+## 公開ビルドの共通設定
+
+GitHub ActionsとNetlifyは、同じ `npm run build:deploy`（`tools/build_deploy.mjs`）を実行します。依存準備・テスト・検証・ビルドの手順を変更するときは、この共通処理を更新してください。各公開先の設定には、実行環境の準備・キャッシュ・アップロードなど公開先固有の処理だけを置きます。
+
+- Node.jsのバージョン: `.node-version`
+- Pythonのバージョン: `runtime.txt`（Netlifyの形式に合わせ、バージョン番号のみ・末尾改行なし）
+- 公開音声用のPython依存: `tools/requirements-release-audio.txt`
+- JavaScript依存: `package.json` / `package-lock.json`
+
+Netlifyは `netlify.toml` のコマンドでビルドし、`dist` を公開します。リポジトリルートをBase directoryとして使ってください。Netlifyの環境では公開パスを `/`、GitHub Pagesと通常のローカル環境では `/SoundEnum2/` に切り替えます。Netlify側に個別のPythonバージョン指定がある場合は、`runtime.txt` と競合しないよう解除してください。
+
+音声変換キャッシュのビルド間の保存はGitHub Actionsに設定しています。Netlifyではキャッシュ保存を追加していないため、ビルド環境にキャッシュがなければ全音声を変換します。公開先への反映・デプロイ結果はそれぞれの管理画面で確認してください。
