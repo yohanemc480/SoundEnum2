@@ -1,7 +1,9 @@
 /** サウンド情報のバージョンと参照先をまとめる。 */
 export class ResourcePathProvider
 {
-    constructor(version)
+    readonly Version: string;
+
+    constructor(version: string)
     {
         if (typeof version !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(version)) throw new Error('Invalid resource version');
         this.Version = version;
@@ -35,6 +37,6 @@ export class ResourcePathProvider
 
 /** バージョンに依存しない共有音声の配置。 */
 export const SharedAudioPaths = Object.freeze({
-    Audio: hash => `resource/audio/${hash}.ogg`,
+    Audio: (hash: string) => `resource/audio/${hash}.ogg`,
     Waveforms: 'resource/audio-waveform-peaks.json'
 });

@@ -8,7 +8,7 @@ import { SearchWaveforms } from './SearchWaveforms.js';
 import { SoundSearchResource } from './SoundSearchResource.js';
 import { SoundManager } from './Singletons/SoundManager.js';
 import { MCCommandSound } from './MCCommandSound.js';
-import { MCCommandSelector } from './Constants/MCCommandSelector.js';
+import { MCCommandSelector } from './Constants/MCCommandSelector.ts';
 import { MCRawSound } from './MCRawSound.js';
 
 export class SoundSearchBrowser

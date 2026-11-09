@@ -1,4 +1,4 @@
-import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.js';
+import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
 import { LocalStorageSchema, normalizeCommandSettings } from './LocalStorageSchema.js';
 import { Text } from './Text.js';
 

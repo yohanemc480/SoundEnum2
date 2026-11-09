@@ -1,7 +1,7 @@
-import { formatSoundCommand } from './FormatSoundCommand.js';
-import { selectWeightedCandidate } from './SelectWeightedCandidate.js';
-import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.js";
-import { MCCommandSelector } from "./Constants/MCCommandSelector.js";
+import { formatSoundCommand } from './FormatSoundCommand.ts';
+import { selectWeightedCandidate } from './SelectWeightedCandidate.ts';
+import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.ts";
+import { MCCommandSelector } from "./Constants/MCCommandSelector.ts";
 import { MCRawSound } from "./MCRawSound.js";
 import { ResourceManager } from "./Singletons/ResourceManager.js";
 

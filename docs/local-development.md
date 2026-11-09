@@ -4,7 +4,7 @@
 
 ## Viteへの移行状況
 
-ViteとTypeScriptの設定を追加しています。依存パッケージ取得後にビルド検証を行う段階です。既存のJSとCSSはそのまま残っており、全ファイルのTS化・vanilla-extractへの移行はまだ完了していません。
+ViteとTypeScriptの設定を追加しています。依存パッケージ取得後にビルド検証を行う段階です。基礎処理7ファイルをTS化済みです。残りのJSとCSSは移行中で、全ファイルのTS化・vanilla-extractへの移行はまだ完了していません。
 
 Node.js 24.13.0を使用します（`.node-version`参照）。初回は次を実行します。
 
@@ -41,12 +41,8 @@ npm run check:pages-size
 
 公開容量の検査はローカルビルドから分けています。上限超過時もローカルで移行を検証できます。公開設定の変更やデプロイはまだ行っていません。
 
-## 移行中に従来方式で確認する
+## TypeScript移行後の注意
 
-現状のJS・CSSは次の方法でも確認できます。TSやvanilla-extractをアプリから利用する段階ではVite方式に切り替えます。
+ブラウザはTypeScriptを直接実行できないため、PythonのHTTPサーバーでソースを配信する方式は使えません。Viteの依存取得が完了するまでは、Node.jsによる`npm test`と`npm run verify:data`で処理を検証できます。
 
-```powershell
-python -m http.server 8000 --bind 127.0.0.1
-```
-
-<http://localhost:8000> を開きます。変更の反映は`Ctrl+R`、必要に応じて`Ctrl+F5`。停止は`Ctrl+C`です。
+Node.jsは型を除去して実行するだけなので、テスト成功は型チェック成功を意味しません。依存取得後に`npm run typecheck`と`npm run build`を実行してください。

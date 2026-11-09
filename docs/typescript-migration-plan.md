@@ -10,7 +10,10 @@
 - 配布データのコピーと、公開前に任意実行する容量検査を追加。
 - 既存31テストと実データ検証（1,984イベント・4,941音源）が通過。
 - npm installはregistry.npmjs.orgのENOTFOUNDで失敗。lockfile生成、型チェック、Viteによるビルド・previewは未完了。
-- ScriptsのTS化、vanilla-extractの導入、GitHub Actionsは未着手。依存取得後に第1段階の実動検証から再開する。
+- 基礎処理7ファイル（Constantsの4ファイル、FormatSoundCommand、SelectWeightedCandidate、ResourcePathProvider）をTS化。定数のリテラル型、コマンドの引数型、抽選のジェネリック、バージョンのreadonlyフィールドを導入。
+- JS/テストのimportを`.ts`へ更新し、Node.js 24の型除去で既存31テスト・実データ検証が通過。これは静的型チェックの代替ではない。
+- NodeテストとViteの両方で同じソースを読めるよう、移行対象のimportには`.ts`を明記し、allowImportingTsExtensionsを設定する（当初の拡張子なし方針を変更）。
+- 依存取得後は型チェックと第1段階のVite実動検証を優先する。vanilla-extract、残りのTS化、GitHub Actionsは未完了。
 - 現在の相対リソースURLはサブパス配下のページから解決する方式を維持している。パス集約は今後の工程。
 
 以下のチェックリストは段階全体の完了時に更新する。
@@ -70,7 +73,7 @@ Toast固有のクラス化・共有インスタンス化は今回の対象外。
 - [ ] アプリ用、Worker用、Node上の設定・テスト用の型チェック範囲を分ける。DOMとWebWorkerのグローバル型を無条件に混ぜない。
 - [ ] strict、noEmit、isolatedModules、bundler向けmoduleResolutionを設定する。環境に合わせてDOM・ES・Viteの型を指定する。
 - [ ] `typecheck`を追加し、`build`は型チェック成功後にViteを実行する。Vite単体の成功を型チェック成功とは扱わない。
-- [ ] 相対importはViteで解決する拡張子なしを基本とする。Workerのnew URLには実ファイル名を記述し、TS化時に`.ts`へ変える。
+- [ ] 相対importはNodeテストでも直接解決できるよう`.ts`を明記する。Workerのnew URLには実ファイル名を記述し、TS化時に`.ts`へ変える。
 - [ ] 既存フロントエンドテストをVitestに移し、`node:assert/strict`のアサーションやデータfixtureを再利用する。node:testの登録をVitestのtestへ変更する。
 - [ ] Node環境を既定とし、DOMが必要なテストだけDOM環境を使う。グローバルの書き換え・AudioContextのモックは各テスト後に復元する。
 - [ ] ソースファイル名を読むテストやWorkerを直接importするテストを棚卸しし、TS化に追従させる。

@@ -13,4 +13,5 @@ export const MCCommandSoundSource = Object.freeze(
     Player: "player",
     Ambient: "ambient",
     Voice: "voice",
-});
+} as const);
+export type SoundSource = typeof MCCommandSoundSource[keyof typeof MCCommandSoundSource];

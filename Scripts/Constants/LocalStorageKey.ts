@@ -5,4 +5,4 @@ export const LocalStorageKey = Object.freeze({
     Favorites: 'soundenum.favorites',
     SavedCompositions: 'soundenum.saved-compositions',
     SearchPreferences: 'soundenum.search-preferences',
-});
+} as const);

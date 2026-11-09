@@ -1,4 +1,4 @@
-import { SharedAudioPaths } from './ResourcePathProvider.js';
+import { SharedAudioPaths } from './ResourcePathProvider.ts';
 
 let loading;
 export async function getWaveform(hash)

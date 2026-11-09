@@ -1,7 +1,7 @@
 import { localStorageStore } from '../LocalStorage.js';
 import { LocalStorageSchema, normalizeCommandSettings } from '../LocalStorageSchema.js';
-import { MCCommandSoundSource } from "../Constants/MCCommandSoundSource.js";
-import { SettingDefine } from "../Constants/SettingDefine.js";
+import { MCCommandSoundSource } from "../Constants/MCCommandSoundSource.ts";
+import { SettingDefine } from "../Constants/SettingDefine.ts";
 import { MCCommandSound } from "../MCCommandSound.js";
 import { ResourceManager } from "./ResourceManager.js";
 import { SingletonBase } from "./SingletonBase.js";

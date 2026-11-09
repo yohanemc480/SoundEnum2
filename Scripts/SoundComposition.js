@@ -1,6 +1,6 @@
 import { revealAddedItem } from './RevealAddedItem.js';
 import { OutputArea } from './OutputArea.js';
-import { formatSoundCommand } from './FormatSoundCommand.js';
+import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { SelectMasterVolumeArea } from './SelectMasterVolumeArea.js';
 import { CompositionWaveform } from './CompositionWaveform.js';
 import { mountSoundSettings } from './SoundSettings.js';
@@ -8,8 +8,8 @@ import { bindSettingsPopover } from './BindSettingsPopover.js';
 import { Text } from './Text.js';
 import { localStorageStore } from './LocalStorage.js';
 import { LocalStorageSchema } from './LocalStorageSchema.js';
-import { selectWeightedCandidate } from './SelectWeightedCandidate.js';
-import { SharedAudioPaths } from './ResourcePathProvider.js';
+import { selectWeightedCandidate } from './SelectWeightedCandidate.ts';
+import { SharedAudioPaths } from './ResourcePathProvider.ts';
 import { SoundManager } from './Singletons/SoundManager.js';
 import { showToast } from './Toast.js';
 

@@ -1,6 +1,6 @@
 import { MCCommandSound } from './MCCommandSound.js';
-import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.js';
-import { LocalStorageKey } from './Constants/LocalStorageKey.js';
+import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
+import { LocalStorageKey } from './Constants/LocalStorageKey.ts';
 
 /** @typedef {string[]} FavoriteSoundIds サウンドIDのみ。バージョンやピッチは保存しない。 */
 

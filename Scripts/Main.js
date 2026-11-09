@@ -12,7 +12,7 @@ import { SoundSearchBrowser } from "./SoundSearchBrowser.js";
 import { MCSoundHashResource } from "./MCSoundHashResource.js";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.js";
 import { NetworkFileLoader } from "./NetworkFileLoader.js";
-import { ResourcePathProvider } from "./ResourcePathProvider.js";
+import { ResourcePathProvider } from "./ResourcePathProvider.ts";
 import { SoundManager } from "./Singletons/SoundManager.js";
 import { OutputArea } from "./OutputArea.js";
 import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.js";

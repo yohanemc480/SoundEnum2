@@ -1,6 +1,6 @@
 import { Text } from "./Text.js";
 import { SoundManager } from "./Singletons/SoundManager.js";
-import { SettingDefine } from "./Constants/SettingDefine.js";
+import { SettingDefine } from "./Constants/SettingDefine.ts";
 
 /**
  * マスター音量調整エリアを表すクラス

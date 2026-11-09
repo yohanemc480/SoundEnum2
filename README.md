@@ -62,15 +62,16 @@ Minecraft Java Editionのサウンドを検索・試聴し、`playsound`コマ�
 Vite・TypeScriptへの移行を進めています。npmでの起動・検証方法と現在の移行状況は[ローカル確認手順](docs/local-development.md)、全体の手順は[移行計画](docs/typescript-migration-plan.md)を参照してください。
 
 
-HTML・CSS・JavaScriptで構成された静的サイトです。生成済みリソースがあれば、フロントエンドのビルドやCLAPの導入は不要です。
-
-リポジトリのルートで次を実行し、<http://localhost:8000> を開きます。
+TypeScriptを含む静的サイトです。Node.js 24.13.0で依存パッケージを取得してから開発サーバーを起動します。CLAPの導入は生成済みリソースの利用には不要です。
 
 ```powershell
-python -m http.server 8000 --bind 127.0.0.1
+npm install
+npm run dev
 ```
 
-詳しい操作は[ローカル確認手順](docs/local-development.md)を参照してください。
+<http://127.0.0.1:8000/SoundEnum2/> を開きます。PythonのHTTPサーバーでソースを直接配信する方式は、TS化後は使用できません。
+
+詳しくは[ローカル確認手順](docs/local-development.md)を参照してください。
 
 ## バージョンのリソースを生成する
 

@@ -8,4 +8,4 @@ export const MCCommandSelector = Object.freeze(
     NearPlayer: "@p",
     Random: "@r",
     Entity: "@e",
-});
+} as const);

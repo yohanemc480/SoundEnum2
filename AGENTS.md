@@ -1,7 +1,7 @@
 # SoundEnum
 
 Minecraftのサウンドを試聴し、playsoundコマンドを生成するプロジェクトです。
-HTML・CSS・JavaScriptで構成され、ローカルでの実行にビルドは不要です。
+HTML・CSS・JavaScript・TypeScriptで構成され、Viteへの移行中です。ブラウザでの実行にはViteによる変換が必要です。
 
 ## ローカルでの確認
 

@@ -1,4 +1,4 @@
-import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.js';
+import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 import { selectResourceVersion } from '../Scripts/VersionSelector.js';
 import { buildSearchEvents } from '../Scripts/BuildSearchEvents.js';
 import { decodeSearchVectors } from '../Scripts/SearchVectors.js';

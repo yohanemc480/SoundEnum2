@@ -5,7 +5,7 @@ import { Worker as NodeWorker } from 'node:worker_threads';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { SoundSearchResource } from '../Scripts/SoundSearchResource.js';
-import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.js';
+import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 import { Text } from '../Scripts/Text.js';
 import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.js';
 
