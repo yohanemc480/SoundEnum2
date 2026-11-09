@@ -1,3 +1,4 @@
+import { CompositionModel } from './Model/Composition/CompositionModel.ts';
 import * as layout from './Layout.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
@@ -38,6 +39,7 @@ interface CompositionElements {
 }
 type PreviewSource = AudioBufferSourceNode & { previewGain: GainNode; baseVolume: number };
 
+/** 組み合わせ画面の接続。状態はModelに委譲し、表示・再生の分離は次の作業で行う。 */
 export class SoundComposition {
     readonly playback: AudioPlayback;
     readonly settings: CommandSettings;
@@ -49,7 +51,9 @@ export class SoundComposition {
     readonly onSimilar: CompositionOptions['onSimilar'];
     onChange?: () => void;
     events: Map<string, SearchSound> | null;
-    rows: SoundCommand[];
+    readonly model = new CompositionModel();
+    /** 既存の表示・保存一覧へ独立した行のコピーを渡す。 */
+    get rows(): SoundCommand[] { return this.model.read(); }
     nodes: Set<PreviewSource>;
     generation: number;
     busy: boolean;
@@ -68,18 +72,17 @@ export class SoundComposition {
         // 上の要素種別検証を、キーごとの戻り値型へ反映する。
         return element as CompositionElements[K];
     }
-    static MaxSounds = 10;
+    static MaxSounds = CompositionModel.MaxSounds;
     constructor({ onPreview, onSimilar, playback, settings }: CompositionOptions) {
         this.playback = playback; this.settings = settings;
         this.onPreview = onPreview;
         this.onSimilar = onSimilar;
         this.events = null;
-        this.rows = [];
         this.nodes = new Set();
         this.generation = 0;
         this.busy = false;
         this.writable = true;
-        try { this.rows = localStorageStore.readEntry(LocalStorageSchema.Composition); }
+        try { this.model.replace(localStorageStore.readEntry(LocalStorageSchema.Composition)); }
         catch (error) { console.error(error); this.writable = false; showToast(Text.compositionFailure); }
         this.output = new OutputArea('#composition-output');
         this.waveform = new CompositionWaveform(this.element('waveform'), this.element('time'));
@@ -109,11 +112,12 @@ export class SoundComposition {
         this.render();
         this.onChange?.();
     }
+    /** 保存成功後にModelを確定する。読み込み失敗時は既存データを上書きしない。 */
     save(rows: SoundCommand[]): boolean {
         try {
             if (!this.writable) throw new Error('Composition storage unavailable');
             localStorageStore.writeEntry(LocalStorageSchema.Composition, rows);
-            this.rows = rows;
+            this.model.replace(rows);
             this.refreshWaveform();
             this.updateOutput();
             this.onChange?.();
@@ -126,7 +130,7 @@ export class SoundComposition {
             return;
         }
         const settings = this.settings.read();
-        if (this.save([...this.rows, { name, ...settings }])) {
+        if (this.save(this.model.withAdded({ name, ...settings }))) {
             this.stop(); this.render();
             revealAddedItem(this.element('list'));
             showToast(Text.compositionAdded);
@@ -171,7 +175,7 @@ export class SoundComposition {
             const remove = document.createElement('button'); remove.type = 'button'; remove.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`;
             remove.setAttribute('aria-label', `${Text.compositionRemove}: ${row.name}`);
             remove.addEventListener('click', () => {
-                if (this.save(this.rows.filter((_, i) => i !== index))) { this.stop(); this.render(); }
+                if (this.save(this.model.withoutRow(index))) { this.stop(); this.render(); }
             });
             const settings = document.createElement('button'); settings.type = 'button';
             settings.className = settingsStyles.settingsButton; settings.textContent = Text.settings;
@@ -190,7 +194,7 @@ export class SoundComposition {
             mountSoundSettings(panel, {
                 read: () => this.rows[index],
                 save: settings => {
-                    const rows = this.rows.map((value, i) => i === index ? { ...value, ...settings } : value);
+                    const rows = this.model.withSettings(index, settings);
                     if (this.save(rows)) this.stop();
                 },
                 onInput: () => this.updateButtons(),

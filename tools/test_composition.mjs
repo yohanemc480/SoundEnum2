@@ -1,3 +1,4 @@
+import { CompositionModel } from '../Scripts/Model/Composition/CompositionModel.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
@@ -17,7 +18,9 @@ test('composition keeps duplicates and precision, rejecting invalid settings', (
 function fixture() {
     const ui = { play: { disabled: false, classList: { toggle() {} }, setAttribute() {} }, status: {}, loading: { hidden: true }, list: { querySelectorAll: () => [] } };
     const composition = Object.create(SoundComposition.prototype);
-    Object.assign(composition, { rows: [{ name: 'a', volume: 1, pitch: 1 }, { name: 'a', volume: .5, pitch: 2 }],
+    const model = new CompositionModel();
+    model.replace([{ name: 'a', volume: 1, pitch: 1 }, { name: 'a', volume: .5, pitch: 2 }]);
+    Object.assign(composition, { model,
         events: new Map([['a', { candidates: [{ hash: 'hash', weight: 1, pitch: .75, volume: .5 }] }]]),
         playback: { pause() {}, read: () => ({ masterVolume: .8 }) },
         generation: 0, nodes: new Set(), busy: false, element: id => ui[id] });

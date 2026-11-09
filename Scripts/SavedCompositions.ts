@@ -1,3 +1,4 @@
+import { SavedCompositionsModel, nextCompositionName as findNextCompositionName } from './Model/Composition/SavedCompositionsModel.ts';
 import * as layout from './Layout.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
@@ -12,29 +13,29 @@ import { confirmAction, promptText } from './ConfirmDialog.ts';
 import { showToast } from './Toast.ts';
 import { Text } from './Text.ts';
 
+/** 現在の日本語文言を渡し、Modelに連番の空きを求める。 */
 export function nextCompositionName(items: readonly { name: string }[]): string {
-    const names = new Set(items.map(item => normalizeCompositionName(item.name)));
-    let number = 1;
-    while (names.has(normalizeCompositionName(Text.savedCompositionDefaultName(number)))) number++;
-    return normalizeCompositionName(Text.savedCompositionDefaultName(number));
+    return findNextCompositionName(items, Text.savedCompositionDefaultName);
 }
 
+/** 保存一覧の画面。値と編集ルールはModelに委譲する。 */
 export class SavedCompositions {
     readonly version: string;
     readonly composition: SoundComposition;
-    items: SavedCompositionsValue;
+    readonly model = new SavedCompositionsModel();
+    /** 表示用に行まで複製した保存一覧を返す。 */
+    get items(): SavedCompositionsValue { return this.model.read(); }
     writable: boolean;
     readonly saveButton: HTMLButtonElement;
     readonly list: HTMLElement;
     readonly status: HTMLElement;
     readonly tab: HTMLElement;
-    static MaxItems = 30;
+    static MaxItems = SavedCompositionsModel.MaxItems;
     constructor(composition: SoundComposition, version: string) {
         this.version = version;
         this.composition = composition;
-        this.items = [];
         this.writable = true;
-        try { this.items = localStorageStore.readEntry(LocalStorageSchema.SavedCompositions); }
+        try { this.model.replace(localStorageStore.readEntry(LocalStorageSchema.SavedCompositions)); }
         catch (error) { console.error(error); this.writable = false; }
         const saveButton = document.querySelector<HTMLButtonElement>('#save-composition');
         const list = document.getElementById('saved-compositions-list');
@@ -59,6 +60,7 @@ export class SavedCompositions {
         composition.onChange = () => this.render();
         this.render();
     }
+    /** 保存候補を検証し、書き込み成功後にModelと表示を更新する。 */
     write(items: SavedCompositionsValue): boolean {
         if (items.length > SavedCompositions.MaxItems && items.length > this.items.length) {
             showToast(Text.savedCompositionLimit(SavedCompositions.MaxItems));
@@ -66,8 +68,9 @@ export class SavedCompositions {
         }
         try {
             if (!this.writable) return false;
-            localStorageStore.writeEntry(LocalStorageSchema.SavedCompositions, items);
-            this.items = items;
+            const validated = this.model.validateChange(items);
+            localStorageStore.writeEntry(LocalStorageSchema.SavedCompositions, validated);
+            this.model.replace(validated);
             this.render();
             return true;
         } catch (error) { console.error(error); showToast(Text.savedCompositionFailure); return false; }
@@ -100,8 +103,8 @@ export class SavedCompositions {
                         catch { throw new Error(Text.savedCompositionNameInvalid); }
                     },
                 });
-                if (name !== null && name !== item.name) {
-                    if (this.write(this.items.map(value => value.id === item.id ? { ...value, name } : value)))
+                if (name !== null && name !== item.name && this.items.some(value => value.id === item.id)) {
+                    if (this.write(this.model.withName(item.id, name)))
                         showToast(Text.savedCompositionSaved);
                 }
             });
@@ -133,8 +136,8 @@ export class SavedCompositions {
             remove.setAttribute('aria-label', Text.savedCompositionDeleteConfirm(item.name));
             remove.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg>';
             remove.addEventListener('click', async () => {
-                if (await confirmAction(Text.savedCompositionDeleteConfirm(item.name), { acceptLabel: Text.confirmDelete }))
-                    this.write(this.items.filter(value => value.id !== item.id));
+                if (await confirmAction(Text.savedCompositionDeleteConfirm(item.name), { acceptLabel: Text.confirmDelete }) && this.items.some(value => value.id === item.id))
+                    this.write(this.model.withoutItem(item.id));
             });
             const overwrite = document.createElement('button'); overwrite.type = 'button';
             overwrite.className = settingsStyles.settingsButton; overwrite.textContent = Text.savedCompositionOverwrite;
@@ -143,7 +146,8 @@ export class SavedCompositions {
                 const sounds = this.composition.rows.map(row => ({ ...row }));
                 if (!sounds.length || sounds.length > 10) return;
                 if (!await confirmAction(Text.savedCompositionOverwriteConfirm(item.name), { acceptLabel: Text.savedCompositionOverwrite })) return;
-                if (this.write(this.items.map(value => value.id === item.id ? { ...value, sounds, version: this.version } : value)))
+                if (!this.items.some(value => value.id === item.id)) return;
+                if (this.write(this.model.withSounds(item.id, sounds, this.version)))
                     showToast(Text.savedCompositionSaved);
             });
             const copy = createCopyButton(() => item.sounds.map(sound => formatSoundCommand(sound)).join('\n'));
