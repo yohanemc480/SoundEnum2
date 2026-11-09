@@ -1,3 +1,4 @@
+import { DisposalScope } from './DisposalScope.ts';
 import { HtmlSearchView } from '../View/Search/HtmlSearchView.ts';
 import { SearchPresenter } from '../Presenter/SearchPresenter.ts';
 import { WorkerSearchService } from '../Infrastructure/Search/WorkerSearchService.ts';
@@ -13,14 +14,21 @@ import type { SoundPreviewService } from '../Contracts/Services/SoundPreviewServ
 
 /** 検索のMVPを生成する。再生サービスはAppから注入し、検索側では実装を知らない。 */
 export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService, preferences: BrowserPreferencesStore) {
-    const view = new HtmlSearchView();
-    const presenter = new SearchPresenter(view, new WorkerSearchService(paths), new StoredSearchPreferences(preferences), composition, preview, new LocalFavoriteSoundsStore(), {
-        schedule: (callback, milliseconds) => {
-            const timer = setTimeout(callback, milliseconds);
-            return () => clearTimeout(timer);
-        },
-        confirmFavoriteRemoval: name => confirmAction(Text.favoritesRemoveConfirm(name), { acceptLabel: Text.confirmRemove }),
-        notifyFailure: operation => showToast(operation === 'favorites' ? Text.favoritesFailure : Text.searchFailure),
-    });
-    return { presenter, view, dispose: () => { presenter.dispose(); view.dispose(); } };
+    const scope = new DisposalScope();
+    try {
+        const view = scope.own(new HtmlSearchView());
+        const searchService = scope.own(new WorkerSearchService(paths));
+        const presenter = scope.own(new SearchPresenter(view, searchService, new StoredSearchPreferences(preferences), composition, preview, new LocalFavoriteSoundsStore(), {
+            schedule: (callback, milliseconds) => {
+                const timer = setTimeout(callback, milliseconds);
+                return () => clearTimeout(timer);
+            },
+            confirmFavoriteRemoval: name => confirmAction(Text.favoritesRemoveConfirm(name), { acceptLabel: Text.confirmRemove }),
+            notifyFailure: operation => showToast(operation === 'favorites' ? Text.favoritesFailure : Text.searchFailure),
+        }));
+        return { presenter, view, dispose: () => scope.dispose() };
+    } catch (error) {
+        try { scope.dispose(); } catch (cleanupError) { console.error(cleanupError); }
+        throw error;
+    }
 }

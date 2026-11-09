@@ -39,4 +39,7 @@ export class OutputArea
         }));
         this.copyButton.disabled = !text;
     }
+
+    /** この部品が追加した表示とボタンを取り除く。再初期化時の重複を防ぐ。 */
+    dispose(): void { this.text.remove(); this.copyButton.remove(); }
 }
