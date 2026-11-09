@@ -39,8 +39,8 @@ test('playback presenter composes multipliers and commands and rejects stale wav
 
 test('playback resource adapter resolves injected data and preserves candidate weights', () => {
     const hash = 'a'.repeat(40);
-    const resources = new SoundPlaybackResources({ GetSoundParameters: () => [{ name: 'raw', pitch: .75, volume: .2, weight: 3 }] },
-        { NameToHash: () => hash });
+    const resources = new SoundPlaybackResources({ event: { sounds: [{ name: 'raw', pitch: .75, volume: .2, weight: 3 }] } },
+        { 'minecraft/sounds/raw.ogg': hash });
     assert.deepEqual(resources.candidates('event'), [{ name: 'raw', hash, pitch: .75, volume: .2, weight: 3 }]);
     assert.equal(resources.audioUrl(hash), `resource/audio/${hash}.ogg`);
     assert.throws(() => resources.audioUrl('invalid'), /Invalid/);

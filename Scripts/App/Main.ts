@@ -21,8 +21,6 @@ import { applyText } from "../View/ApplyText.ts";
 import { Text } from "../I18n/Text.ts";
 import { createBrowserTabs } from './CreateBrowserTabs.ts';
 import { createSearchScreen } from './CreateSearchScreen.ts';
-import { MCSoundHashResource } from "../MCSoundHashResource.ts";
-import { MCPlaysoundCommandParamResource } from "../MCPlaysoundCommandParamResource.ts";
 import { fetchTextResource } from '../Infrastructure/Resources/FetchTextResource.ts';
 import { DisposalScope } from './DisposalScope.ts';
 import { ResourcePathProvider } from "../ResourcePathProvider.ts";
@@ -67,13 +65,9 @@ try {
     const paths = new ResourcePathProvider(version);
     const hashText = await fetchTextResource(paths.Hash, lifecycle.signal);
     scope.throwIfDisposed();
-    const soundHashResource = new MCSoundHashResource(hashText);
     const soundText = await fetchTextResource(paths.Sounds, lifecycle.signal);
     scope.throwIfDisposed();
-    const playsoundCommandParamResource = new MCPlaysoundCommandParamResource(soundText);
-
-    soundHashResource.ParseResource();
-    playsoundCommandParamResource.ParseResource();
+    const playbackResources = new SoundPlaybackResources(JSON.parse(soundText), JSON.parse(hashText));
 
     const playback = scope.own(new BrowserAudioPlayback());
     const commandSettings = new CommandSettings();
@@ -86,7 +80,7 @@ try {
         read: () => settingsStore.read(), save: value => settingsStore.save(value),
     });
     const playbackPresenter = scope.own(new PlaybackPresenter(playback, playbackView,
-        new SoundPlaybackResources(playsoundCommandParamResource, soundHashResource), { load: getWaveform },
+        playbackResources, { load: getWaveform },
         commandSettings, command => outputArea.SetText(command)));
     const masterVolumeControl = scope.own(new SelectMasterVolumeArea('#select-master-volume', {
         value: playback.read().masterVolume, onChange: value => playbackPresenter.setMasterVolume(value),

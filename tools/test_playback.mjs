@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BrowserAudioPlayback } from '../Scripts/Infrastructure/Audio/BrowserAudioPlayback.ts';
-import { MCRawSound } from '../Scripts/MCRawSound.ts';
+import { SoundPlaybackResources } from '../Scripts/Infrastructure/Resources/SoundPlaybackResources.ts';
 class FakeAudio extends EventTarget {
     paused = true; ended = false; duration = NaN; currentTime = 0; plays = 0; src = '';
     pause() { this.paused = true; this.dispatchEvent(new Event('pause')); }
@@ -57,6 +57,6 @@ test('pause and disposal prevent late audio; allocated URLs are released', async
 });
 
 test('missing audio hashes fail before forming an invalid audio URL', () => {
-    const raw = new MCRawSound({ name: 'missing' });
-    assert.throws(() => raw.CreateLink({ NameToHash: () => undefined }), /Missing audio hash/);
+    const resources = new SoundPlaybackResources({ event: { sounds: ['missing'] } }, {});
+    assert.throws(() => resources.candidates('event'), /Missing audio hash/);
 });
