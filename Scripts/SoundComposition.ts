@@ -1,3 +1,4 @@
+import { playing as playingClass } from './Playback.css.ts';
 import type { SoundCommand } from './FormatSoundCommand.ts';
 import type { SearchEvent } from './SearchTypes.ts';
 import { revealAddedItem } from './RevealAddedItem.ts';
@@ -177,7 +178,7 @@ export class SoundComposition {
         const invalid = [...this.element('list').querySelectorAll('input')].some(input => !input.validity.valid || !Number.isFinite(input.valueAsNumber));
         const play = this.element('play');
         play.disabled = !this.busy && (invalid || !this.events || !this.rows.length || this.rows.some(row => !this.events?.has(row.name)));
-        play.classList.toggle('is-playing', this.busy);
+        play.classList.toggle(playingClass, this.busy);
         play.setAttribute('aria-label', this.busy ? Text.compositionStop : Text.compositionPlay);
         play.title = this.busy ? Text.compositionStop : Text.compositionPlay;
     }

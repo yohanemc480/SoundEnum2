@@ -4,7 +4,7 @@
 
 ## Viteへの移行状況
 
-既存50ファイルすべてをTypeScriptへ移行し、共通型とJSON検証の2ファイルを追加しています。HTMLの起動先もMain.tsへ変更しました。依存取得・静的型チェック・Viteビルド（リソースコピーを含む）が成功しています。ブラウザ動作確認とvanilla-extractへのCSS移行は未完了です。
+既存50ファイルすべてをTypeScriptへ移行し、共通型とJSON検証の2ファイルを追加しています。HTMLの起動先もMain.tsへ変更しました。依存取得・静的型チェック・Viteビルド（リソースコピーを含む）が成功しています。vanilla-extractを導入し、通知・再生状態・音量パネルのスタイルを移行しました。残りのCSS移行と移行後のブラウザ動作確認は未完了です。
 
 Node.js 24.13.0を使用します（`.node-version`参照）。クローン後の初回は次を実行します。
 
@@ -27,7 +27,7 @@ npm run build
 npm run preview
 ```
 
-- `test`: 36件のNodeテスト。TS化にあわせてテスト環境も移行します。
+- `test`: 36件のNodeテスト。専用ローダーで.css.tsのファイルスコープを設定し、実際のクラス名exportを読み込みます。CSSの描画は行わず、CSS生成はViteビルドで検証します。
 - `verify:data`: 先頭バージョンの実データを使い、検索・Worker・チェックサムを検証します。
 - `typecheck`: Scripts内の全TSファイルを検査します。JS混在用の設定は削除しています。
 - `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。Pythonによるデータ生成は実行しません。

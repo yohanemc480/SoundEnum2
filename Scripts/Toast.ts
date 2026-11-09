@@ -1,3 +1,5 @@
+import * as styles from './Toast.css.ts';
+
 let timer: ReturnType<typeof setTimeout> | undefined;
 let redisplayTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -10,15 +12,16 @@ export function showToast(message: string, duration = 2000): void
 {
     const toast = document.querySelector<HTMLElement>('#toast');
     if (!toast) throw new Error('Missing toast element');
+    toast.classList.add(styles.toast);
     clearTimeout(timer);
     clearTimeout(redisplayTimer);
     const display = () => {
         toast.textContent = message;
-        toast.classList.add('is-visible');
-        timer = setTimeout(() => toast.classList.remove('is-visible'), duration);
+        toast.classList.add(styles.visible);
+        timer = setTimeout(() => toast.classList.remove(styles.visible), duration);
     };
     if (toast.textContent) {
-        toast.classList.remove('is-visible');
+        toast.classList.remove(styles.visible);
         // CSS のフェードアウト（150ms）が終わってから表示し直す。
         // 待機中の再呼び出しでは、古い通知の再表示をキャンセルする。
         redisplayTimer = setTimeout(display, 180);

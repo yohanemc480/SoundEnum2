@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 8000 --strictPort",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.worker.json && tsc --noEmit -p tsconfig.node.json",
-    "test": "node --test tools/test_*.mjs",
+    "test": "node --import ./tools/register_css_tests.mjs --test tools/test_*.mjs",
     "verify:data": "node tools/verify_search_data.mjs",
     "build": "npm run typecheck && vite build && node tools/copy_static_resources.mjs",
     "preview": "vite preview --host 127.0.0.1 --port 8000 --strictPort",
@@ -17,6 +17,8 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "@vanilla-extract/css": "^1.21.3",
+    "@vanilla-extract/vite-plugin": "^5.2.6",
     "typescript": "~5.9.3",
     "vite": "^8.0.0"
   }

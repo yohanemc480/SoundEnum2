@@ -1,3 +1,4 @@
+import { playing as playingClass } from './Playback.css.ts';
 import { Text } from "./Text.ts";
 import { PreviewWaveform } from "./PreviewWaveform.ts";
 /** 試聴中の音声と再生ボタン・シークバーを同期する。 */
@@ -30,7 +31,7 @@ export class PreviewPlayer
             button.disabled = !audio.getAttribute('src') || !!audio.error;
             const playing = !audio.paused && !audio.ended;
             const label = playing ? Text.pause : Text.play;
-            button.classList.toggle('is-playing', playing);
+            button.classList.toggle(playingClass, playing);
             button.setAttribute('aria-label', label);
             button.title = label;
             seek.disabled = !ready;

@@ -1,3 +1,4 @@
+import * as styles from './VolumeControl.css.ts';
 import { Text } from "./Text.ts";
 import { SoundManager } from "./Singletons/SoundManager.ts";
 import { SettingDefine } from "./Constants/SettingDefine.ts";
@@ -16,7 +17,7 @@ export class SelectMasterVolumeArea
         if (!panel) throw new Error(`Missing volume panel: ${appendTarget}`);
         const slider = document.createElement('input');
         slider.type = 'range';
-        slider.className = 'preview-volume-slider';
+        slider.className = styles.slider;
         slider.setAttribute('aria-label', Text.previewVolume);
         slider.min = String(SettingDefine.MinMasterVolume);
         slider.max = String(SettingDefine.MaxMasterVolume);
@@ -30,7 +31,7 @@ export class SelectMasterVolumeArea
         const button = control.querySelector('button');
         if (!button) throw new Error('Missing volume button');
         const setOpen = (open: boolean) => {
-            control.classList.toggle('is-open', open);
+            control.classList.toggle(styles.open, open);
             panel.inert = !open;
             panel.setAttribute('aria-hidden', String(!open));
             button.setAttribute('aria-expanded', String(open));
