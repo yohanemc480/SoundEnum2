@@ -1,10 +1,12 @@
+import { FavoriteSounds } from '../Model/Favorites/FavoriteSounds.ts';
+import type { FavoriteSoundsStore } from '../Contracts/Services/FavoriteSoundsStore.ts';
 import type { SearchOptions, SearchResult, SearchSourceIndex } from '../Model/Search/SearchTypes.ts';
 import type { SearchView, SearchRow } from '../Contracts/Views/SearchView.ts';
 import type { SearchService } from '../Contracts/Services/SearchService.ts';
 import type { SearchPreferencesStore } from '../Contracts/Services/SearchPreferencesStore.ts';
 import type { CompositionActions } from '../Contracts/Services/CompositionActions.ts';
 import type { SoundPreviewRequest, SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
-import type { FavoriteSoundsStore, SearchInteractionServices } from '../Contracts/Services/SearchInteractionServices.ts';
+import type { SearchInteractionServices } from '../Contracts/Services/SearchInteractionServices.ts';
 
 const emptyOptions = (): Required<SearchOptions> => ({ query: '', tags: [], referenceSoundName: '', excludeMultipleCandidates: false });
 
@@ -27,7 +29,8 @@ export class SearchPresenter {
     private readonly preferences: SearchPreferencesStore;
     private readonly composition: CompositionActions;
     private readonly previewService: SoundPreviewService;
-    private readonly favorites: FavoriteSoundsStore | null;
+    private readonly favoritesStore: FavoriteSoundsStore | null;
+    private readonly favorites: FavoriteSounds | null;
     private readonly interactions: SearchInteractionServices;
 
     constructor(
@@ -44,7 +47,11 @@ export class SearchPresenter {
         this.preferences = preferences;
         this.composition = composition;
         this.previewService = previewService;
-        this.favorites = favorites;
+        this.favoritesStore = favorites;
+        try {
+            this.favorites = favorites ? new FavoriteSounds() : null;
+            if (favorites) this.favorites?.replace(favorites.read());
+        } catch { this.favorites = null; }
         this.interactions = interactions;
         this.unbind = view.bind({
             activate: () => { void this.load(); },
@@ -171,17 +178,19 @@ export class SearchPresenter {
 
     /** 保存された名前を表示行へ変換し、保存機能が利用可能かどうかとともにViewへ渡す。 */
     private renderFavorites(): void {
-        if (!this.disposed) this.view.showFavorites([...this.favorites?.names ?? []].map(name => this.createRow(name)), this.favorites !== null);
+        if (!this.disposed) this.view.showFavorites((this.favorites?.read() ?? []).map(name => this.createRow(name)), this.favorites !== null);
     }
 
     /** 削除確認と保存を行い、成功時だけ表示を更新する。同じ音への確認待ち操作は重複させない。 */
     private async toggleFavorite(name: string): Promise<void> {
-        if (!this.favorites || this.pendingFavorites.has(name)) return;
+        if (this.disposed || !this.favorites || !this.favoritesStore || this.pendingFavorites.has(name)) return;
         this.pendingFavorites.add(name);
         try {
-            if (this.favorites.names.has(name) && !await this.interactions.confirmFavoriteRemoval(name)) return;
+            if (this.favorites.has(name) && !await this.interactions.confirmFavoriteRemoval(name)) return;
             if (this.disposed) return;
-            this.favorites.toggle(name);
+            const next = this.favorites.withToggled(name);
+            this.favoritesStore.save(next);
+            this.favorites.replace(next);
             this.renderFavorites();
         } catch { if (!this.disposed) this.interactions.notifyFailure('favorites'); }
         finally { this.pendingFavorites.delete(name); }

@@ -1,3 +1,4 @@
+import { normalizeFavoriteSounds } from './Model/Favorites/FavoriteSounds.ts';
 import { normalizeComposition, normalizeSavedCompositions } from './Model/Composition/CompositionData.ts';
 export { normalizeComposition, normalizeSavedCompositions, normalizeCompositionName } from './Model/Composition/CompositionData.ts';
 export type { CompositionValue, SavedComposition, SavedCompositionsValue } from './Model/Composition/CompositionData.ts';
@@ -39,11 +40,6 @@ export function normalizePreferences(input: unknown = {}): SearchPreferencesValu
     };
 }
 
-function normalizeFavorites(value: unknown): FavoriteSoundIds {
-    if (!Array.isArray(value) || value.some(name => typeof name !== 'string')) throw new Error('Invalid favorites');
-    return [...new Set(value.filter((name: unknown): name is string => typeof name === 'string'))];
-}
-
 export const LocalStorageSchema = Object.freeze({
     CommandSettings: Object.freeze({
         key: LocalStorageKey.CommandSettings,
@@ -58,7 +54,7 @@ export const LocalStorageSchema = Object.freeze({
     Favorites: Object.freeze({
         key: LocalStorageKey.Favorites,
         createDefault: () => [],
-        normalize: normalizeFavorites,
+        normalize: normalizeFavoriteSounds,
     }),
     SavedCompositions: Object.freeze({
         key: LocalStorageKey.SavedCompositions,

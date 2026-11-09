@@ -2,7 +2,7 @@ import { HtmlSearchView } from '../View/Search/HtmlSearchView.ts';
 import { SearchPresenter } from '../Presenter/SearchPresenter.ts';
 import { WorkerSearchService } from '../Infrastructure/Search/WorkerSearchService.ts';
 import { readPreferences, saveSearchOptions, toSearchOptions } from '../SearchPreferences.ts';
-import { Favorites } from '../Favorites.ts';
+import { LocalFavoriteSoundsStore } from '../Infrastructure/Storage/LocalFavoriteSoundsStore.ts';
 import { confirmAction } from '../ConfirmDialog.ts';
 import { showToast } from '../Toast.ts';
 import { Text } from '../Text.ts';
@@ -13,12 +13,9 @@ import type { SoundPreviewService } from '../Contracts/Services/SoundPreviewServ
 /** 検索のMVPを生成する。再生サービスはAppから注入し、検索側では実装を知らない。 */
 export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService) {
     const view = new HtmlSearchView();
-    let favorites: Favorites | null;
-    try { favorites = new Favorites(); }
-    catch (error) { console.error(error); favorites = null; }
     const presenter = new SearchPresenter(view, new WorkerSearchService(paths), {
         read: () => toSearchOptions(readPreferences()), save: saveSearchOptions,
-    }, composition, preview, favorites, {
+    }, composition, preview, new LocalFavoriteSoundsStore(), {
         schedule: (callback, milliseconds) => {
             const timer = setTimeout(callback, milliseconds);
             return () => clearTimeout(timer);

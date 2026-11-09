@@ -26,7 +26,7 @@ function setup(overrides = {}) {
         activateSearchTab() { state.activated = true; },
     };
     const service = { load: async () => index, search: async () => [], dispose() { state.disposed++; }, ...overrides.service };
-    const favorites = overrides.favorites === undefined ? { names: new Set(), toggle(name) { this.names.has(name) ? this.names.delete(name) : this.names.add(name); } } : overrides.favorites;
+    const favorites = overrides.favorites === undefined ? { read: () => [], save() {} } : overrides.favorites;
     const presenter = new SearchPresenter(view, service, {
         read: () => overrides.options ?? options, save: value => state.saved.push(value),
     }, { setEvents(value) { state.events = value; }, add(name) { state.added = name; }, stop() { state.stopped++; } },
@@ -111,7 +111,7 @@ test('similar search, composition and preview pass values instead of elements', 
 });
 
 test('favorite cancellation and storage failures preserve displayed state', async () => {
-    const favorites = { names: new Set(['reference']), toggle() { throw new Error('storage'); } };
+    const favorites = { read: () => ['reference'], save() { throw new Error('storage'); } };
     const confirmation = deferred();
     const h = setup({ favorites, confirm: () => confirmation.promise }); await h.presenter.load();
     h.state.actions.toggleFavorite('reference'); confirmation.resolve(false); await flush();
@@ -120,6 +120,28 @@ test('favorite cancellation and storage failures preserve displayed state', asyn
     assert.deepEqual(h.state.notifications, ['favorites']);
     assert.deepEqual(h.state.favorites.at(-1).rows.map(row => row.name), ['reference']);
     h.presenter.dispose();
+});
+
+test('favorite read failures disable only favorites and prevent overwriting corrupt data', async () => {
+    let writes = 0;
+    const h = setup({ favorites: { read() { throw new Error('corrupt'); }, save() { writes++; } } });
+    await h.presenter.load();
+    assert.equal(h.state.statuses.at(-1), 'ready');
+    assert.equal(h.state.favorites.at(-1).available, false);
+    h.state.actions.toggleFavorite('reference'); await flush(); assert.equal(writes, 0);
+    h.presenter.dispose();
+});
+
+test('favorite changes persist before display, keep unavailable names and ignore late confirmations', async () => {
+    let saved = ['unavailable']; const confirmation = deferred();
+    const h = setup({ favorites: { read: () => saved, save: value => { saved = [...value]; } }, confirm: () => confirmation.promise });
+    await h.presenter.load(); assert.equal(h.state.favorites.at(-1).rows[0].candidateCount, 0);
+    h.state.actions.toggleFavorite('reference'); await flush();
+    assert.deepEqual(saved, ['unavailable', 'reference']);
+    assert.deepEqual(h.state.favorites.at(-1).rows.map(row => row.name), saved);
+    h.state.actions.toggleFavorite('reference'); h.state.actions.toggleFavorite('reference');
+    h.presenter.dispose(); confirmation.resolve(true); await flush();
+    assert.deepEqual(saved, ['unavailable', 'reference']);
 });
 
 test('dispose cancels waiting work and prevents late load or search from updating view', async () => {
