@@ -1,13 +1,16 @@
-import * as settingsStyles from './Settings.css.ts';
+import * as settingsStyles from '../../Settings/Settings.css.ts';
 import * as styles from './ConfirmDialog.css.ts';
-import { Text } from './Text.ts';
+import { Text } from '../../../Text.ts';
 
+/** 確定ボタンの表示指定。 */
 interface ConfirmOptions { acceptLabel?: string }
+/** テキスト入力の初期値と検証条件。 */
 interface TextOptions {
     value: string;
     maxLength: number;
     validate?: (value: string) => string;
 }
+/** 名前などを入力するダイアログへの指定。 */
 type PromptOptions = Partial<TextOptions> & ConfirmOptions;
 let pending: Promise<unknown> = Promise.resolve();
 
@@ -25,12 +28,14 @@ export function confirmAction(message: string, { acceptLabel = Text.confirmAccep
     return result;
 }
 
+/** 前のダイアログが閉じるのを待って入力を求める。キャンセル時はnullを返す。 */
 export function promptText(message: string, { value = '', maxLength = 20, validate, acceptLabel = Text.confirmAccept }: PromptOptions = {}): Promise<string | null> {
     const result = pending.then(() => openDialog(message, acceptLabel, { value, maxLength, validate }));
     pending = result.catch(() => {});
     return result;
 }
 
+/** ダイアログを構築し、確定・キャンセルと元の要素へのフォーカス復帰を扱う。 */
 function openDialog(message: string, acceptLabel: string): Promise<boolean>;
 function openDialog(message: string, acceptLabel: string, textOptions: TextOptions): Promise<string | null>;
 function openDialog(message: string, acceptLabel: string, textOptions?: TextOptions): Promise<boolean | string | null>
@@ -74,6 +79,7 @@ function openDialog(message: string, acceptLabel: string, textOptions?: TextOpti
             });
         }
         let closing = false;
+        /** 二重に閉じないようにし、動きを減らす設定では即座に閉じる。 */
         const close = (accepted = false) => {
             if (closing) return;
             closing = true;
@@ -97,6 +103,7 @@ function openDialog(message: string, acceptLabel: string, textOptions?: TextOpti
         });
         dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
         let backdropPressed = false;
+        /** ポインター位置がダイアログ本体の外側か判定する。 */
         const outside = (event: MouseEvent) => {
             const rect = dialog.getBoundingClientRect();
             return event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;

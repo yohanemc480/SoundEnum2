@@ -1,7 +1,7 @@
-import { field } from './InputFields.css.ts';
+import { field } from '../InputFields.css.ts';
 import * as styles from './VolumeControl.css.ts';
-import { Text } from "./Text.ts";
-import { SettingDefine } from "./Constants/SettingDefine.ts";
+import { Text } from "../../../Text.ts";
+import { SettingDefine } from "../../../Constants/SettingDefine.ts";
 
 /**
  * マスター音量調整エリアを表すクラス

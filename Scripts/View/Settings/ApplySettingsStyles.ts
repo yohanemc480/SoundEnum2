@@ -1,5 +1,6 @@
 import * as styles from './Settings.css.ts';
 
+/** HTMLの指定を生成クラスへ置き換え、設定部品のスタイルを適用する。 */
 export function applySettingsStyles(): void {
     document.querySelectorAll<HTMLElement>('[data-settings-style]').forEach(element => {
         for (const key of (element.dataset.settingsStyle ?? '').split(' ')) {

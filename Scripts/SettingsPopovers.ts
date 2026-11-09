@@ -1,7 +1,7 @@
-import { applyLayoutStyles } from './ApplyLayoutStyles.ts';
-import { applySettingsStyles } from './ApplySettingsStyles.ts';
-import * as settingsStyles from './Settings.css.ts';
-import { bindSettingsPopover } from './BindSettingsPopover.ts';
+import { applyLayoutStyles } from './View/Layout/ApplyLayoutStyles.ts';
+import { applySettingsStyles } from './View/Settings/ApplySettingsStyles.ts';
+import * as settingsStyles from './View/Settings/Settings.css.ts';
+import { bindSettingsPopover } from './View/Components/BindSettingsPopover.ts';
 
 applyLayoutStyles();
 applySettingsStyles();

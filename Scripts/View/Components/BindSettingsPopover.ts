@@ -1,7 +1,8 @@
-// 開閉・外側クリック・Esc・フォーカス復帰はブラウザのPopover APIに任せる。
+/** 設定パネルをボタンに追従させる。開閉はPopover APIに任せ、位置監視の解除関数を返す。 */
 export function bindSettingsPopover(button: HTMLElement | null, panel: HTMLElement | null): () => void
 {
     if (!button || !panel) throw new Error('Missing settings popover element');
+    /** 開いているパネルを画面内に収めて、ボタンの下へ配置する。 */
     const positionSettings = (): void => {
         if (!panel.matches(':popover-open')) return;
         const anchor = button.getBoundingClientRect();

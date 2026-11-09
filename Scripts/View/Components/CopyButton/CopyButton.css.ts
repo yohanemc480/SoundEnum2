@@ -1,4 +1,4 @@
-import { output } from './OutputArea.css.ts';
+import { output } from '../OutputArea/OutputArea.css.ts';
 import { style } from '@vanilla-extract/css';
 
 export const button = style({

@@ -1,6 +1,6 @@
-import * as layout from '../../Layout.css.ts';
-import * as fieldStyles from '../../InputFields.css.ts';
-import * as settingsStyles from '../../Settings.css.ts';
+import * as layout from '../Layout/Layout.css.ts';
+import * as fieldStyles from '../Components/InputFields.css.ts';
+import * as settingsStyles from './Settings.css.ts';
 import type { CommandSettingsValue } from '../../Model/Command/CommandSettings.ts';
 import type { CommandSettingsView, CommandSettingsActions } from '../../Contracts/Views/CommandSettingsView.ts';
 import { MCCommandSoundSource } from '../../Constants/MCCommandSoundSource.ts';

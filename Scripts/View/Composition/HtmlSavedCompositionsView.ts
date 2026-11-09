@@ -1,8 +1,8 @@
-import * as layout from '../../Layout.css.ts';
-import * as settingsStyles from '../../Settings.css.ts';
-import * as styles from '../../Compositions.css.ts';
-import { createCopyButton } from '../../CopyButton.ts';
-import { revealAddedItem } from '../../RevealAddedItem.ts';
+import * as layout from '../Layout/Layout.css.ts';
+import * as settingsStyles from '../Settings/Settings.css.ts';
+import * as styles from './Compositions.css.ts';
+import { createCopyButton } from '../Components/CopyButton/CopyButton.ts';
+import { revealAddedItem } from '../Components/RevealAddedItem.ts';
 import { Text } from '../../Text.ts';
 import type { SavedCompositionsView, SavedCompositionsActions, SavedCompositionsDisplayState } from '../../Contracts/Views/SavedCompositionsView.ts';
 

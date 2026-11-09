@@ -4,8 +4,8 @@ import { WorkerSearchService } from '../Infrastructure/Search/WorkerSearchServic
 import { StoredSearchPreferences } from '../Infrastructure/Storage/StoredSearchPreferences.ts';
 import type { BrowserPreferencesStore } from '../Contracts/Services/BrowserPreferencesStore.ts';
 import { LocalFavoriteSoundsStore } from '../Infrastructure/Storage/LocalFavoriteSoundsStore.ts';
-import { confirmAction } from '../ConfirmDialog.ts';
-import { showToast } from '../Toast.ts';
+import { confirmAction } from '../View/Components/ConfirmDialog/ConfirmDialog.ts';
+import { showToast } from '../View/Components/Toast/Toast.ts';
 import { Text } from '../Text.ts';
 import type { ResourcePathProvider } from '../ResourcePathProvider.ts';
 import type { CompositionActions } from '../Contracts/Services/CompositionActions.ts';

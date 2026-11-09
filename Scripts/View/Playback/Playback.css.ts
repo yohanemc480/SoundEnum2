@@ -1,4 +1,4 @@
-import * as layout from './Layout.css.ts';
+import * as layout from '../Layout/Layout.css.ts';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 const spin = keyframes({ to: { transform: 'rotate(360deg)' } });
 export const transport = style({

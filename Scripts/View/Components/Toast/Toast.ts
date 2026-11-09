@@ -15,6 +15,7 @@ export function showToast(message: string, duration = 2000): void
     toast.classList.add(styles.toast);
     clearTimeout(timer);
     clearTimeout(redisplayTimer);
+    /** 最新の通知を表示し、非表示に戻す時刻を設定する。 */
     const display = () => {
         toast.textContent = message;
         toast.classList.add(styles.visible);

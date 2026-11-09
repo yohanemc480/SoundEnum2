@@ -1,7 +1,8 @@
 import * as styles from './CopyButton.css.ts';
-import { copyCommand } from "./CopyCommand.ts";
-import { Text } from "./Text.ts";
+import { copyCommand } from "../../../CopyCommand.ts";
+import { Text } from "../../../Text.ts";
 
+/** クリック時点の最新テキストをコピーするボタンを生成する。 */
 export function createCopyButton(getText: () => string): HTMLButtonElement
 {
     const button = document.createElement('button');

@@ -1,5 +1,5 @@
-import * as layout from './Layout.css.ts';
-import * as fields from './InputFields.css.ts';
+import * as layout from '../Layout/Layout.css.ts';
+import * as fields from '../Components/InputFields.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 export const settingsButton = style({
     "padding": "6px 12px",

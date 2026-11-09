@@ -1,7 +1,8 @@
 import * as styles from './OutputArea.css.ts';
-import { copyCommand } from "./CopyCommand.ts";
-import { createCopyButton } from "./CopyButton.ts";
+import { copyCommand } from "../../../CopyCommand.ts";
+import { createCopyButton } from "../CopyButton/CopyButton.ts";
 
+/** 複数行のコマンドとコピー操作を表示する共通部品。 */
 export class OutputArea
 {
     value: string;
@@ -24,6 +25,7 @@ export class OutputArea
         target.append(this.text, this.copyButton);
     }
 
+    /** 表示とコピー対象を同時に更新し、空の場合はコピーを無効にする。 */
     SetText(text: string): void
     {
         this.value = text;

@@ -6,7 +6,7 @@ import { getWaveform } from '../Infrastructure/Audio/WaveformResource.ts';
 import { SharedAudioPaths } from '../ResourcePathProvider.ts';
 import { CompositionModel } from '../Model/Composition/CompositionModel.ts';
 import { Text } from '../Text.ts';
-import { showToast } from '../Toast.ts';
+import { showToast } from '../View/Components/Toast/Toast.ts';
 import type { AudioPlayback } from '../Contracts/Services/AudioPlayback.ts';
 import type { CommandSettings } from '../Model/Command/CommandSettings.ts';
 import type { SoundCommand } from '../FormatSoundCommand.ts';

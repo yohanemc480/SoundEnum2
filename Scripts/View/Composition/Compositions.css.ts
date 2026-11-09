@@ -1,6 +1,6 @@
-import * as layout from './Layout.css.ts';
-import * as settingsStyles from './Settings.css.ts';
-import { button as copyButton } from './CopyButton.css.ts';
+import * as layout from '../Layout/Layout.css.ts';
+import * as settingsStyles from '../Settings/Settings.css.ts';
+import { button as copyButton } from '../Components/CopyButton/CopyButton.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const compositionRow = style({

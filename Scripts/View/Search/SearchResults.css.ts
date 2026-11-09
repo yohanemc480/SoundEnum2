@@ -1,4 +1,4 @@
-import { compositionRow, compositionName } from '../../Compositions.css.ts';
+import { compositionRow, compositionName } from '../Composition/Compositions.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const compositionAdd = style({});

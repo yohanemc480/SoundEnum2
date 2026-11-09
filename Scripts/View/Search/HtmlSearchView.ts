@@ -1,6 +1,6 @@
-import * as layout from '../../Layout.css.ts';
-import * as settingsStyles from '../../Settings.css.ts';
-import { compositionRow } from '../../Compositions.css.ts';
+import * as layout from '../Layout/Layout.css.ts';
+import * as settingsStyles from '../Settings/Settings.css.ts';
+import { compositionRow } from '../Composition/Compositions.css.ts';
 import * as styles from './SearchResults.css.ts';
 import { SoundAutocomplete } from './SoundAutocomplete.ts';
 import { SearchWaveforms } from './SearchWaveforms.ts';
