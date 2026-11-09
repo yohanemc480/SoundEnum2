@@ -30,7 +30,7 @@ npm run preview
 - `test`: `tests/` 配下のNodeテスト。層間の依存方向と循環参照も検査します。専用ローダーで.css.tsのファイルスコープを設定し、実際のクラス名exportを読み込みます。CSSの描画は行わず、CSS生成はViteビルドで検証します。
 - `verify:data`: 先頭バージョンの実データを使い、検索・Worker・チェックサムを検証します。
 - `typecheck`: アプリ・Worker・ツールを検査し、Model・Presenter・ContractsはDOMライブラリなしでも型チェックします。
-- `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。Pythonによるデータ生成は実行しません。
+- `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。公開用音声の圧縮はPythonで実行します。CLAP推論は実行しません。
 - `preview`: 生成済みの`dist/`を <http://127.0.0.1:8000/SoundEnum2/> で確認します。ソース変更後は再ビルドが必要です。
 
 生成済み成果物のサイズは、必要に応じて次のコマンドで確認できます。
@@ -39,7 +39,7 @@ npm run preview
 npm run check:pages-size
 ```
 
-公開容量の検査はビルド・自動公開から分けており、公開ワークフローでは実行しません。
+公開容量の検査は `npm run build` の最後に実行し、公開ファイルが1,000,000,000バイトを超える場合は失敗させます。
 
 ## TypeScript移行後の注意
 
@@ -61,9 +61,30 @@ Nodeテストは `npm test`、Pythonの更新・検索データ生成テスト�
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
+## 公開用音声の圧縮
+
+`resource/audio/` は元音源のまま保持します。`npm run dev` では元音源を使い、`npm run build` で生成する `dist/resource/audio/` には比較試聴の圧縮D（OGG Vorbis、compression_level=1.0）を配置します。圧縮後の方が大きい場合は元音源を採用します。
+
+初回のみPython環境を準備してください（既存の `.venv` があれば作成は不要です）。
+
+```powershell
+python -m venv .venv
+.venv/Scripts/python.exe -m pip install -r tools/requirements-release-audio.txt
+npm run build
+npm run preview
+```
+
+ビルドは `.venv` のPythonを優先し、なければPATH上の `python` を使います。別の環境を使う場合は `SOUNDENUM_PYTHON` に実行ファイルのパスを指定できます。
+
+初回は全音声を最大4並列で変換します。2回目以降は `.cache/release-audio/` を再利用します。元音源のSHA-1とキャッシュのSHA-256を検証し、破損したキャッシュは再生成します。設定・ライブラリのバージョンが変わると別のキャッシュを使います。このキャッシュと `dist/` はGitには登録しません。
+
+公開音声のファイル名は元音源のハッシュを識別子として維持しますが、圧縮後の内容のSHA-1とは一致しません。サンプル数・サンプルレート・チャンネル数は維持し、検索ベクトル・タグ・波形は元音源から生成したものを使います。検索用データの再生成や元音源の検証には `dist/` を使わないでください。
+
+GitHub Actionsは同じビルド手順で圧縮し、容量チェックを通った `dist/` だけを公開します。元音源・圧縮キャッシュ・Python環境は公開対象に含めません。通常どおりmainへの反映で公開でき、LFSや別サービスの設定は不要です。
+
 ## GitHub Pagesへの公開
 
-`.github/workflows/deploy-pages.yml` がmainへのpush（PRのマージを含む）で実行されます。Node.jsは `.node-version` に合わせ、依存インストール、Nodeテスト、検索データ検証、型チェック、本番ビルドの成功後に `dist/` を公開します。生成済み音源もビルド時にコピーするため、Pythonによる音源生成は不要です。
+`.github/workflows/deploy-pages.yml` がmainへのpush（PRのマージを含む）で実行されます。Node.jsは `.node-version` に合わせ、依存インストール、Nodeテスト、検索データ検証、型チェック、本番ビルドの成功後に `dist/` を公開します。公開用音声はビルド時にPythonで圧縮します。Actionsが必要な依存を準備し、圧縮結果をキャッシュします。CLAP推論は不要です。
 
 初回はGitHubのリポジトリで **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定してください。Environmentの公開ブランチ制限を設定している場合は、`github-pages` でmainを許可します。独自のシークレットやアクセストークンは不要です。
 
