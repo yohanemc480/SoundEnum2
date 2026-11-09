@@ -229,3 +229,17 @@ export const candidateProbabilityPreview = style({
 export const candidateProbability = style({
     flexShrink: 0, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', color: 'var(--muted)',
 });
+
+export const similarSearchButton = style({
+    position: 'relative',
+});
+// 候補数はレイアウトに含めず、単一候補のボタンと同じ寸法を保つ。
+export const similarSearchCandidateBadge = style({
+    position: 'absolute', top: '-8px', right: '-5px',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    boxSizing: 'border-box', minWidth: '18px', height: '18px', padding: '0 4px',
+    border: '2px solid var(--surface)', borderRadius: '999px',
+    background: 'var(--line)', color: 'var(--muted)',
+    fontSize: '10px', fontWeight: 700, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
+    pointerEvents: 'none',
+});

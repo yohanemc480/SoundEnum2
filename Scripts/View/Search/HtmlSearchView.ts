@@ -401,8 +401,17 @@ export class HtmlSearchView implements SearchView {
             };
             preview.addEventListener('click', () => playCandidate(entry.referenceCandidateIndex === undefined ? null : entry.candidate ?? null, preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;
+            similar.className = styles.similarSearchButton;
             similar.disabled = !candidates.length;
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
+            if (candidates.length > 1) {
+                const badge = document.createElement('span');
+                badge.className = styles.similarSearchCandidateBadge;
+                badge.textContent = String(candidates.length);
+                badge.setAttribute('aria-hidden', 'true');
+                similar.append(badge);
+                similar.setAttribute('aria-label', `${Text.searchSimilarTo(entry.name)}（${Text.searchCandidate(candidates.length)}）`);
+            }
             similar.addEventListener('click', () => {
                 if (candidates.length <= 1) this.actions?.searchSimilar(entry.name);
                 else this.showCandidateChoices(entry.name, similar);
