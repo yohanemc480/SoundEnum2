@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
-import { SoundComposition } from '../Scripts/SoundComposition.js';
+import { SoundComposition } from '../Scripts/SoundComposition.ts';
 import { SoundManager } from '../Scripts/Singletons/SoundManager.ts';
 
 test('composition keeps duplicates and precision, rejecting invalid settings', () => {

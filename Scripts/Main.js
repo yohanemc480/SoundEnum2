@@ -1,5 +1,5 @@
-import { SavedCompositions } from './SavedCompositions.js';
-import { SoundComposition } from './SoundComposition.js';
+import { SavedCompositions } from './SavedCompositions.ts';
+import { SoundComposition } from './SoundComposition.ts';
 import { mountSoundSettings } from './SoundSettings.ts';
 import { confirmAction } from './ConfirmDialog.ts';
 import { localStorageStore } from './LocalStorage.ts';

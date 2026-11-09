@@ -1,3 +1,5 @@
+import type { SoundCommand } from './FormatSoundCommand.ts';
+import type { SearchEvent } from './SearchTypes.ts';
 import { revealAddedItem } from './RevealAddedItem.ts';
 import { OutputArea } from './OutputArea.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
@@ -13,9 +15,47 @@ import { SharedAudioPaths } from './ResourcePathProvider.ts';
 import { SoundManager } from './Singletons/SoundManager.ts';
 import { showToast } from './Toast.ts';
 
+interface CompositionOptions {
+    onPreview: (row: SoundCommand, button: HTMLButtonElement) => void | Promise<void>;
+    onSimilar: (name: string) => void;
+}
+interface CompositionElements {
+    waveform: HTMLCanvasElement;
+    play: HTMLButtonElement;
+    time: HTMLElement;
+    list: HTMLElement;
+    count: HTMLElement;
+    status: HTMLElement;
+    loading: HTMLElement;
+}
+type PreviewSource = AudioBufferSourceNode & { previewGain: GainNode; baseVolume: number };
+
 export class SoundComposition {
+    readonly onPreview: CompositionOptions['onPreview'];
+    readonly onSimilar: CompositionOptions['onSimilar'];
+    onChange?: () => void;
+    events: Map<string, SearchEvent> | null;
+    rows: SoundCommand[];
+    nodes: Set<PreviewSource>;
+    generation: number;
+    busy: boolean;
+    writable: boolean;
+    readonly output: OutputArea;
+    readonly waveform: CompositionWaveform;
+    volume: number;
+    disposePopovers: (() => void)[] = [];
+    controller?: AbortController;
+    context?: AudioContext;
+
+    element<K extends keyof CompositionElements>(id: K): CompositionElements[K] {
+        const element = document.getElementById(`composition-${id}`);
+        const expectedType = id === 'waveform' ? HTMLCanvasElement : id === 'play' ? HTMLButtonElement : HTMLElement;
+        if (!(element instanceof expectedType)) throw new Error(`Missing/invalid composition element: ${id}`);
+        // 上の要素種別検証を、キーごとの戻り値型へ反映する。
+        return element as CompositionElements[K];
+    }
     static MaxSounds = 10;
-    constructor({ onPreview, onSimilar }) {
+    constructor({ onPreview, onSimilar }: CompositionOptions) {
         this.onPreview = onPreview;
         this.onSimilar = onSimilar;
         this.events = null;
@@ -26,7 +66,6 @@ export class SoundComposition {
         this.writable = true;
         try { this.rows = localStorageStore.readEntry(LocalStorageSchema.Composition); }
         catch (error) { console.error(error); this.writable = false; showToast(Text.compositionFailure); }
-        this.element = id => document.getElementById(`composition-${id}`);
         this.output = new OutputArea('#composition-output');
         this.waveform = new CompositionWaveform(this.element('waveform'), this.element('time'));
         this.volume = SoundManager.Instance.GetMasterVolume();
@@ -39,12 +78,12 @@ export class SoundComposition {
         SoundManager.Instance.GetAudio().addEventListener('play', () => this.stop());
         this.render();
     }
-    setEvents(events) {
+    setEvents(events: readonly SearchEvent[]): void {
         this.events = new Map(events.map(event => [event.name, event]));
         this.render();
         this.onChange?.();
     }
-    save(rows) {
+    save(rows: SoundCommand[]): boolean {
         try {
             if (!this.writable) throw new Error('Composition storage unavailable');
             localStorageStore.writeEntry(LocalStorageSchema.Composition, rows);
@@ -55,7 +94,7 @@ export class SoundComposition {
             return true;
         } catch (error) { console.error(error); showToast(Text.compositionFailure); return false; }
     }
-    add(name) {
+    add(name: string): void {
         if (this.rows.length >= SoundComposition.MaxSounds) {
             showToast(Text.compositionLimit(SoundComposition.MaxSounds));
             return;
@@ -84,7 +123,7 @@ export class SoundComposition {
         this.disposePopovers = [];
         list.replaceChildren();
         this.element('count').textContent = Text.compositionCount(this.rows.length);
-        const unavailable = this.events && this.rows.some(row => !this.events.has(row.name));
+        const unavailable = this.events && this.rows.some(row => !this.events?.has(row.name));
         this.element('status').textContent = !this.writable ? Text.compositionFailure : !this.rows.length ? Text.compositionEmpty :
             unavailable ? Text.compositionUnavailable : '';
         this.element('loading').hidden = !!this.events || !this.rows.length;
@@ -95,7 +134,7 @@ export class SoundComposition {
             name.disabled = !this.events?.get(row.name)?.candidates.length;
             name.addEventListener('click', () => this.onPreview(this.rows[index], name));
             item.addEventListener('click', event => {
-                if (event.target.closest('button, .settings-popover')) return;
+                if (event.target instanceof Element && event.target.closest('button, .settings-popover')) return;
                 name.click();
             });
             const similar = document.createElement('button'); similar.type = 'button';
@@ -119,7 +158,7 @@ export class SoundComposition {
             actions.append(similar, settings, remove);
             heading.append(name, actions); item.append(heading);
             this.disposePopovers.push(bindSettingsPopover(settings, panel));
-            if (this.events && !this.events.has(row.name)) {
+            if (this.events && !this.events?.has(row.name)) {
                 const note = document.createElement('p'); note.className = 'section-note'; note.textContent = Text.favoritesUnavailable; item.append(note);
             }
             mountSoundSettings(panel, {
@@ -137,7 +176,7 @@ export class SoundComposition {
     updateButtons() {
         const invalid = [...this.element('list').querySelectorAll('input')].some(input => !input.validity.valid || !Number.isFinite(input.valueAsNumber));
         const play = this.element('play');
-        play.disabled = !this.busy && (invalid || !this.events || !this.rows.length || this.rows.some(row => !this.events.has(row.name)));
+        play.disabled = !this.busy && (invalid || !this.events || !this.rows.length || this.rows.some(row => !this.events?.has(row.name)));
         play.classList.toggle('is-playing', this.busy);
         play.setAttribute('aria-label', this.busy ? Text.compositionStop : Text.compositionPlay);
         play.title = this.busy ? Text.compositionStop : Text.compositionPlay;
@@ -152,7 +191,7 @@ export class SoundComposition {
         this.element('loading').hidden = true;
         this.updateButtons();
     }
-    async play() {
+    async play(): Promise<void> {
         if (this.element('play').disabled) return;
         this.stop();
         const generation = this.generation;
@@ -162,31 +201,43 @@ export class SoundComposition {
         this.element('status').textContent = '';
         this.element('loading').hidden = false;
         try {
-            this.context ??= new AudioContext();
-            await this.context.resume();
+            const context = this.context ??= new AudioContext();
+            await context.resume();
             if (generation !== this.generation) return;
-            const prepared = this.rows.map(row => ({ ...row, candidate: selectWeightedCandidate(this.events.get(row.name).candidates, candidate => candidate.weight ?? 1) }));
-            const buffers = new Map();
+            const events = this.events;
+            if (!events) throw new Error('Composition events unavailable');
+            const prepared = this.rows.map(row => {
+                const event = events.get(row.name);
+                if (!event) throw new Error(`Missing sound event: ${row.name}`);
+                return { ...row, candidate: selectWeightedCandidate(event.candidates, candidate => candidate.weight ?? 1) };
+            });
+            const buffers = new Map<string, AudioBuffer>();
+            const getBuffer = (hash: string): AudioBuffer => {
+                const buffer = buffers.get(hash);
+                if (!buffer) throw new Error(`Missing decoded audio: ${hash}`);
+                return buffer;
+            };
             // 同一ハッシュは一度だけ読み込む。再生前に全音声の準備を完了する。
             await Promise.all([...new Set(prepared.map(row => row.candidate.hash))].map(async hash => {
                 const response = await fetch(SharedAudioPaths.Audio(hash), { signal });
                 if (!response.ok) throw new Error(`Audio HTTP ${response.status}`);
-                buffers.set(hash, await this.context.decodeAudioData(await response.arrayBuffer()));
+                buffers.set(hash, await context.decodeAudioData(await response.arrayBuffer()));
             }));
             if (generation !== this.generation) return;
             this.waveform?.setRows(prepared.map(row => ({ ...row, candidate: {
-                ...row.candidate, duration: buffers.get(row.candidate.hash).duration / row.candidate.pitch,
+                ...row.candidate, duration: getBuffer(row.candidate.hash).duration / row.candidate.pitch,
             } })));
             SoundManager.Instance.GetAudio().pause();
-            const start = this.context.currentTime + .05;
+            const start = context.currentTime + .05;
             for (const row of prepared) {
-                const source = this.context.createBufferSource();
-                const gain = this.context.createGain();
-                source.buffer = buffers.get(row.candidate.hash);
+                const gain = context.createGain();
+                const source = Object.assign(context.createBufferSource(), {
+                    previewGain: gain, baseVolume: row.volume * row.candidate.volume,
+                });
+                source.buffer = getBuffer(row.candidate.hash);
                 source.playbackRate.value = row.pitch * row.candidate.pitch;
-                source.previewGain = gain; source.baseVolume = row.volume * row.candidate.volume;
                 gain.gain.value = Math.min(1, source.baseVolume * (this.volume ?? SoundManager.Instance.GetMasterVolume()));
-                source.connect(gain); gain.connect(this.context.destination);
+                source.connect(gain); gain.connect(context.destination);
                 this.nodes.add(source);
                 source.onended = () => {
                     source.disconnect(); gain.disconnect(); this.nodes.delete(source);
@@ -194,8 +245,8 @@ export class SoundComposition {
                 };
                 source.start(start);
             }
-            this.waveform?.play(this.context, start, Math.max(...prepared.map(row =>
-                buffers.get(row.candidate.hash).duration / (row.pitch * row.candidate.pitch))));
+            this.waveform?.play(context, start, Math.max(...prepared.map(row =>
+                getBuffer(row.candidate.hash).duration / (row.pitch * row.candidate.pitch))));
             this.element('loading').hidden = true;
         } catch (error) {
             if (generation !== this.generation) return;

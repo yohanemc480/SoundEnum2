@@ -1,4 +1,4 @@
-import { nextCompositionName } from '../Scripts/SavedCompositions.js';
+import { nextCompositionName } from '../Scripts/SavedCompositions.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeSavedCompositions, normalizePreferences, normalizeCompositionName } from '../Scripts/LocalStorageSchema.ts';

@@ -1,3 +1,5 @@
+import type { SoundComposition } from './SoundComposition.ts';
+import type { SavedCompositionsValue } from './LocalStorageSchema.ts';
 import { revealAddedItem } from './RevealAddedItem.ts';
 import { createCopyButton } from './CopyButton.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
@@ -7,7 +9,7 @@ import { confirmAction, promptText } from './ConfirmDialog.ts';
 import { showToast } from './Toast.ts';
 import { Text } from './Text.ts';
 
-export function nextCompositionName(items) {
+export function nextCompositionName(items: readonly { name: string }[]): string {
     const names = new Set(items.map(item => normalizeCompositionName(item.name)));
     let number = 1;
     while (names.has(normalizeCompositionName(Text.savedCompositionDefaultName(number)))) number++;
@@ -15,30 +17,46 @@ export function nextCompositionName(items) {
 }
 
 export class SavedCompositions {
+    readonly version: string;
+    readonly composition: SoundComposition;
+    items: SavedCompositionsValue;
+    writable: boolean;
+    readonly saveButton: HTMLButtonElement;
+    readonly list: HTMLElement;
+    readonly status: HTMLElement;
+    readonly tab: HTMLElement;
     static MaxItems = 30;
-    constructor(composition, version) {
+    constructor(composition: SoundComposition, version: string) {
         this.version = version;
         this.composition = composition;
         this.items = [];
         this.writable = true;
         try { this.items = localStorageStore.readEntry(LocalStorageSchema.SavedCompositions); }
         catch (error) { console.error(error); this.writable = false; }
-        this.saveButton = document.getElementById('save-composition');
+        const saveButton = document.querySelector<HTMLButtonElement>('#save-composition');
+        const list = document.getElementById('saved-compositions-list');
+        const status = document.getElementById('saved-compositions-status');
+        const tab = document.getElementById('compositions-tab');
+        if (!saveButton || !list || !status || !tab) throw new Error('Missing saved compositions element');
+        this.saveButton = saveButton;
+        this.list = list;
+        this.status = status;
+        this.tab = tab;
         this.saveButton.addEventListener('click', () => {
             if (!composition.rows.length || composition.rows.length > 10) return;
             const name = nextCompositionName(this.items);
             const item = { id: crypto.randomUUID(), name, version: this.version, sounds: composition.rows.map(row => ({ ...row })) };
             if (this.write([...this.items, item])) {
-                document.getElementById('compositions-tab').click();
-                revealAddedItem(document.getElementById('saved-compositions-list'));
+                this.tab.click();
+                revealAddedItem(this.list);
                 showToast(Text.savedCompositionSaved);
             }
         });
-        document.getElementById('compositions-tab').addEventListener('click', () => this.render());
+        this.tab.addEventListener('click', () => this.render());
         composition.onChange = () => this.render();
         this.render();
     }
-    write(items) {
+    write(items: SavedCompositionsValue): boolean {
         if (items.length > SavedCompositions.MaxItems && items.length > this.items.length) {
             showToast(Text.savedCompositionLimit(SavedCompositions.MaxItems));
             return false;
@@ -53,8 +71,8 @@ export class SavedCompositions {
     }
     render() {
         this.saveButton.disabled = !this.writable || !this.composition.rows.length || this.composition.rows.length > 10;
-        document.getElementById('saved-compositions-status').textContent = !this.writable ? Text.savedCompositionFailure : this.items.length ? '' : Text.savedCompositionEmpty;
-        const list = document.getElementById('saved-compositions-list');
+        this.status.textContent = !this.writable ? Text.savedCompositionFailure : this.items.length ? '' : Text.savedCompositionEmpty;
+        const list = this.list;
         list.replaceChildren();
         for (const item of this.items) {
             const card = document.createElement('div'); card.className = 'saved-composition';
@@ -86,7 +104,7 @@ export class SavedCompositions {
             });
             titleGroup.append(title, edit);
             heading.append(titleGroup, nameGroup);
-            const missing = this.composition.events ? item.sounds.filter(sound => !this.composition.events.has(sound.name)) : [];
+            const missing = this.composition.events ? item.sounds.filter(sound => !this.composition.events?.has(sound.name)) : [];
             const warning = document.createElement('p'); warning.className = 'section-note';
             warning.textContent = missing.length ? Text.savedCompositionUnavailable : '';
             warning.hidden = !missing.length;
@@ -101,7 +119,7 @@ export class SavedCompositions {
             const load = document.createElement('button'); load.type = 'button'; load.className = 'settings-button saved-composition-load'; load.textContent = Text.savedCompositionLoad;
             load.disabled = !this.composition.events || missing.length > 0;
             load.addEventListener('click', async () => {
-                if (!this.composition.events || item.sounds.some(sound => !this.composition.events.has(sound.name))) return;
+                if (!this.composition.events || item.sounds.some(sound => !this.composition.events?.has(sound.name))) return;
                 if (this.composition.rows.length && !await confirmAction(Text.savedCompositionLoadConfirm(item.name), { acceptLabel: Text.savedCompositionLoad })) return;
                 if (this.composition.save(item.sounds.map(row => ({ ...row })))) {
                     this.composition.stop(); this.composition.render();

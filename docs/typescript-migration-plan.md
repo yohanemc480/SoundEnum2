@@ -10,6 +10,8 @@
 - 配布データのコピーと、公開前に任意実行する容量検査を追加。
 - 既存31テストと実データ検証（1,984イベント・4,941音源）が通過。
 - npm installはregistry.npmjs.orgのENOTFOUNDで失敗。lockfile生成、型チェック、Viteによるビルド・previewは未完了。
+- 組み合わせ再生・保存一覧の2ファイル（SoundComposition、SavedCompositions）をTS化。既存48ファイルを移行済み、追加2ファイルを含めTSは50ファイル。残りのJSはMain、SoundSearchBrowserの2ファイル。
+- 保存データ・再生候補・Web Audioノード・UIコールバックを型付けし、DOM要素と再生データの欠落を検証。36テストと実データ検証を通過。静的型チェック・Viteビルド・ブラウザ動作は依存取得待ちで未検証。
 - コマンド出力・候補入力の2ファイル（OutputArea、SoundAutocomplete）をTS化。既存46ファイルを移行済み、追加2ファイル込みでTSは48ファイル。残りのJSはMain、SavedCompositions、SoundComposition、SoundSearchBrowserの4ファイル。
 - 出力要素・入力欄・候補配列を型付けし、DOM参照や候補が存在しない場合を処理。36テストと実データ検証が通過。候補選択や出力表示の実ブラウザ確認と静的型チェック・Viteビルドは未検証。
 - 波形・再生UI4ファイル（PreviewWaveform、CompositionWaveform、SearchWaveforms、PreviewPlayer）をTS化。既存44ファイルを移行済み、追加2ファイル込みでTSは46ファイル。残りのJSはMain、OutputArea、SavedCompositions、SoundAutocomplete、SoundComposition、SoundSearchBrowserの6ファイル。
