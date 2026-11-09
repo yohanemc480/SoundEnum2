@@ -212,3 +212,20 @@ export const referenceArrival = style({
     transformOrigin: 'center',
     '@media': { '(prefers-reduced-motion: reduce)': { animation: 'none' } },
 });
+
+export const candidateProbabilityList = style({
+    listStyle: 'none', margin: 0, padding: 0,
+});
+export const candidateProbabilityPreview = style({
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px',
+    width: '100%', border: 0, borderRadius: '6px', padding: '8px 6px',
+    background: 'transparent', color: 'var(--text)', font: 'inherit', fontSize: '12px',
+    textAlign: 'left', overflowWrap: 'anywhere', cursor: 'pointer',
+    selectors: {
+        '&:hover': { background: '#283f33' },
+        [`&.${selected}`]: { background: '#283f33' },
+    },
+});
+export const candidateProbability = style({
+    flexShrink: 0, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', color: 'var(--muted)',
+});

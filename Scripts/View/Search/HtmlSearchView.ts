@@ -299,10 +299,9 @@ export class HtmlSearchView implements SearchView {
         panel.style.top = `${Math.max(margin, Math.min(top, window.innerHeight - panel.offsetHeight - margin))}px`;
     }
 
-    /** 候補の試聴と、その候補を基準にした類似検索を共通の一覧で提供する。 */
-    showCandidateChoices(name: string, anchor: HTMLElement = this.element('base')): void {
+    /** 候補表示の見出しと閉じる操作を用意し、表示元のボタンに関連付ける。 */
+    private prepareCandidatePopover(name: string, anchor: HTMLElement): HTMLElement {
         this.candidateAnchor = anchor;
-        const candidates = this.index?.events.find(sound => sound.name === name)?.candidates ?? [];
         const panel = this.candidatePopover;
         panel.replaceChildren();
         const heading = document.createElement('div'); heading.className = layout.sectionHeading;
@@ -311,6 +310,39 @@ export class HtmlSearchView implements SearchView {
         close.setAttribute('aria-label', Text.close);
         close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
         heading.append(title, close); panel.append(heading);
+        panel.setAttribute('aria-label', name);
+        return panel;
+    }
+
+    /** 再生候補と重みに比例する選択確率だけを並べ、各音を試聴できるようにする。 */
+    private showCandidateProbabilities(name: string, anchor: HTMLElement): void {
+        const candidates = this.index?.events.find(sound => sound.name === name)?.candidates ?? [];
+        const totalWeight = candidates.reduce((total, candidate) => total + candidate.weight, 0);
+        const panel = this.prepareCandidatePopover(name, anchor);
+        const list = document.createElement('ul');
+        list.className = styles.candidateProbabilityList;
+        candidates.forEach((candidate, i) => {
+            const row = document.createElement('li');
+            const button = document.createElement('button');
+            button.type = 'button'; button.className = styles.candidateProbabilityPreview;
+            button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
+            const label = document.createElement('span'); label.textContent = candidate.name;
+            const probability = document.createElement('span');
+            probability.className = styles.candidateProbability;
+            probability.textContent = Text.searchCandidateProbability(candidate.weight / totalWeight);
+            button.append(label, probability);
+            button.addEventListener('click', () => { selectSoundPreview(button); this.actions?.preview({ name, candidate }); });
+            row.append(button); list.append(row);
+        });
+        panel.append(list);
+        panel.showPopover();
+        this.positionCandidatePopover();
+    }
+
+    /** 類似検索の基準を選ぶために、候補の試聴・タグ・検索操作を表示する。 */
+    showCandidateChoices(name: string, anchor: HTMLElement = this.element('base')): void {
+        const candidates = this.index?.events.find(sound => sound.name === name)?.candidates ?? [];
+        const panel = this.prepareCandidatePopover(name, anchor);
         candidates.forEach((candidate, i) => {
             const button = document.createElement('button'); button.type = 'button'; button.className = styles.soundTagCandidate;
             const label = document.createElement('span');
@@ -394,10 +426,10 @@ export class HtmlSearchView implements SearchView {
             if (entry.candidateCount > 1) {
                 const trigger = document.createElement('button'); trigger.type = 'button';
                 trigger.textContent = Text.searchCandidate(entry.candidateCount);
-                trigger.setAttribute('aria-label', Text.searchCandidateTags(entry.candidateCount));
-                trigger.title = Text.searchCandidateTags(entry.candidateCount);
+                trigger.setAttribute('aria-label', Text.searchCandidateDetails(entry.candidateCount));
+                trigger.title = Text.searchCandidateDetails(entry.candidateCount);
                 trigger.addEventListener('click', () => {
-                    this.showCandidateChoices(entry.name, trigger);
+                    this.showCandidateProbabilities(entry.name, trigger);
                 });
                 trigger.className = styles.searchCandidateTrigger;
                 heading.append(trigger);
