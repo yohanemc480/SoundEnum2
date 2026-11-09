@@ -1,0 +1,55 @@
+name: GitHub Pagesへ公開
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # 手動実行でも公開元をmainに限定する。
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: ソースを取得
+        uses: actions/checkout@v6
+      - name: Node.jsを準備
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - name: 依存パッケージをインストール
+        run: npm ci
+      - name: テスト
+        run: npm test
+      - name: 検索データを検証
+        run: npm run verify:data
+      - name: 型チェックと本番ビルド
+        run: npm run build
+      - name: GitHub Pagesを準備
+        uses: actions/configure-pages@v5
+      - name: 公開用ファイルをアップロード
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pagesへ公開
+        id: deployment
+        uses: actions/deploy-pages@v4

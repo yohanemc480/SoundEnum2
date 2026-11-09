@@ -33,13 +33,13 @@ npm run preview
 - `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。Pythonによるデータ生成は実行しません。
 - `preview`: 生成済みの`dist/`を <http://127.0.0.1:8000/SoundEnum2/> で確認します。ソース変更後は再ビルドが必要です。
 
-GitHub Pagesへの公開前には、生成済み成果物のサイズを確認します。
+生成済み成果物のサイズは、必要に応じて次のコマンドで確認できます。
 
 ```powershell
 npm run check:pages-size
 ```
 
-公開容量の検査はローカルビルドから分けています。上限超過時もローカルで移行を検証できます。公開設定の変更やデプロイはまだ行っていません。
+公開容量の検査はビルド・自動公開から分けており、公開ワークフローでは実行しません。
 
 ## TypeScript移行後の注意
 
@@ -60,3 +60,13 @@ Nodeテストは `npm test`、Pythonの更新・検索データ生成テスト�
 ```powershell
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
+
+## GitHub Pagesへの公開
+
+`.github/workflows/deploy-pages.yml` がmainへのpush（PRのマージを含む）で実行されます。Node.jsは `.node-version` に合わせ、依存インストール、Nodeテスト、検索データ検証、型チェック、本番ビルドの成功後に `dist/` を公開します。生成済み音源もビルド時にコピーするため、Pythonによる音源生成は不要です。
+
+初回はGitHubのリポジトリで **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定してください。Environmentの公開ブランチ制限を設定している場合は、`github-pages` でmainを許可します。独自のシークレットやアクセストークンは不要です。
+
+公開先は `https://yohanemc480.github.io/SoundEnum2/` です。Viteの基準パス `/SoundEnum2/` をそのまま使用します。NetlifyのPRプレビューとは独立しており、developや作業ブランチへのpushではPagesを更新しません。
+
+再実行は **Actions → GitHub Pagesへ公開 → Run workflow** でmainを選びます。ワークフローをmainへ反映してから実行してください。main以外を選んだ場合は公開をスキップします。
