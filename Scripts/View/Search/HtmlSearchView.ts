@@ -38,6 +38,7 @@ export class HtmlSearchView implements SearchView {
     private favoriteNames = new Set<string>();
     private favoritesAvailable = false;
     private resultBase = '';
+    private displayedReferenceKey = '';
     private referenceCandidateIndex: number | null = null;
     readonly candidatePopover: HTMLElement;
     private candidateAnchor?: HTMLElement;
@@ -188,6 +189,7 @@ export class HtmlSearchView implements SearchView {
         this.element('list').replaceChildren();
         this.element('base-preview').replaceChildren();
         this.element('base-preview').hidden = true;
+        this.displayedReferenceKey = '';
         this.element('pagination').hidden = true;
         if (status === 'loading') this.form.disabled = true;
         const messages = { loading: Text.searchLoading, failure: Text.searchFailure,
@@ -209,7 +211,13 @@ export class HtmlSearchView implements SearchView {
         this.element('pagination').hidden = !page.pageCount;
         this.element('page').textContent = Text.searchPage(page.pageIndex + 1, page.pageCount);
         this.element('status').textContent = page.total ? Text.searchResults(page.total, page.pageIndex * 50 + 1, page.pageIndex * 50 + page.rows.length) : Text.searchEmpty;
-        if (page.baseline) this.appendRow(page.baseline, basePreview);
+        // 同じ基準での再検索・ページ切り替えでは弾ませず、候補変更も含めた新しい設定だけを示す。
+        const referenceKey = page.baseline ? JSON.stringify([page.baseline.name, page.baseline.referenceCandidateIndex ?? null]) : '';
+        if (page.baseline) {
+            this.appendRow(page.baseline, basePreview);
+            if (referenceKey !== this.displayedReferenceKey) basePreview.firstElementChild?.classList.add(styles.referenceArrival);
+        }
+        this.displayedReferenceKey = referenceKey;
         for (const row of page.rows) this.appendRow(row, list);
         this.setResultsBusy(false);
     }

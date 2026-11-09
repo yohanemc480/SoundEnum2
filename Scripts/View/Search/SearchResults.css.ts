@@ -1,5 +1,5 @@
 import { selected } from '../Components/SoundPreviewRow.css.ts';
-import { globalStyle, style } from '@vanilla-extract/css';
+import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 export const compositionAdd = style({});
 
@@ -199,4 +199,16 @@ export const candidateSearch = style({
 });
 globalStyle(`.${candidateRow}:hover, .${candidateRow}:has(.${soundTagCandidate}.${selected})`, {
     background: '#283f33', borderColor: '#42634d',
+});
+
+const referenceBounce = keyframes({
+    '0%': { transform: 'scaleX(0.86)', opacity: 0.65 },
+    '45%': { transform: 'scaleX(1.012)', opacity: 1 },
+    '72%': { transform: 'scaleX(0.996)' },
+    '100%': { transform: 'scaleX(1)', opacity: 1 },
+});
+export const referenceArrival = style({
+    animation: `${referenceBounce} 380ms ease-out`,
+    transformOrigin: 'center',
+    '@media': { '(prefers-reduced-motion: reduce)': { animation: 'none' } },
 });
