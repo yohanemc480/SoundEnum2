@@ -32,7 +32,13 @@ export function searchSounds(index: SearchIndex, vectors: Float32Array, { query 
         if (!candidates.length) continue;
         let candidate = candidates[0];
         if (baseline) for (const current of candidates) if (scoreRow(current.vectorRow) > scoreRow(candidate.vectorRow)) candidate = current;
-        result.push({ name: event.name, candidate, score: baseline ? scoreRow(candidate.vectorRow) : null,
+        // コマンドでは候補を固定できないため、タグの一致候補だけでなく全再生候補の中央値で評価する。
+        const candidateScores = baseline ? event.candidates.map(current => scoreRow(current.vectorRow)).sort((a, b) => a - b) : [];
+        const middle = Math.floor(candidateScores.length / 2);
+        const score = !baseline ? null : candidateScores.length % 2
+            ? candidateScores[middle]
+            : (candidateScores[middle - 1] + candidateScores[middle]) / 2;
+        result.push({ name: event.name, candidate, score,
             sameAudio: baseRows.has(candidate.vectorRow), tags: index.audioTags[candidate.hash],
             candidateCount: event.candidates.length });
     }

@@ -168,3 +168,23 @@ test('複数候補の単音検索は選択した音だけを基準にし、全�
         assert.throws(() => searchSounds(fixture(), vectors, { referenceSoundName: 'split', referenceCandidateIndex }), /Unknown base candidate/);
     }
 });
+
+
+test('結果の類似度は全候補の中央値で、偶数は中央2値の平均を使う', () => {
+    const index = fixture();
+    const [high, low] = index.events.find(event => event.name === 'split').candidates;
+    const middle = index.events.find(event => event.name === 'both').candidates[0];
+    index.events.push({ name: 'odd', candidates: [high, low, middle] });
+    index.events.push({ name: 'duplicates', candidates: [high, low, low] });
+    const before = JSON.stringify(index);
+    const rows = searchSounds(index, vectors, { referenceSoundName: 'base' });
+    assert.equal(rows.find(row => row.name === 'split').score, .5);
+    assert.equal(rows.find(row => row.name === 'odd').score, vectors[4]);
+    assert.equal(rows.find(row => row.name === 'duplicates').score, 0);
+    assert.equal(rows.find(row => row.name === 'shared').score, 1);
+    assert.ok(rows.findIndex(row => row.name === 'both') < rows.findIndex(row => row.name === 'split'));
+    const filtered = searchSounds(index, vectors, { referenceSoundName: 'base', tags: ['water'] });
+    assert.equal(filtered.find(row => row.name === 'split').score, .5);
+    assert.ok(searchSounds(index, vectors, {}).every(row => row.score === null));
+    assert.equal(JSON.stringify(index), before);
+});
