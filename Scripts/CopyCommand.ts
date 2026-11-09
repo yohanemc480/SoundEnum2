@@ -1,8 +1,8 @@
-import { Text } from "./Text.js";
-import { showToast } from "./Toast.js";
+import { Text } from "./Text.ts";
+import { showToast } from "./Toast.ts";
 
 /** コピーの結果を、レイアウトを動かさない通知で伝える。 */
-export async function copyCommand(text)
+export async function copyCommand(text: string): Promise<void>
 {
     try {
         await navigator.clipboard.writeText(text);

@@ -1,6 +1,6 @@
 # 表示文言の編集
 
-画面の文言は `Scripts/Text.js` の `Text` にまとめています。日本語のみを扱います。
+画面の文言は `Scripts/Text.ts` の `Text` にまとめています。日本語のみを扱います。
 
 - JavaScriptでは `Text.copySuccess` のようにプロパティを参照します。キーを別のenumに重複定義する必要はありません。
 - 件数などを含む文言は `Text.searchResults(count, first, last)` のように関数で取得します。

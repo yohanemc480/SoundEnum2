@@ -1,8 +1,8 @@
 // 開閉・外側クリック・Esc・フォーカス復帰はブラウザのPopover APIに任せる。
-export function bindSettingsPopover(button, panel)
+export function bindSettingsPopover(button: HTMLElement | null, panel: HTMLElement | null): () => void
 {
-    function positionSettings()
-    {
+    if (!button || !panel) throw new Error('Missing settings popover element');
+    const positionSettings = (): void => {
         if (!panel.matches(':popover-open')) return;
         const anchor = button.getBoundingClientRect();
         const margin = 12;
@@ -12,7 +12,7 @@ export function bindSettingsPopover(button, panel)
         panel.style.bottom = 'auto';
         panel.style.left = `${left}px`;
         panel.style.top = `${top}px`;
-    }
+    };
 
     panel.addEventListener('toggle', positionSettings);
     window.addEventListener('resize', positionSettings);

@@ -1,5 +1,5 @@
 /** 追加された項目まで一覧を移動し、軽く弾ませる。 */
-export function revealAddedItem(list) {
+export function revealAddedItem(list: HTMLElement): void {
     const added = list.lastElementChild;
     requestAnimationFrame(() => {
         if (!added?.isConnected || !list.clientHeight) return;

@@ -1,7 +1,7 @@
-import { copyCommand } from "./CopyCommand.js";
-import { Text } from "./Text.js";
+import { copyCommand } from "./CopyCommand.ts";
+import { Text } from "./Text.ts";
 
-export function createCopyButton(getText)
+export function createCopyButton(getText: () => string): HTMLButtonElement
 {
     const button = document.createElement('button');
     button.type = 'button';

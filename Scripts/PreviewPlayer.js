@@ -1,4 +1,4 @@
-import { Text } from "./Text.js";
+import { Text } from "./Text.ts";
 import { PreviewWaveform } from "./PreviewWaveform.js";
 /** 試聴中の音声と再生ボタン・シークバーを同期する。 */
 export class PreviewPlayer

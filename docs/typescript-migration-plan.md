@@ -10,6 +10,9 @@
 - 配布データのコピーと、公開前に任意実行する容量検査を追加。
 - 既存31テストと実データ検証（1,984イベント・4,941音源）が通過。
 - npm installはregistry.npmjs.orgのENOTFOUNDで失敗。lockfile生成、型チェック、Viteによるビルド・previewは未完了。
+- 共通UI9ファイル（Text、ApplyText、CopyButton、CopyCommand、Toast、BrowserTabs、RevealAddedItem、BindSettingsPopover、SettingsPopovers）をTS化。既存36ファイルを移行済み、追加2ファイルを含めTSは38ファイル。残りのJSは14ファイル。
+- 文言関数の引数型、DOM参照と属性値の検証、タブIDの型を追加。HTMLのSettingsPopoversエントリーも.tsへ更新。Toastのクラス化など設計変更は実施していない。
+- 共通UI移行後も36テストと実データ検証が通過。ブラウザでの表示・操作、静的型チェック、Viteビルドは依存取得後の確認事項。
 - 再生関連6ファイル（MCRawSound、MCCommandSound、SingletonBase、ResourceManager、SoundManager、WaveformResource）をTS化。既存27ファイルを移行済み、追加2ファイルを含めTSは29ファイル。
 - 既存の共有インスタンス生成方式を維持し、派生クラスごとの型を宣言。MCCommandSoundの誤ったsource定数名をMasterへ修正し、未定義ハッシュでのURL生成を防止。波形JSONはunknownから検証する。
 - 再生のピッチ・音量、ダウンロードの切り替え、HTTPエラー、ハッシュ欠落のテストを追加。36テストと実データ検証が通過。静的型チェックとViteビルドは依存取得後に実施する。

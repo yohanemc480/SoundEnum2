@@ -1,5 +1,5 @@
 import { readPreferences, savePreferences } from './SearchPreferences.ts';
-import { Text } from './Text.js';
+import { Text } from './Text.ts';
 
 export function selectResourceVersion(versions, requested)
 {

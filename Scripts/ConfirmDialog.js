@@ -1,4 +1,4 @@
-import { Text } from './Text.js';
+import { Text } from './Text.ts';
 
 let pending = Promise.resolve();
 

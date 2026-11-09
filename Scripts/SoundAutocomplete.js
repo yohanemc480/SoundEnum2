@@ -1,4 +1,4 @@
-import { Text } from './Text.js';
+import { Text } from './Text.ts';
 
 /** 基準音入力専用の候補リスト。フォーカスは入力欄に保持する。 */
 export class SoundAutocomplete {

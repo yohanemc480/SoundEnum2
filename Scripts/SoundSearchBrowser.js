@@ -1,9 +1,9 @@
 import { SoundAutocomplete } from './SoundAutocomplete.js';
 import { confirmAction } from './ConfirmDialog.js';
 import { readPreferences, savePreferences, restoreSearchPreferences } from './SearchPreferences.ts';
-import { showToast } from './Toast.js';
+import { showToast } from './Toast.ts';
 import { Favorites } from './Favorites.ts';
-import { Text } from './Text.js';
+import { Text } from './Text.ts';
 import { SearchWaveforms } from './SearchWaveforms.js';
 import { SoundSearchResource } from './SoundSearchResource.ts';
 import { SoundManager } from './Singletons/SoundManager.ts';

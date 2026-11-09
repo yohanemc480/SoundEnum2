@@ -1,17 +1,17 @@
-import { revealAddedItem } from './RevealAddedItem.js';
+import { revealAddedItem } from './RevealAddedItem.ts';
 import { OutputArea } from './OutputArea.js';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { SelectMasterVolumeArea } from './SelectMasterVolumeArea.js';
 import { CompositionWaveform } from './CompositionWaveform.js';
 import { mountSoundSettings } from './SoundSettings.js';
-import { bindSettingsPopover } from './BindSettingsPopover.js';
-import { Text } from './Text.js';
+import { bindSettingsPopover } from './BindSettingsPopover.ts';
+import { Text } from './Text.ts';
 import { localStorageStore } from './LocalStorage.ts';
 import { LocalStorageSchema } from './LocalStorageSchema.ts';
 import { selectWeightedCandidate } from './SelectWeightedCandidate.ts';
 import { SharedAudioPaths } from './ResourcePathProvider.ts';
 import { SoundManager } from './Singletons/SoundManager.ts';
-import { showToast } from './Toast.js';
+import { showToast } from './Toast.ts';
 
 export class SoundComposition {
     static MaxSounds = 10;

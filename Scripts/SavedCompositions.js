@@ -1,11 +1,11 @@
-import { revealAddedItem } from './RevealAddedItem.js';
-import { createCopyButton } from './CopyButton.js';
+import { revealAddedItem } from './RevealAddedItem.ts';
+import { createCopyButton } from './CopyButton.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { localStorageStore } from './LocalStorage.ts';
 import { LocalStorageSchema, normalizeCompositionName } from './LocalStorageSchema.ts';
 import { confirmAction, promptText } from './ConfirmDialog.js';
-import { showToast } from './Toast.js';
-import { Text } from './Text.js';
+import { showToast } from './Toast.ts';
+import { Text } from './Text.ts';
 
 export function nextCompositionName(items) {
     const names = new Set(items.map(item => normalizeCompositionName(item.name)));

@@ -1,4 +1,4 @@
-import { Text } from "./Text.js";
+import { Text } from "./Text.ts";
 import { SoundManager } from "./Singletons/SoundManager.ts";
 import { SettingDefine } from "./Constants/SettingDefine.ts";
 

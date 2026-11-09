@@ -1,16 +1,21 @@
 import { readPreferences, savePreferences } from './SearchPreferences.ts';
 /** 各検索画面から独立したタブの操作とキーボード移動。 */
-export function initializeBrowserTabs()
+export function initializeBrowserTabs(): void
 {
-    const tabs = [...document.querySelectorAll('[data-browser-tab]')];
+    const tabs = [...document.querySelectorAll<HTMLElement>('[data-browser-tab]')];
     tabs.forEach((tab, index) => {
         tab.addEventListener('click', () => {
-            savePreferences({ tab: tab.id });
+            const id = tab.id;
+            if (id !== 'search-tab' && id !== 'favorites-tab' && id !== 'compositions-tab') throw new Error(`Unknown browser tab: ${id}`);
+            savePreferences({ tab: id });
             tabs.forEach(other => {
                 const selected = other === tab;
-                other.setAttribute('aria-selected', selected);
+                other.setAttribute('aria-selected', String(selected));
                 other.tabIndex = selected ? 0 : -1;
-                document.getElementById(other.getAttribute('aria-controls')).hidden = !selected;
+                const panelId = other.getAttribute('aria-controls');
+                const panel = panelId ? document.getElementById(panelId) : null;
+                if (!panel) throw new Error(`Missing browser tab panel: ${panelId}`);
+                panel.hidden = !selected;
             });
         });
         tab.addEventListener('keydown', event => {

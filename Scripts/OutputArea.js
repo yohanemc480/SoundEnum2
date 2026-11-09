@@ -1,5 +1,5 @@
-import { copyCommand } from "./CopyCommand.js";
-import { createCopyButton } from "./CopyButton.js";
+import { copyCommand } from "./CopyCommand.ts";
+import { createCopyButton } from "./CopyButton.ts";
 
 export class OutputArea
 {
