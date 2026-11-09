@@ -1,3 +1,4 @@
+import type { CopyText } from '../Contracts/Services/Clipboard.ts';
 import { HtmlCompositionView } from '../View/Composition/HtmlCompositionView.ts';
 import { CompositionPresenter } from '../Presenter/CompositionPresenter.ts';
 import { BrowserCompositionPlayback } from '../Infrastructure/Audio/BrowserCompositionPlayback.ts';
@@ -13,9 +14,9 @@ import type { SoundCommand } from '../FormatSoundCommand.ts';
 
 /** 組み合わせのView・Presenter・音声・保存を組み立て、画面間の接続を受け取る。 */
 export function createCompositionScreen(previewPlayback: AudioPlayback, settings: CommandSettings,
-    selectPreview: (button: HTMLButtonElement) => void, preview: (row: SoundCommand) => void | Promise<void>, similar: (name: string) => void) {
+    selectPreview: (button: HTMLButtonElement) => void, preview: (row: SoundCommand) => void | Promise<void>, similar: (name: string) => void, copyText: CopyText) {
     const volume = previewPlayback.read().masterVolume;
-    const view = new HtmlCompositionView(volume, selectPreview);
+    const view = new HtmlCompositionView(volume, selectPreview, copyText);
     const playback = new BrowserCompositionPlayback(SharedAudioPaths.Audio, volume);
     const presenter = new CompositionPresenter(view, new LocalCompositionStore(), playback, previewPlayback, settings,
         { load: getWaveform }, { preview, similar, notify: message => showToast(message === 'added' ? Text.compositionAdded :

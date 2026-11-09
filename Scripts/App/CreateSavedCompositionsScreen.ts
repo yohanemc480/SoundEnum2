@@ -1,3 +1,4 @@
+import type { CopyText } from '../Contracts/Services/Clipboard.ts';
 import { HtmlSavedCompositionsView } from '../View/Composition/HtmlSavedCompositionsView.ts';
 import { SavedCompositionsPresenter } from '../Presenter/SavedCompositionsPresenter.ts';
 import { LocalSavedCompositionsStore } from '../Infrastructure/Storage/LocalSavedCompositionsStore.ts';
@@ -9,8 +10,8 @@ import { showToast } from '../View/Components/Toast/Toast.ts';
 import { Text } from '../I18n/Text.ts';
 
 /** 保存一覧の各層と、既存の確認ダイアログ・通知を接続する。 */
-export function createSavedCompositionsScreen(editor: CompositionEditor, version: string) {
-    const view = new HtmlSavedCompositionsView();
+export function createSavedCompositionsScreen(editor: CompositionEditor, version: string, copyText: CopyText) {
+    const view = new HtmlSavedCompositionsView(copyText);
     const presenter = new SavedCompositionsPresenter(view, new LocalSavedCompositionsStore(), editor, version, {
         createId: () => crypto.randomUUID(), defaultName: Text.savedCompositionDefaultName,
         rename: name => promptText(Text.savedCompositionRename, { value: name, maxLength: 20, acceptLabel: Text.savedCompositionRenameAccept,

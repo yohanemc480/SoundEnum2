@@ -1,3 +1,4 @@
+import type { CopyText } from '../../Contracts/Services/Clipboard.ts';
 import * as layout from '../Layout/Layout.css.ts';
 import * as settingsStyles from '../Settings/Settings.css.ts';
 import * as styles from './Compositions.css.ts';
@@ -14,7 +15,9 @@ export class HtmlSavedCompositionsView implements SavedCompositionsView {
     private readonly list: HTMLElement;
     private readonly status: HTMLElement;
     private readonly tab: HTMLElement;
-    constructor() {
+    private readonly copyText: CopyText;
+    constructor(copyText: CopyText) {
+        this.copyText = copyText;
         const saveButton = document.querySelector<HTMLButtonElement>('#save-composition');
         const list = document.getElementById('saved-compositions-list');
         const status = document.getElementById('saved-compositions-status');
@@ -69,7 +72,7 @@ export class HtmlSavedCompositionsView implements SavedCompositionsView {
             overwrite.className = settingsStyles.settingsButton; overwrite.textContent = Text.savedCompositionOverwrite;
             overwrite.disabled = !state.canSave;
             overwrite.addEventListener('click', () => this.actions?.overwrite(item.id));
-            const copy = createCopyButton(() => item.commands.join('\n'));
+            const copy = createCopyButton(() => item.commands.join('\n'), this.copyText);
             copy.classList.add(styles.savedCompositionCopy);
             actions.append(remove, copy, overwrite, load); card.append(heading, sounds, warning, actions); list.append(card);
         }

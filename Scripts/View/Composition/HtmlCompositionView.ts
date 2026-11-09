@@ -1,3 +1,4 @@
+import type { CopyText } from '../../Contracts/Services/Clipboard.ts';
 import * as layout from '../Layout/Layout.css.ts';
 import * as settingsStyles from '../Settings/Settings.css.ts';
 import * as styles from './Compositions.css.ts';
@@ -28,7 +29,7 @@ interface CompositionElements {
 /** DOM・入力欄・Canvasを所有し、操作を値でPresenterへ通知する。 */
 export class HtmlCompositionView implements CompositionView {
     private actions?: CompositionViewActions;
-    private readonly output = new OutputArea('#composition-output');
+    private readonly output: OutputArea;
     private readonly waveform: CompositionWaveform;
     private readonly volumeControl: SelectMasterVolumeArea;
     private readonly selectPreview: (button: HTMLButtonElement) => void;
@@ -36,7 +37,8 @@ export class HtmlCompositionView implements CompositionView {
     private readonly settingsViews = new Map<number, CommandSettingsView>();
     private disposePopovers: (() => void)[] = [];
     private buildingRows = false;
-    constructor(volume: number, selectPreview: (button: HTMLButtonElement) => void) {
+    constructor(volume: number, selectPreview: (button: HTMLButtonElement) => void, copyText: CopyText) {
+        this.output = new OutputArea('#composition-output', copyText);
         this.selectPreview = selectPreview;
         this.waveform = new CompositionWaveform(this.element('waveform'), this.element('time'));
         this.volumeControl = new SelectMasterVolumeArea('#composition-volume', { value: volume, onChange: value => this.actions?.volume(value) });

@@ -1,5 +1,5 @@
 import * as styles from './OutputArea.css.ts';
-import { copyCommand } from "../../../CopyCommand.ts";
+import type { CopyText } from '../../../Contracts/Services/Clipboard.ts';
 import { createCopyButton } from "../CopyButton/CopyButton.ts";
 
 /** 複数行のコマンドとコピー操作を表示する共通部品。 */
@@ -9,7 +9,7 @@ export class OutputArea
     readonly text: HTMLDivElement;
     readonly copyButton: HTMLButtonElement;
 
-    constructor(appendTarget: string)
+    constructor(appendTarget: string, copyText: CopyText)
     {
         const target = document.querySelector<HTMLElement>(appendTarget);
         if (!target) throw new Error(`Missing command output element: ${appendTarget}`);
@@ -17,10 +17,10 @@ export class OutputArea
         this.value = '';
         this.text = document.createElement('div');
         this.text.className = styles.text;
-        this.copyButton = createCopyButton(() => this.value);
+        this.copyButton = createCopyButton(() => this.value, copyText);
         this.copyButton.disabled = true;
         this.text.addEventListener('click', () => {
-            if (!this.copyButton.disabled) copyCommand(this.value);
+            if (!this.copyButton.disabled) void copyText(this.value);
         });
         target.append(this.text, this.copyButton);
     }

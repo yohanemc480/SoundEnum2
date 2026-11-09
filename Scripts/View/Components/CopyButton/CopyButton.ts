@@ -1,9 +1,9 @@
 import * as styles from './CopyButton.css.ts';
-import { copyCommand } from "../../../CopyCommand.ts";
+import type { CopyText } from '../../../Contracts/Services/Clipboard.ts';
 import { Text } from "../../../I18n/Text.ts";
 
 /** クリック時点の最新テキストをコピーするボタンを生成する。 */
-export function createCopyButton(getText: () => string): HTMLButtonElement
+export function createCopyButton(getText: () => string, copyText: CopyText): HTMLButtonElement
 {
     const button = document.createElement('button');
     button.type = 'button';
@@ -14,7 +14,7 @@ export function createCopyButton(getText: () => string): HTMLButtonElement
     button.querySelector('svg')?.classList.add(styles.icon);
     button.addEventListener('click', event => {
         event.stopPropagation();
-        copyCommand(getText());
+        void copyText(getText());
     });
     return button;
 }

@@ -1,3 +1,4 @@
+import { createCommandCopier } from './App/CreateCommandCopier.ts';
 import { LocalBrowserPreferencesStore } from './Infrastructure/Storage/LocalBrowserPreferencesStore.ts';
 import { BrowserAudioPlayback } from './Infrastructure/Audio/BrowserAudioPlayback.ts';
 import { SoundPlaybackResources } from './Infrastructure/Resources/SoundPlaybackResources.ts';
@@ -71,7 +72,8 @@ const playback = new BrowserAudioPlayback();
 const commandSettings = new CommandSettings();
 const settingsStore = new LocalCommandSettingsStore();
 const playbackView = new HtmlPlaybackView();
-const outputArea = new OutputArea('#preview-output');
+const copyText = createCommandCopier();
+const outputArea = new OutputArea('#preview-output', copyText);
 mountSoundSettings(requireElement('command-settings'), {
     model: commandSettings,
     read: () => settingsStore.read(), save: value => settingsStore.save(value),
@@ -86,14 +88,14 @@ const browserTabs = createBrowserTabs(browserPreferences);
 const compositionScreen = createCompositionScreen(playback, commandSettings,
     button => searchScreen.view.selectPreviewButton(button),
     row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
-    name => { void searchScreen.presenter.searchSimilar(name); });
+    name => { void searchScreen.presenter.searchSimilar(name); }, copyText);
 const composition = compositionScreen.presenter;
 const searchScreen = createSearchScreen(paths, composition, playbackPresenter, browserPreferences);
 const savedCompositionsScreen = createSavedCompositionsScreen({
     read: () => ({ rows: composition.rows, soundNames: composition.events ? [...composition.events.keys()] : null }),
     subscribeChanges: listener => composition.subscribeChanges(listener),
     replace: rows => { if (!composition.save(rows)) return false; composition.render(); return true; },
-}, paths.Version);
+}, paths.Version, copyText);
 void searchScreen.presenter.load();
 /** アプリ終了時に購読・通信・音声の所有者を順に破棄する。 */
 const dispose = () => { browserTabs.dispose(); searchScreen.dispose(); savedCompositionsScreen.dispose(); compositionScreen.dispose(); playbackPresenter.dispose(); playbackView.dispose(); masterVolumeControl.dispose(); playback.dispose(); };
