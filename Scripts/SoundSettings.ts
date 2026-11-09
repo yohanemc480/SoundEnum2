@@ -1,3 +1,4 @@
+import * as settingsStyles from './Settings.css.ts';
 import type { CommandSettingsValue } from './LocalStorageSchema.ts';
 import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
 import { LocalStorageSchema, normalizeCommandSettings } from './LocalStorageSchema.ts';
@@ -16,14 +17,14 @@ export function mountSoundSettings(panel: HTMLElement | null, { read, save, onIn
     const heading = document.createElement('div'); heading.className = 'section-heading';
     const title = document.createElement('h2'); title.textContent = Text.commandSettings;
     const close = document.createElement('button'); close.type = 'button';
-    close.className = 'settings-button close-button'; close.setAttribute('aria-label', Text.closeCommandSettings);
+    close.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`; close.setAttribute('aria-label', Text.closeCommandSettings);
     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
     heading.append(title, close);
     const controls = document.createElement('div'); controls.className = 'params';
     const fields = new Map<NumericSetting, { input: HTMLInputElement; slider: HTMLInputElement }>();
     const sourceLabel = document.createElement('label'); sourceLabel.className = 'param';
     const caption = document.createElement('span'); caption.className = 'param-label'; caption.textContent = Text.source;
-    const source = document.createElement('select'); source.className = 'sound-settings-source';
+    const source = document.createElement('select'); source.className = settingsStyles.soundSettingsSource;
     for (const value of Object.values(MCCommandSoundSource)) source.append(new Option(value, value));
     sourceLabel.append(caption, source); controls.append(sourceLabel);
     function refresh() {
@@ -55,7 +56,7 @@ export function mountSoundSettings(panel: HTMLElement | null, { read, save, onIn
         label.append(caption, slider, input); controls.append(label);
     }
     const reset = document.createElement('button'); reset.type = 'button';
-    reset.className = 'settings-button reset-sound-settings'; reset.textContent = Text.resetCommandSettings;
+    reset.className = `${settingsStyles.settingsButton} ${settingsStyles.resetSoundSettings}`; reset.textContent = Text.resetCommandSettings;
     reset.addEventListener('click', () => commit(LocalStorageSchema.CommandSettings.createDefault()));
     panel.replaceChildren(heading, controls, reset);
     refresh();

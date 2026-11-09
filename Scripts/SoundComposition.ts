@@ -1,3 +1,4 @@
+import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
 import { playing as playingClass } from './Playback.css.ts';
 import type { SoundCommand } from './FormatSoundCommand.ts';
@@ -136,24 +137,24 @@ export class SoundComposition {
             name.disabled = !this.events?.get(row.name)?.candidates.length;
             name.addEventListener('click', () => this.onPreview(this.rows[index], name));
             item.addEventListener('click', event => {
-                if (event.target instanceof Element && event.target.closest('button, .settings-popover')) return;
+                if (event.target instanceof Element && event.target.closest(`button, .${settingsStyles.settingsPopover}`)) return;
                 name.click();
             });
             const similar = document.createElement('button'); similar.type = 'button';
-            similar.className = 'settings-button'; similar.textContent = Text.searchSimilar;
+            similar.className = settingsStyles.settingsButton; similar.textContent = Text.searchSimilar;
             similar.setAttribute('aria-label', Text.searchSimilarTo(row.name));
             similar.disabled = name.disabled;
             similar.addEventListener('click', () => this.onSimilar(row.name));
-            const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'settings-button close-button';
+            const remove = document.createElement('button'); remove.type = 'button'; remove.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`;
             remove.setAttribute('aria-label', `${Text.compositionRemove}: ${row.name}`);
             remove.addEventListener('click', () => {
                 if (this.save(this.rows.filter((_, i) => i !== index))) { this.stop(); this.render(); }
             });
             const settings = document.createElement('button'); settings.type = 'button';
-            settings.className = 'settings-button'; settings.textContent = Text.settings;
+            settings.className = settingsStyles.settingsButton; settings.textContent = Text.settings;
             settings.setAttribute('aria-label', `${Text.settings}: ${row.name}`);
             const panel = document.createElement('div'); panel.popover = 'auto';
-            panel.className = 'settings-popover sound-settings';
+            panel.className = `${settingsStyles.settingsPopover} ${settingsStyles.soundSettings}`;
             panel.setAttribute('aria-label', `${Text.settings}: ${row.name}`);
             settings.popoverTargetElement = panel;
             const actions = document.createElement('div'); actions.className = styles.compositionActions;

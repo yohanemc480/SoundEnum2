@@ -1,3 +1,4 @@
+import * as settingsStyles from './Settings.css.ts';
 import * as styles from './ConfirmDialog.css.ts';
 import { Text } from './Text.ts';
 
@@ -52,12 +53,12 @@ function openDialog(message: string, acceptLabel: string, textOptions?: TextOpti
         actions.className = styles.actions;
         const cancel = document.createElement('button');
         cancel.type = 'button';
-        cancel.className = 'settings-button';
+        cancel.className = settingsStyles.settingsButton;
         cancel.textContent = Text.cancel;
         cancel.autofocus = true;
         const confirm = document.createElement('button');
         confirm.type = 'button';
-        confirm.className = `settings-button ${styles.accept}`;
+        confirm.className = `${settingsStyles.settingsButton} ${styles.accept}`;
         confirm.textContent = acceptLabel;
         let input: HTMLInputElement | undefined;
         let resultValue = '';

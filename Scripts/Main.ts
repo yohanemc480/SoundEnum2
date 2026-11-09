@@ -1,3 +1,4 @@
+import { applySettingsStyles } from './ApplySettingsStyles.ts';
 import { SavedCompositions } from './SavedCompositions.ts';
 import { SoundComposition } from './SoundComposition.ts';
 import { mountSoundSettings } from './SoundSettings.ts';
@@ -24,6 +25,7 @@ function requireElement(id: string): HTMLElement {
     return element;
 }
 
+applySettingsStyles();
 applyText();
 requireElement('clear-local-storage').addEventListener('click', async () => {
     if (!await confirmAction(Text.clearLocalStorageConfirm, { acceptLabel: Text.confirmDelete })) return;

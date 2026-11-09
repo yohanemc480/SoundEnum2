@@ -1,3 +1,4 @@
+import * as settingsStyles from './Settings.css.ts';
 import { button as copyButton } from './CopyButton.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
@@ -99,7 +100,7 @@ globalStyle(`.${compositionRow} button:disabled`, {
     "opacity": ".45",
     "cursor": "default"
 });
-globalStyle(`.${compositionActions} > .settings-button:not(.close-button)`, {
+globalStyle(`.${compositionActions} > .${settingsStyles.settingsButton}:not(.${settingsStyles.closeButton})`, {
     "padding": "3px 8px",
     "minHeight": "28px"
 });
@@ -142,7 +143,7 @@ globalStyle(`.${savedCompositionDelete} svg`, {
     "strokeLinecap": "round",
     "strokeLinejoin": "round"
 });
-globalStyle(`.${savedComposition} .settings-button:disabled`, {
+globalStyle(`.${savedComposition} .${settingsStyles.settingsButton}:disabled`, {
     "opacity": ".45",
     "cursor": "default"
 });

@@ -1,3 +1,4 @@
+import * as settingsStyles from './Settings.css.ts';
 import { compositionRow } from './Compositions.css.ts';
 import * as styles from './SearchResults.css.ts';
 import type { OutputArea } from './OutputArea.ts';
@@ -379,7 +380,7 @@ export class SoundSearchBrowser
                     panel.replaceChildren();
                     const heading = document.createElement('div'); heading.className = 'section-heading';
                     const title = document.createElement('h2'); title.textContent = entry.name;
-                    const close = document.createElement('button'); close.type = 'button'; close.className = 'settings-button close-button';
+                    const close = document.createElement('button'); close.type = 'button'; close.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`;
                     close.setAttribute('aria-label', Text.close);
                     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
                     heading.append(title, close); panel.append(heading);

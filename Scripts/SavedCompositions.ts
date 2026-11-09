@@ -1,3 +1,4 @@
+import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
 import type { SoundComposition } from './SoundComposition.ts';
 import type { SavedCompositionsValue } from './LocalStorageSchema.ts';
@@ -86,7 +87,7 @@ export class SavedCompositions {
             const nameGroup = document.createElement('div'); nameGroup.className = styles.savedCompositionHeading;
             nameGroup.append(version, count);
             const titleGroup = document.createElement('div'); titleGroup.className = styles.savedCompositionTitle;
-            const edit = document.createElement('button'); edit.type = 'button'; edit.className = `settings-button ${styles.savedCompositionEdit}`;
+            const edit = document.createElement('button'); edit.type = 'button'; edit.className = `${settingsStyles.settingsButton} ${styles.savedCompositionEdit}`;
             edit.title = Text.savedCompositionRename;
             edit.setAttribute('aria-label', Text.savedCompositionRename);
             edit.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 5 4 4M4 20l5-1L20 8a2.8 2.8 0 0 0-4-4L5 15Z"/></svg>';
@@ -117,7 +118,7 @@ export class SavedCompositions {
                 sounds.append(line);
             }
             const actions = document.createElement('div'); actions.className = styles.compositionActions;
-            const load = document.createElement('button'); load.type = 'button'; load.className = `settings-button ${styles.savedCompositionLoad}`; load.textContent = Text.savedCompositionLoad;
+            const load = document.createElement('button'); load.type = 'button'; load.className = `${settingsStyles.settingsButton} ${styles.savedCompositionLoad}`; load.textContent = Text.savedCompositionLoad;
             load.disabled = !this.composition.events || missing.length > 0;
             load.addEventListener('click', async () => {
                 if (!this.composition.events || item.sounds.some(sound => !this.composition.events?.has(sound.name))) return;
@@ -126,7 +127,7 @@ export class SavedCompositions {
                     this.composition.stop(); this.composition.render();
                 }
             });
-            const remove = document.createElement('button'); remove.type = 'button'; remove.className = `settings-button ${styles.savedCompositionDelete}`;
+            const remove = document.createElement('button'); remove.type = 'button'; remove.className = `${settingsStyles.settingsButton} ${styles.savedCompositionDelete}`;
             remove.title = Text.savedCompositionDelete;
             remove.setAttribute('aria-label', Text.savedCompositionDeleteConfirm(item.name));
             remove.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg>';
@@ -135,7 +136,7 @@ export class SavedCompositions {
                     this.write(this.items.filter(value => value.id !== item.id));
             });
             const overwrite = document.createElement('button'); overwrite.type = 'button';
-            overwrite.className = 'settings-button'; overwrite.textContent = Text.savedCompositionOverwrite;
+            overwrite.className = settingsStyles.settingsButton; overwrite.textContent = Text.savedCompositionOverwrite;
             overwrite.disabled = !this.writable || !this.composition.rows.length || this.composition.rows.length > 10;
             overwrite.addEventListener('click', async () => {
                 const sounds = this.composition.rows.map(row => ({ ...row }));

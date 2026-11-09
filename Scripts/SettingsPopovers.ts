@@ -1,4 +1,7 @@
+import { applySettingsStyles } from './ApplySettingsStyles.ts';
+import * as settingsStyles from './Settings.css.ts';
 import { bindSettingsPopover } from './BindSettingsPopover.ts';
 
-bindSettingsPopover(document.querySelector<HTMLElement>('.app-settings-button'), document.getElementById('app-settings'));
+applySettingsStyles();
+bindSettingsPopover(document.querySelector<HTMLElement>(`.${settingsStyles.appSettingsButton}`), document.getElementById('app-settings'));
 bindSettingsPopover(document.getElementById('command-settings-button'), document.getElementById('command-settings'));

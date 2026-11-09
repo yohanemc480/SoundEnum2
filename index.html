@@ -17,14 +17,14 @@
     </div>
     <div class="app-header-actions">
       <p data-i18n="appTagline"></p>
-      <button type="button" class="settings-button app-settings-button" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
+      <button type="button" data-settings-style="settingsButton appSettingsButton" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 2h4l.5 3 1.4.8 2.8-1 2 3.4-2.3 2v1.6l2.3 2-2 3.4-2.8-1-1.4.8-.5 3h-4l-.5-3-1.4-.8-2.8 1-2-3.4 2.3-2v-1.6l-2.3-2 2-3.4 2.8 1 1.4-.8Z" transform="translate(0 1)"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
     </div>
   </header>
-  <section id="app-settings" class="settings-popover app-settings-popover" popover="auto" aria-labelledby="app-settings-title">
-    <div class="section-heading"><h2 id="app-settings-title" data-i18n="settings"></h2><button type="button" class="settings-button close-button" popovertarget="app-settings" popovertargetaction="hide" data-i18n-aria-label="close"></button></div>
-    <button id="clear-local-storage" type="button" class="settings-button" data-i18n="clearLocalStorage"></button>
+  <section id="app-settings" data-settings-style="settingsPopover appSettingsPopover" popover="auto" aria-labelledby="app-settings-title">
+    <div class="section-heading"><h2 id="app-settings-title" data-i18n="settings"></h2><button type="button" data-settings-style="settingsButton closeButton" popovertarget="app-settings" popovertargetaction="hide" data-i18n-aria-label="close"></button></div>
+    <button id="clear-local-storage" type="button" data-settings-style="settingsButton" data-i18n="clearLocalStorage"></button>
   </section>
   <main class="workspace">
     <section class="main" data-i18n-aria-label="soundSelection">
@@ -40,8 +40,8 @@
           <form id="search-form-container">
             <fieldset id="search-form" disabled>
               <div class="search-filters">
-                <div class="search-text-field"><label for="search-query" data-i18n="soundName"></label><div class="clearable-input"><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"><button id="search-clear-query" type="button" class="close-button input-clear" data-i18n-aria-label="searchClearQuery"></button></div></div>
-                <div class="search-text-field"><label for="search-base" data-i18n="searchBase"></label><div class="clearable-input"><input id="search-base" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><button id="search-clear-base" type="button" class="close-button input-clear" data-i18n-aria-label="searchClearBase"></button></div></div>
+                <div class="search-text-field"><label for="search-query" data-i18n="soundName"></label><div class="clearable-input"><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"><button id="search-clear-query" type="button" class="input-clear" data-settings-style="closeButton" data-i18n-aria-label="searchClearQuery"></button></div></div>
+                <div class="search-text-field"><label for="search-base" data-i18n="searchBase"></label><div class="clearable-input"><input id="search-base" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><button id="search-clear-base" type="button" class="input-clear" data-settings-style="closeButton" data-i18n-aria-label="searchClearBase"></button></div></div>
                 <div class="search-tags-field"><span data-i18n="searchTags"></span><div id="search-tags" class="search-tags" role="group" data-i18n-aria-label="searchTags"></div></div>
               </div>
               <div class="search-options-row">
@@ -90,7 +90,7 @@
         </div>
         <p id="preview-status" role="status"></p>
         <div class="preview-command">
-          <div class="section-heading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" class="settings-button" popovertarget="command-settings" data-i18n="settings"></button></div>
+          <div class="section-heading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" data-settings-style="settingsButton" popovertarget="command-settings" data-i18n="settings"></button></div>
           <div class="output" aria-live="polite"></div>
         </div>
       </section>
@@ -112,7 +112,7 @@
         </div>
         <p id="composition-status" role="status"></p>
         <div id="composition-list" class="search-list"></div>
-        <div class="composition-save-actions"><button id="save-composition" type="button" class="settings-button" data-i18n="savedCompositionSave" disabled></button></div>
+        <div class="composition-save-actions"><button id="save-composition" type="button" data-settings-style="settingsButton" data-i18n="savedCompositionSave" disabled></button></div>
         <div class="composition-command">
           <div class="section-heading"><h2 data-i18n="command"></h2></div>
           <div id="composition-output" class="output" aria-live="polite"></div>
@@ -120,7 +120,7 @@
       </section>
     </aside>
   </main>
-  <section id="command-settings" class="settings-popover sound-settings" popover="auto" data-i18n-aria-label="commandSettings">
+  <section id="command-settings" data-settings-style="settingsPopover soundSettings" popover="auto" data-i18n-aria-label="commandSettings">
   </section>
   <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <script src="Scripts/SettingsPopovers.ts" type="module"></script>
