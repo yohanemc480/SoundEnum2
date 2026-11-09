@@ -61,10 +61,11 @@ export class HtmlSearchView implements SearchView {
         const positionCandidates = () => this.positionCandidatePopover();
         this.candidatePopover.addEventListener('toggle', positionCandidates, { signal: this.lifecycle.signal });
         window.addEventListener('resize', positionCandidates, { signal: this.lifecycle.signal });
-        window.addEventListener('scroll', event => {
-            if (!(event.target instanceof Node && this.candidatePopover.contains(event.target))) positionCandidates();
-        }, { capture: true, signal: this.lifecycle.signal });
         const closeCandidates = () => this.candidatePopover.hidePopover();
+        window.addEventListener('scroll', event => {
+            // 候補一覧内のスクロールは維持し、背後が動いたら選択を閉じる。
+            if (!(event.target instanceof Node && this.candidatePopover.contains(event.target))) closeCandidates();
+        }, { capture: true, signal: this.lifecycle.signal });
         document.querySelectorAll('[data-browser-tab]').forEach(tab => tab.addEventListener('click', closeCandidates, { signal: this.lifecycle.signal }));
 
         this.form = this.element('form');
