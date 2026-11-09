@@ -77,7 +77,7 @@ try {
     const playbackView = scope.own(new HtmlPlaybackView());
     const copyText = createCommandCopier();
     const outputArea = scope.own(new OutputArea('#preview-output', copyText));
-    new CommandSettingsPresenter(commandSettings, createCommandSettingsView(requireElement('command-settings')),
+    new CommandSettingsPresenter(commandSettings, createCommandSettingsView(requireElement('playback-settings'), undefined, true),
         settingsStore, () => console.warn('Cannot save or load command settings'));
     const playbackPresenter = scope.own(new PlaybackPresenter(playback, playbackView,
         playbackResources, { load: getWaveform },

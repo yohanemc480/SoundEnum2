@@ -130,6 +130,7 @@ globalStyle(`#preview-time`, {
     "whiteSpace": "nowrap"
 });
 globalStyle(`.${command} .${layout.sectionHeading}`, {
+    "alignItems": "flex-start",
     "marginBottom": "8px"
 });
 globalStyle(`#composition-waveform`, {

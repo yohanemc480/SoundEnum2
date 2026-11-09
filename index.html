@@ -105,7 +105,7 @@
         </div>
         <p id="preview-status" role="status"></p>
         <div data-playback-style="command">
-          <div data-layout-style="sectionHeading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" data-settings-style="settingsButton" popovertarget="command-settings" data-i18n="settings"></button></div>
+          <div data-layout-style="sectionHeading"><h2 data-i18n="command"></h2><div id="playback-settings" data-settings-style="soundSettings" role="group" data-i18n-aria-label="playbackSettings"></div></div>
           <div id="preview-output" aria-live="polite"></div>
         </div>
       </section>
@@ -135,8 +135,6 @@
       </section>
     </aside>
   </main>
-  <section id="command-settings" data-settings-style="settingsPopover soundSettings" popover="auto" data-i18n-aria-label="commandSettings">
-  </section>
   <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <script src="Scripts/App/Bootstrap.ts" type="module"></script>
 </body>
