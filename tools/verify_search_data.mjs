@@ -13,7 +13,7 @@ import { resolveSoundEventReferences } from '../Scripts/Model/Search/ResolveSoun
 const root = new URL('../', import.meta.url);
 globalThis.location = { href: 'http://localhost/' };
 globalThis.fetch = async url => {
-    const path = new URL(url).pathname.slice(1);
+    const path = new URL(url, globalThis.location.href).pathname.slice(1);
     try { return new Response(await readFile(new URL(path, root))); }
     catch (error) { if (error.code === 'ENOENT') return new Response('', { status: 404 }); throw error; }
 };
