@@ -59,6 +59,9 @@ Minecraft Java Editionのサウンドを検索・試聴し、`playsound`コマ�
 
 ## ローカルで動かす
 
+Vite・TypeScriptへの移行を進めています。npmでの起動・検証方法と現在の移行状況は[ローカル確認手順](docs/local-development.md)、全体の手順は[移行計画](docs/typescript-migration-plan.md)を参照してください。
+
+
 HTML・CSS・JavaScriptで構成された静的サイトです。生成済みリソースがあれば、フロントエンドのビルドやCLAPの導入は不要です。
 
 リポジトリのルートで次を実行し、<http://localhost:8000> を開きます。
