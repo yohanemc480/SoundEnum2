@@ -1,17 +1,21 @@
-import type { SoundEntry, SoundEventDefinitions, SearchTagData } from './Model/Search/SearchTypes.ts';
+import type { SoundEntry, SoundEventDefinitions, SearchTagData } from '../../Model/Search/SearchTypes.ts';
 
+/** 配列とnullを除き、JSONオブジェクトとして扱える値か判定する。 */
 function isRecord(value: unknown): value is Record<string, unknown> {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
+/** すべての要素が文字列である配列か判定する。 */
 function isStringArray(value: unknown): value is string[] {
     return Array.isArray(value) && value.every((item: unknown) => typeof item === 'string');
 }
+/** 音源名と任意の再生設定がリソースの形式に合うか判定する。 */
 function isSoundEntry(value: unknown): value is SoundEntry {
     return isRecord(value) && typeof value.name === 'string'
         && (value.type === undefined || typeof value.type === 'string')
         && ['pitch', 'volume', 'weight'].every(key => value[key] === undefined || typeof value[key] === 'number');
 }
 
+/** サウンドイベント定義を検証する。イベント参照の展開は呼び出し側で行う。 */
 export function parseSoundEvents(value: unknown): SoundEventDefinitions {
     if (!isRecord(value)) throw new Error('Invalid sound events');
     const events: SoundEventDefinitions = Object.create(null);
@@ -26,6 +30,7 @@ export function parseSoundEvents(value: unknown): SoundEventDefinitions {
     return events;
 }
 
+/** 音源パスとSHA-1ハッシュの対応を検証し、独立した辞書を返す。 */
 export function parseHashMap(value: unknown): Record<string, string> {
     if (!isRecord(value)) throw new Error('Invalid audio hashes');
     const result: Record<string, string> = Object.create(null);
@@ -36,6 +41,7 @@ export function parseHashMap(value: unknown): Record<string, string> {
     return result;
 }
 
+/** 再生時間が有限の非負数であることを検証し、独立した辞書を返す。 */
 export function parseDurations(value: unknown): Record<string, number> {
     if (!isRecord(value)) throw new Error('Invalid audio durations');
     const result: Record<string, number> = Object.create(null);
@@ -46,6 +52,7 @@ export function parseDurations(value: unknown): Record<string, number> {
     return result;
 }
 
+/** タグデータの形式とスキーマ版を検証する。音源との対応検証は検索処理側で行う。 */
 export function parseSearchTags(value: unknown): SearchTagData {
     if (!isRecord(value) || value.schemaVersion !== 3 || typeof value.version !== 'string'
         || typeof value.vectorHash !== 'string' || !/^[0-9a-f]{64}$/.test(value.vectorHash)

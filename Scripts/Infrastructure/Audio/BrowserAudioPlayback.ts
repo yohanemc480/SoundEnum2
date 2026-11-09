@@ -1,5 +1,5 @@
 import type { AudioPlayback, AudioPlaybackRequest, AudioPlaybackState } from '../../Contracts/Services/AudioPlayback.ts';
-import { SettingDefine } from '../../Constants/SettingDefine.ts';
+import { MasterVolumeSettings } from '../../Model/Playback/MasterVolumeSettings.ts';
 
 /** 音源取得・Blob URL・HTMLAudioElementを所有し、値の状態だけを外部へ通知する。 */
 export class BrowserAudioPlayback implements AudioPlayback {
@@ -13,7 +13,7 @@ export class BrowserAudioPlayback implements AudioPlayback {
     private disposed = false;
     private frame: number | null = null;
     private state: AudioPlaybackState = { revision: 0, soundName: '', hash: '', currentTime: 0, duration: 0,
-        playing: false, ready: false, loading: false, error: null, masterVolume: SettingDefine.DefaultMasterVolume };
+        playing: false, ready: false, loading: false, error: null, masterVolume: MasterVolumeSettings.DefaultMasterVolume };
 
     constructor(audio = new Audio()) {
         this.audio = audio;

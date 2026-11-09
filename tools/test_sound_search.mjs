@@ -1,4 +1,4 @@
-import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
+import { ResourcePathProvider } from '../Scripts/Infrastructure/Resources/ResourcePathProvider.ts';
 import { selectResourceVersion } from '../Scripts/Model/Resources/ResourceVersions.ts';
 import { buildSearchSounds } from '../Scripts/Model/Search/BuildSearchSounds.ts';
 import { decodeSearchVectors } from '../Scripts/Model/Search/SearchVectors.ts';

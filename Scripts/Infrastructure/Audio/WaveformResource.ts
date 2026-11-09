@@ -1,4 +1,4 @@
-import { SharedAudioPaths } from '../../ResourcePathProvider.ts';
+import { SharedAudioPaths } from '../Resources/ResourcePathProvider.ts';
 
 let loading: Promise<Record<string, unknown>> | null = null;
 /** 波形ファイルを共有して取得し、指定音源の正規化済みピークを返す。失敗時は再試行できる。 */

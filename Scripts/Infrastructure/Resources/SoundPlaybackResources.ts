@@ -1,8 +1,8 @@
 import type { PlaybackResources, PlaybackCandidate } from '../../Contracts/Services/PlaybackResources.ts';
 import type { SoundEntry } from '../../Model/Search/SearchTypes.ts';
 import { resolveSoundEventReferences } from '../../Model/Search/ResolveSoundEventReferences.ts';
-import { parseSoundEvents, parseHashMap } from '../../ResourceData.ts';
-import { SharedAudioPaths } from '../../ResourcePathProvider.ts';
+import { parseSoundEvents, parseHashMap } from './ParseResourceData.ts';
+import { SharedAudioPaths } from './ResourcePathProvider.ts';
 
 /** 取得済みのJSONを検証し、試聴用の候補と音声URLを解決する。通信は行わない。 */
 export class SoundPlaybackResources implements PlaybackResources {

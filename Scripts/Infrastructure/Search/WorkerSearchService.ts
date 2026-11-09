@@ -1,7 +1,7 @@
-import type { ResourcePathProvider } from '../../ResourcePathProvider.ts';
+import type { ResourcePathProvider } from '../Resources/ResourcePathProvider.ts';
 import type { SearchSourceIndex } from '../../Model/Search/SearchTypes.ts';
 import type { SearchRequest, SearchInitRequest, SearchQueryRequest, SearchReadyResponse, SearchResultsResponse, SearchSuccessResponse, SearchWorkerResponse } from './SearchWorkerProtocol.ts';
-import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from '../../ResourceData.ts';
+import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from '../Resources/ParseResourceData.ts';
 import { buildSearchSounds } from '../../Model/Search/BuildSearchSounds.ts';
 
 import type { SearchService } from '../../Contracts/Services/SearchService.ts';

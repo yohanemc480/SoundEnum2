@@ -1,7 +1,7 @@
 import { field } from '../InputFields.css.ts';
 import * as styles from './VolumeControl.css.ts';
 import { Text } from "../../../I18n/Text.ts";
-import { SettingDefine } from "../../../Constants/SettingDefine.ts";
+import { MasterVolumeSettings } from "../../../Model/Playback/MasterVolumeSettings.ts";
 
 /**
  * マスター音量調整エリアを表すクラス
@@ -21,8 +21,8 @@ export class SelectMasterVolumeArea
         slider.type = 'range';
         slider.className = styles.slider;
         slider.setAttribute('aria-label', Text.previewVolume);
-        slider.min = String(SettingDefine.MinMasterVolume);
-        slider.max = String(SettingDefine.MaxMasterVolume);
+        slider.min = String(MasterVolumeSettings.MinMasterVolume);
+        slider.max = String(MasterVolumeSettings.MaxMasterVolume);
         slider.step = '0.01';
         slider.value = String(value);
         slider.addEventListener('input', () => this.OnUpdateValue(slider.value), { signal: this.lifecycle.signal });

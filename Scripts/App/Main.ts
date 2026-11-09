@@ -23,7 +23,7 @@ import { createBrowserTabs } from './CreateBrowserTabs.ts';
 import { createSearchScreen } from './CreateSearchScreen.ts';
 import { fetchTextResource } from '../Infrastructure/Resources/FetchTextResource.ts';
 import { DisposalScope } from './DisposalScope.ts';
-import { ResourcePathProvider } from "../ResourcePathProvider.ts";
+import { ResourcePathProvider } from "../Infrastructure/Resources/ResourcePathProvider.ts";
 import { OutputArea } from "../View/Components/OutputArea/OutputArea.ts";
 import { SelectMasterVolumeArea } from "../View/Components/VolumeControl/SelectMasterVolumeArea.ts";
 

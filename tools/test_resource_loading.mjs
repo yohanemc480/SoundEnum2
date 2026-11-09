@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from '../Scripts/ResourceData.ts';
+import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from '../Scripts/Infrastructure/Resources/ParseResourceData.ts';
 import { WorkerSearchService } from '../Scripts/Infrastructure/Search/WorkerSearchService.ts';
-import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
+import { ResourcePathProvider } from '../Scripts/Infrastructure/Resources/ResourcePathProvider.ts';
 
 test('resource parsers reject malformed JSON shapes before search or playback', () => {
     assert.throws(() => parseSoundEvents({ event: { sounds: [{ name: 1 }] } }), /Invalid/);

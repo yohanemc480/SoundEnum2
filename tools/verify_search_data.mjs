@@ -5,7 +5,7 @@ import { Worker as NodeWorker } from 'node:worker_threads';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { WorkerSearchService } from '../Scripts/Infrastructure/Search/WorkerSearchService.ts';
-import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
+import { ResourcePathProvider } from '../Scripts/Infrastructure/Resources/ResourcePathProvider.ts';
 import { Text } from '../Scripts/I18n/Text.ts';
 import { resolveSoundEventReferences } from '../Scripts/Model/Search/ResolveSoundEventReferences.ts';
 

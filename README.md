@@ -90,3 +90,15 @@ python -m pip --python .venv/Scripts/python.exe install -r tools/requirements-cl
 Minecraftのサウンド・名称などはMojang Studios / Microsoftおよび各権利者に帰属します。本アプリは非公式のプロジェクトです。
 
 内部のプロジェクト名はSoundEnumです。
+
+## ソースの構成
+
+- `Scripts/App/`：起動、部品の生成・接続、終了処理
+- `Scripts/Model/`：状態・計算・入力値のルール
+- `Scripts/Presenter/`：操作の調整と表示更新
+- `Scripts/Contracts/`：Viewとサービスのインターフェース
+- `Scripts/View/`：DOM操作とCSS
+- `Scripts/Infrastructure/`：通信・保存・音声・クリップボードとリソース処理
+- `Scripts/I18n/`：日本語の表示文言
+
+移行の進捗と残りの確認項目は[MVP構成への整理計画](docs/mvp-refactoring-plan.md)を参照してください。

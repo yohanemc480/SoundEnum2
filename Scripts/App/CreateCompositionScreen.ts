@@ -5,7 +5,7 @@ import { CompositionPresenter } from '../Presenter/CompositionPresenter.ts';
 import { BrowserCompositionPlayback } from '../Infrastructure/Audio/BrowserCompositionPlayback.ts';
 import { LocalCompositionStore } from '../Infrastructure/Storage/LocalCompositionStore.ts';
 import { getWaveform } from '../Infrastructure/Audio/WaveformResource.ts';
-import { SharedAudioPaths } from '../ResourcePathProvider.ts';
+import { SharedAudioPaths } from '../Infrastructure/Resources/ResourcePathProvider.ts';
 import { CompositionModel } from '../Model/Composition/CompositionModel.ts';
 import { Text } from '../I18n/Text.ts';
 import { showToast } from '../View/Components/Toast/Toast.ts';

@@ -8,7 +8,7 @@ import { LocalFavoriteSoundsStore } from '../Infrastructure/Storage/LocalFavorit
 import { confirmAction } from '../View/Components/ConfirmDialog/ConfirmDialog.ts';
 import { showToast } from '../View/Components/Toast/Toast.ts';
 import { Text } from '../I18n/Text.ts';
-import type { ResourcePathProvider } from '../ResourcePathProvider.ts';
+import type { ResourcePathProvider } from '../Infrastructure/Resources/ResourcePathProvider.ts';
 import type { CompositionActions } from '../Contracts/Services/CompositionActions.ts';
 import type { SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
 
