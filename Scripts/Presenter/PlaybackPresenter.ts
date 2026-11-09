@@ -27,10 +27,16 @@ export class PlaybackPresenter implements SoundPreviewService {
     /** 指定候補または重みに従う候補を選び、設定と候補の倍率を掛けて試聴する。 */
     async play(request: SoundPreviewRequest): Promise<void> {
         if (this.disposed) return;
-        const candidate = request.candidate ?? selectWeightedCandidate(this.resources.candidates(request.name), value => value.weight);
+        const candidates = this.resources.candidates(request.name);
+        const candidate = request.candidate ?? selectWeightedCandidate(candidates, value => value.weight);
+        // 明示選択は一覧の番号を優先し、ランダム再生も実際に選んだ候補の番号を表示する。
+        const candidateIndex = request.candidateIndex ?? (request.candidate === null ? candidates.indexOf(candidate) : candidates.findIndex(value => (
+            value.name === candidate.name && value.hash === candidate.hash && value.pitch === candidate.pitch
+            && value.volume === candidate.volume && value.weight === candidate.weight)));
+        const candidateNumber = candidateIndex >= 0 ? candidateIndex + 1 : undefined;
         const command = { ...this.settings.read(), ...request.settings, name: request.name };
         this.output(formatSoundCommand(command));
-        await this.playback.play({ soundName: request.name, hash: candidate.hash, url: this.resources.audioUrl(candidate.hash),
+        await this.playback.play({ soundName: request.name, candidateNumber, hash: candidate.hash, url: this.resources.audioUrl(candidate.hash),
             pitch: command.pitch * candidate.pitch, volume: command.volume * candidate.volume });
     }
     /** プレイヤーのマスター音量を再生サービスへ反映する。 */

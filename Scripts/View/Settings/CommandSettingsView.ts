@@ -8,8 +8,8 @@ import { Text } from '../../I18n/Text.ts';
 
 type NumericSetting = 'volume' | 'pitch' | 'minVolume';
 
-/** 設定入力欄を構築する。入力値を通知し、正規化や保存は行わない。 */
-export function createCommandSettingsView(panel: HTMLElement | null, onInput: () => void = () => {}): CommandSettingsView {
+/** 設定入力欄を構築する。単音試聴ではコマンド専用項目を折りたたみ、組み合わせの行ではポップアップとして表示する。 */
+export function createCommandSettingsView(panel: HTMLElement | null, onInput: () => void = () => {}, inline = false): CommandSettingsView {
     let current: CommandSettingsValue;
     let actions: CommandSettingsActions;
     /** 表示済みの値を入力の組み立てに使う。 */
@@ -22,12 +22,14 @@ export function createCommandSettingsView(panel: HTMLElement | null, onInput: ()
     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
     heading.append(title, close);
     const controls = document.createElement('div'); controls.className = fieldStyles.fields;
+    const commandControls = document.createElement('div'); commandControls.className = fieldStyles.fields;
     const fields = new Map<NumericSetting, { input: HTMLInputElement; slider: HTMLInputElement }>();
     const sourceLabel = document.createElement('label'); sourceLabel.className = fieldStyles.field;
     const caption = document.createElement('span'); caption.className = fieldStyles.label; caption.textContent = Text.source;
     const source = document.createElement('select'); source.className = settingsStyles.soundSettingsSource;
     for (const value of Object.values(MCCommandSoundSource)) source.append(new Option(value, value));
-    sourceLabel.append(caption, source); controls.append(sourceLabel);
+    sourceLabel.append(caption, source);
+    (inline ? commandControls : controls).append(sourceLabel);
     /** 正規化済みの現在値を入力欄へ表示する。 */
     function refresh() {
         const value = read();
@@ -56,11 +58,22 @@ export function createCommandSettingsView(panel: HTMLElement | null, onInput: ()
             commit({ ...read(), [key]: input.valueAsNumber });
         });
         fields.set(key, { input, slider });
-        label.append(caption, slider, input); controls.append(label);
+        label.append(caption, slider, input);
+        (inline && key === 'minVolume' ? commandControls : controls).append(label);
     }
     const reset = document.createElement('button'); reset.type = 'button';
     reset.className = `${settingsStyles.settingsButton} ${settingsStyles.resetSoundSettings}`; reset.textContent = Text.resetCommandSettings;
+    reset.setAttribute('aria-label', Text.resetCommandSettings);
+    reset.title = Text.resetCommandSettings;
     reset.addEventListener('click', () => actions.reset());
-    panel.replaceChildren(heading, controls, reset);
+    if (inline) {
+        // 開閉状態はDOM内だけで管理し、画面を作るたびに閉じた状態から始める。
+        const details = document.createElement('details'); details.className = settingsStyles.commandDetails;
+        details.open = false;
+        const summary = document.createElement('summary'); summary.textContent = Text.commandSettingsDetails;
+        details.append(summary, commandControls);
+        panel.replaceChildren(controls, details, reset);
+    }
+    else panel.replaceChildren(heading, controls, reset);
     return { bind: value => { actions = value; }, show: value => { current = value; refresh(); } };
 }

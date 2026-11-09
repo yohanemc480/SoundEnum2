@@ -24,6 +24,11 @@ export const appHeaderIdentity = style({
 export const appBrand = style({
     "minWidth": "0"
 });
+export const settingsControl = style({
+    position: 'relative',
+    display: 'flex',
+    flexShrink: 0,
+});
 export const brandName = style({
     "display": "block",
     "fontSize": "clamp(22px, 3vw, 30px)",
@@ -43,6 +48,18 @@ export const workspace = style({
     "display": "grid",
     "gridTemplateColumns": "minmax(0, 1fr) clamp(420px, 36vw, 560px)",
     "gap": "20px"
+});
+export const buildCommit = style({
+    // 設定ボタンを基準に上へ添え、ヘッダーの高さや各要素の位置に影響させない。
+    position: 'absolute',
+    bottom: '100%',
+    right: 0,
+    marginBottom: '4px',
+    color: 'var(--text)',
+    fontSize: '10px',
+    lineHeight: '1.4',
+    fontFamily: 'monospace',
+    whiteSpace: 'nowrap',
 });
 export const main = style({});
 export const sub = style({});

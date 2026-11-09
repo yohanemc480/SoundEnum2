@@ -20,7 +20,8 @@ export const searchPagination = style({
     "marginTop": "12px",
     "flexWrap": "wrap"
 });
-export const searchTextField = style({});
+// 入力欄の内容によって暗黙の列が広がるのを防ぐ。
+export const searchTextField = style({ gridTemplateColumns: 'minmax(0, 1fr)' });
 export const searchTagsField = style({});
 export const searchFilters = style({
     "display": "grid",
@@ -32,7 +33,7 @@ export const searchFilters = style({
 export const searchTags = style({
     "display": "flex",
     "flexWrap": "wrap",
-    "gap": "6px 12px",
+    "gap": "4px 10px",
     "minHeight": "38px",
     "alignContent": "center"
 });
@@ -113,7 +114,10 @@ globalStyle(`.${searchTextField}, .${searchTagsField}`, {
     "color": "var(--muted)"
 });
 globalStyle(`.${searchTextField} input`, {
-    "width": "100%"
+    "width": "100%",
+    "maxWidth": "100%",
+    "minWidth": "0",
+    "boxSizing": "border-box"
 });
 globalStyle(`#search-base-preview`, {
     "marginBottom": "8px"
@@ -139,8 +143,14 @@ globalStyle(`#search-status`, {
 globalStyle(`.${searchTags} label`, {
     "display": "flex",
     "alignItems": "center",
+    "minHeight": "20px",
+    "lineHeight": "20px",
     "gap": "5px",
     "cursor": "pointer"
+});
+// テキスト入力用の高さと余白を解除し、タグ1行分の領域を小さく保つ。
+globalStyle(`.${searchTags} input[type="checkbox"]`, {
+    width: '14px', height: '14px', padding: 0, margin: 0, flex: '0 0 14px',
 });
 globalStyle(`#search-form:disabled`, {
     "opacity": ".5"
@@ -196,3 +206,11 @@ globalStyle(`.${inputClear}:hover`, {
 globalStyle(`.${clearableInput}:has(input:placeholder-shown) .${inputClear}`, {
     "visibility": "hidden"
 });
+
+
+// 除外バージョンは説明と選択欄をまとめ、検索条件の幅に合わせて折り返す。
+export const searchVersionFilter = style({
+    display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px 10px',
+    color: 'var(--muted)', fontSize: '12px',
+});
+globalStyle(`.${searchVersionFilter} select`, { width: '150px', height: '32px', padding: '5px 30px 5px 8px' });

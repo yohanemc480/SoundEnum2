@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build:deploy"
+  publish = "dist"
+
+[[plugins]]
+  package = "./tools/netlify-release-audio-cache"

@@ -12,7 +12,7 @@ export interface SavedCompositionsInteractions {
     defaultName(number: number): string;
     rename(name: string): Promise<string | null>;
     confirm(operation: 'load' | 'remove' | 'overwrite', name: string): Promise<boolean>;
-    notify(message: 'saved' | 'limit' | 'failure'): void;
+    notify(message: 'saved' | 'limit' | 'failure' | { type: 'duplicate'; name: string }): void;
 }
 
 /** 保存一覧の操作を調整する。保存成功時だけModelを確定し、古い確認結果は適用しない。 */
@@ -67,6 +67,8 @@ export class SavedCompositionsPresenter {
     private saveCurrent(): void {
         if (this.disposed || !this.writable) return;
         const state = this.editor.read(); if (!this.hasSavableRows(state)) return;
+        const duplicate = this.model.findSameContent(state.rows);
+        if (duplicate) { this.interactions.notify({ type: 'duplicate', name: duplicate.name }); return; }
         if (this.model.read().length >= SavedCompositionsModel.MaxItems) { this.interactions.notify('limit'); return; }
         try {
             const name = nextCompositionName(this.model.read(), this.interactions.defaultName);
@@ -112,6 +114,8 @@ export class SavedCompositionsPresenter {
         const revision = this.revision, editorRevision = this.editorRevision;
         try {
             if (!await this.interactions.confirm('overwrite', item.name) || !this.isCurrent(revision) || editorRevision !== this.editorRevision) return;
+            const duplicate = this.model.findSameContent(state.rows, id);
+            if (duplicate) { this.interactions.notify({ type: 'duplicate', name: duplicate.name }); return; }
             if (this.write(this.model.withSounds(id, state.rows, this.version))) this.interactions.notify('saved');
         } catch { this.notifyFailure(); }
     }

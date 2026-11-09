@@ -29,9 +29,12 @@
     </div>
     <div data-layout-style="appHeaderActions">
       <p data-i18n="appTagline"></p>
-      <button type="button" data-settings-style="settingsButton appSettingsButton" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 2h4l.5 3 1.4.8 2.8-1 2 3.4-2.3 2v1.6l2.3 2-2 3.4-2.8-1-1.4.8-.5 3h-4l-.5-3-1.4-.8-2.8 1-2-3.4 2.3-2v-1.6l-2.3-2 2-3.4 2.8 1 1.4-.8Z" transform="translate(0 1)"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+      <div data-layout-style="settingsControl">
+        <span id="build-commit" data-layout-style="buildCommit" title="__BUILD_COMMIT_SHA__"><span data-i18n="buildCommitLabel">Build:</span> __BUILD_COMMIT_SHORT__</span>
+        <button type="button" data-settings-style="settingsButton appSettingsButton" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 2h4l.5 3 1.4.8 2.8-1 2 3.4-2.3 2v1.6l2.3 2-2 3.4-2.8-1-1.4.8-.5 3h-4l-.5-3-1.4-.8-2.8 1-2-3.4 2.3-2v-1.6l-2.3-2 2-3.4 2.8 1 1.4-.8Z" transform="translate(0 1)"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
     </div>
   </header>
   <section id="app-settings" data-settings-style="settingsPopover appSettingsPopover" popover="auto" aria-labelledby="app-settings-title">
@@ -57,6 +60,7 @@
                 <div data-search-style="searchTagsField"><span data-i18n="searchTags"></span><div id="search-tags" data-search-style="searchTags" role="group" data-i18n-aria-label="searchTags"></div></div>
               </div>
               <div data-search-style="searchOptionsRow">
+                <label data-search-style="searchVersionFilter"><span data-i18n="searchExcludedVersion"></span><select id="search-excluded-version"></select></label>
                 <label data-search-style="searchOption"><input id="search-exclude-multiple" type="checkbox"><span data-i18n="searchExcludeMultiple"></span></label>
                 <button id="search-clear" type="button" data-i18n="searchClear"></button>
               </div>
@@ -102,7 +106,7 @@
         </div>
         <p id="preview-status" role="status"></p>
         <div data-playback-style="command">
-          <div data-layout-style="sectionHeading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" data-settings-style="settingsButton" popovertarget="command-settings" data-i18n="settings"></button></div>
+          <div data-layout-style="sectionHeading"><h2 data-i18n="command"></h2><div id="playback-settings" data-settings-style="soundSettings" role="group" data-i18n-aria-label="playbackSettings"></div></div>
           <div id="preview-output" aria-live="polite"></div>
         </div>
       </section>
@@ -132,8 +136,6 @@
       </section>
     </aside>
   </main>
-  <section id="command-settings" data-settings-style="settingsPopover soundSettings" popover="auto" data-i18n-aria-label="commandSettings">
-  </section>
   <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
   <script src="Scripts/App/Bootstrap.ts" type="module"></script>
 </body>

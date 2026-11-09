@@ -1,3 +1,4 @@
+import { audioResourceCache } from '../Resources/ResourceCache.ts';
 import type { AudioPlayback, AudioPlaybackRequest, AudioPlaybackState } from '../../Contracts/Services/AudioPlayback.ts';
 import { MasterVolumeSettings } from '../../Model/Playback/MasterVolumeSettings.ts';
 
@@ -42,14 +43,13 @@ export class BrowserAudioPlayback implements AudioPlayback {
         this.releaseSource();
         const generation = ++this.generation;
         const controller = new AbortController(); this.controller = controller;
-        this.state = { ...this.state, revision: this.state.revision + 1, soundName: request.soundName, hash: request.hash,
+        this.state = { ...this.state, revision: this.state.revision + 1, soundName: request.soundName, candidateNumber: request.candidateNumber, hash: request.hash,
             loading: true, error: null, currentTime: 0, duration: 0, ready: false, playing: false };
         this.requestVolume = request.volume;
         this.publish();
         try {
-            const response = await fetch(request.url, { signal: controller.signal });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const blob = await response.blob();
+            const bytes = await audioResourceCache.load(request.url, controller.signal);
+            const blob = new Blob([bytes], { type: 'audio/ogg' });
             if (controller.signal.aborted || generation !== this.generation || this.disposed) return;
             this.objectUrl = URL.createObjectURL(blob);
             this.audio.src = this.objectUrl;

@@ -23,7 +23,7 @@ export function createSavedCompositionsScreen(editor: CompositionEditor, version
                 ? confirmAction(Text.savedCompositionLoadConfirm(name), { acceptLabel: Text.savedCompositionLoad })
                 : operation === 'remove' ? confirmAction(Text.savedCompositionDeleteConfirm(name), { acceptLabel: Text.confirmDelete })
                     : confirmAction(Text.savedCompositionOverwriteConfirm(name), { acceptLabel: Text.savedCompositionOverwrite }),
-            notify: message => showToast(message === 'saved' ? Text.savedCompositionSaved : message === 'limit'
+            notify: message => showToast(typeof message === 'object' ? Text.savedCompositionDuplicate(message.name) : message === 'saved' ? Text.savedCompositionSaved : message === 'limit'
                 ? Text.savedCompositionLimit(SavedCompositionsModel.MaxItems) : Text.savedCompositionFailure),
         }));
         return { dispose: () => scope.dispose() };

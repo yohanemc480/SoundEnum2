@@ -97,3 +97,34 @@ globalStyle(`.${soundSettings} select`, {
 globalStyle(`.${soundSettings} .${soundSettingsSource}`, {
     "gridColumn": "2 / -1"
 });
+
+// 音量・ピッチと折りたたんだコマンド専用項目を、それぞれ2列で表示する。
+globalStyle(`#playback-settings`, { flex: '1', minWidth: 0, width: 'auto', padding: 0 });
+globalStyle(`#playback-settings .${fields.fields}`, { display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '8px 12px' });
+globalStyle(`#playback-settings .${fields.field}`, { width: 'auto', gridTemplateColumns: 'minmax(0, 1fr) 48px', gap: '4px' });
+globalStyle(`#playback-settings .${fields.label}`, { gridColumn: '1 / -1' });
+// 選択欄は文字と上下の余白が収まる高さを確保し、矢印用の余白を小さくする。
+globalStyle(`#playback-settings .${soundSettingsSource}`, {
+    gridColumn: '1 / -1', width: '100%', height: '32px',
+    padding: '4px 24px 4px 8px', fontSize: '12px', lineHeight: '20px',
+    backgroundPosition: 'right 8px center',
+});
+globalStyle(`#playback-settings input:not([type="range"])`, { width: '48px', padding: '4px', height: '28px' });
+// リセットは4項目の右下に控えめに置き、補助操作だけで大きな余白を作らない。
+globalStyle(`#playback-settings .${resetSoundSettings}`, {
+    margin: '2px 0 0 auto', padding: '2px 0', border: 'none',
+    background: 'transparent', color: 'var(--muted)', fontSize: '11px', lineHeight: '16px',
+});
+globalStyle(`#playback-settings .${resetSoundSettings}:hover`, {
+    color: 'var(--text)', textDecoration: 'underline',
+});
+
+export const commandDetails = style({ marginTop: '6px' });
+globalStyle(`.${commandDetails} > summary`, {
+    color: 'var(--muted)', fontSize: '11px', lineHeight: '20px', cursor: 'pointer',
+});
+globalStyle(`.${commandDetails} > summary:hover`, { color: 'var(--text)' });
+globalStyle(`.${commandDetails} > summary:focus-visible`, {
+    outline: '2px solid var(--accent)', outlineOffset: '2px',
+});
+globalStyle(`.${commandDetails}[open] > summary`, { marginBottom: '6px' });

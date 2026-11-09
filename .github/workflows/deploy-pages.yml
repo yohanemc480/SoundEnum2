@@ -27,12 +27,21 @@ jobs:
           cache: npm
       - name: 依存パッケージをインストール
         run: npm ci
-      - name: テスト
-        run: npm test
-      - name: 検索データを検証
-        run: npm run verify:data
-      - name: 型チェックと本番ビルド
-        run: npm run build
+      - name: 公開音声用のPythonを準備
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: runtime.txt
+          cache: pip
+          cache-dependency-path: tools/requirements-release-audio.txt
+      - name: 圧縮音声をキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: .cache/release-audio
+          key: release-audio-${{ runner.os }}-${{ hashFiles('tools/build_release_audio.py', 'tools/requirements-release-audio.txt') }}-${{ hashFiles('resource/*/audio-file-hashes.json') }}
+          restore-keys: |
+            release-audio-${{ runner.os }}-${{ hashFiles('tools/build_release_audio.py', 'tools/requirements-release-audio.txt') }}-
+      - name: 共通の公開ビルドを実行
+        run: npm run build:deploy
       - name: GitHub Pagesを準備
         uses: actions/configure-pages@v5
       - name: 公開用ファイルをアップロード
