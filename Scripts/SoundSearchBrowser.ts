@@ -1,3 +1,30 @@
+import type { OutputArea } from './OutputArea.ts';
+import type { ResourcePathProvider } from './ResourcePathProvider.ts';
+import type { SoundComposition } from './SoundComposition.ts';
+import type { SoundCommand } from './FormatSoundCommand.ts';
+import type { SearchCandidate, SearchResult, SearchSourceIndex } from './SearchTypes.ts';
+
+type BrowserResult = Omit<SearchResult, 'candidate'> & { candidate?: SearchCandidate };
+const searchElementTypes = {
+    form: HTMLFieldSetElement, 'form-container': HTMLFormElement,
+    query: HTMLInputElement, base: HTMLInputElement, 'exclude-multiple': HTMLInputElement,
+    'clear-query': HTMLButtonElement, 'clear-base': HTMLButtonElement,
+    retry: HTMLButtonElement, clear: HTMLButtonElement,
+    previous: HTMLButtonElement, next: HTMLButtonElement,
+    tags: HTMLElement, list: HTMLElement, 'base-preview': HTMLElement,
+    pagination: HTMLElement, status: HTMLElement, page: HTMLElement,
+};
+function requireElement(id: string): HTMLElement {
+    const element = document.getElementById(id);
+    if (!element) throw new Error(`Missing element: ${id}`);
+    return element;
+}
+function tagLabel(key: string | undefined): string {
+    const label: unknown = key && Object.hasOwn(Text, key) ? Text[key as keyof typeof Text] : undefined;
+    if (typeof label !== 'string') throw new Error(`Unknown tag label: ${key}`);
+    return label;
+}
+
 import { SoundAutocomplete } from './SoundAutocomplete.ts';
 import { confirmAction } from './ConfirmDialog.ts';
 import { readPreferences, savePreferences, restoreSearchPreferences } from './SearchPreferences.ts';
@@ -13,7 +40,30 @@ import { MCRawSound } from './MCRawSound.ts';
 
 export class SoundSearchBrowser
 {
-    constructor(outputArea, paths, composition)
+    readonly outputArea: OutputArea;
+    readonly composition: SoundComposition;
+    readonly favorites: Favorites | null;
+    readonly resource: SoundSearchResource;
+    requestId: number;
+    page: number;
+    results: BrowserResult[];
+    resultBase = '';
+    readonly candidatePopover: HTMLElement;
+    candidateAnchor?: HTMLElement;
+    readonly form: HTMLFieldSetElement;
+    readonly autocomplete: SoundAutocomplete;
+    readonly waveforms: SearchWaveforms;
+    timer?: ReturnType<typeof setTimeout>;
+    index: SearchSourceIndex | null = null;
+    loading = false;
+
+    element<K extends keyof typeof searchElementTypes>(id: K): InstanceType<(typeof searchElementTypes)[K]> {
+        const element = requireElement(`search-${id}`);
+        if (!(element instanceof searchElementTypes[id])) throw new Error(`Invalid search element: ${id}`);
+        return element as InstanceType<(typeof searchElementTypes)[K]>;
+    }
+
+    constructor(outputArea: OutputArea, paths: ResourcePathProvider, composition: SoundComposition)
     {
         this.outputArea = outputArea;
         this.composition = composition;
@@ -39,14 +89,13 @@ export class SoundSearchBrowser
         const closeCandidates = () => this.candidatePopover.hidePopover();
         window.addEventListener('resize', closeCandidates);
         window.addEventListener('scroll', event => {
-            if (!this.candidatePopover.contains(event.target)) closeCandidates();
+            if (!(event.target instanceof Node && this.candidatePopover.contains(event.target))) closeCandidates();
         }, true);
         document.querySelectorAll('[data-browser-tab]').forEach(tab => tab.addEventListener('click', closeCandidates));
 
-        this.element = id => document.getElementById(`search-${id}`);
         this.form = this.element('form');
         this.autocomplete = new SoundAutocomplete(this.element('base'));
-        for (const name of ['query', 'base']) {
+        for (const name of ['query', 'base'] as const) {
             this.element(`clear-${name}`).addEventListener('click', () => {
                 const input = this.element(name);
                 input.value = '';
@@ -55,7 +104,9 @@ export class SoundSearchBrowser
                 this.autocomplete.hide();
             });
         }
-        this.waveforms = new SearchWaveforms(document.querySelector('.browser-panel'));
+        const browserPanel = document.querySelector<HTMLElement>('.browser-panel');
+        if (!browserPanel) throw new Error('Missing browser panel');
+        this.waveforms = new SearchWaveforms(browserPanel);
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
         this.form.addEventListener('input', () => {
             this.saveSearchPreferences();
@@ -67,8 +118,8 @@ export class SoundSearchBrowser
             clearTimeout(this.timer);
             this.search();
         });
-        document.getElementById('search-tab').addEventListener('click', () => this.load());
-        document.getElementById('favorites-tab').addEventListener('click', async () => {
+        requireElement('search-tab').addEventListener('click', () => this.load());
+        requireElement('favorites-tab').addEventListener('click', async () => {
             await this.load();
             this.renderFavorites();
         });
@@ -93,7 +144,7 @@ export class SoundSearchBrowser
         this.element('status').textContent = Text.searchLoading;
         try {
             const index = await this.resource.load();
-            if (index.tags.some(tag => typeof Text[tag.textKey] !== 'string')) throw new Error('Unknown tag label');
+            index.tags.forEach(tag => tagLabel(tag.textKey));
             this.index = index;
             this.composition.setEvents(index.events);
             this.autocomplete.setNames(index.events.map(event => event.name));
@@ -103,7 +154,7 @@ export class SoundSearchBrowser
                 const label = document.createElement('label');
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox'; checkbox.value = tag.id;
-                label.append(checkbox, document.createTextNode(Text[tag.textKey]));
+                label.append(checkbox, document.createTextNode(tagLabel(tag.textKey)));
                 tags.append(label);
             }
             const saved = restoreSearchPreferences(readPreferences(), index);
@@ -117,7 +168,7 @@ export class SoundSearchBrowser
         } catch (error) {
             this.index = null;
             this.resource.dispose();
-            this.element('status').textContent = error.message === 'missing' ? Text.searchMissing : Text.searchFailure;
+            this.element('status').textContent = error instanceof Error && error.message === 'missing' ? Text.searchMissing : Text.searchFailure;
             this.element('retry').hidden = false;
             console.error(error);
         } finally { this.loading = false; }
@@ -126,7 +177,7 @@ export class SoundSearchBrowser
     saveSearchPreferences()
     {
         savePreferences({ query: this.element('query').value, base: this.element('base').value.trim(),
-            tags: [...this.element('tags').querySelectorAll('input:checked')].map(input => input.value),
+            tags: [...this.element('tags').querySelectorAll<HTMLInputElement>('input:checked')].map(input => input.value),
             excludeMultiple: this.element('exclude-multiple').checked });
     }
 
@@ -150,7 +201,7 @@ export class SoundSearchBrowser
             const { results } = await this.resource.request({ type: 'search', options: {
                 query: this.element('query').value, base,
                 excludeMultiple: this.element('exclude-multiple').checked,
-                tags: [...this.element('tags').querySelectorAll('input:checked')].map(input => input.value)
+                tags: [...this.element('tags').querySelectorAll<HTMLInputElement>('input:checked')].map(input => input.value)
             } });
             if (id !== this.requestId) return;
             this.results = results.filter(entry => entry.name !== base); this.resultBase = base; this.page = 0; this.render();
@@ -162,7 +213,7 @@ export class SoundSearchBrowser
         }
     }
 
-    createTagBadges(tags)
+    createTagBadges(tags: readonly string[])
     {
         const badges = document.createElement('span');
         badges.className = 'sound-tag-badges';
@@ -170,7 +221,7 @@ export class SoundSearchBrowser
         for (const id of tags) {
             const badge = document.createElement('span');
             badge.className = 'sound-tag-badge';
-            badge.textContent = Text[this.index.tags.find(tag => tag.id === id).textKey];
+            badge.textContent = tagLabel(this.index?.tags.find(tag => tag.id === id)?.textKey);
             badges.append(badge);
         }
         if (!tags.length) {
@@ -184,6 +235,7 @@ export class SoundSearchBrowser
 
     render()
     {
+        if (!this.index) return;
         this.waveforms.clear();
         this.renderFavorites();
         const list = this.element('list');
@@ -211,8 +263,8 @@ export class SoundSearchBrowser
         }
     }
 
-    updateFavoriteButton(button) {
-        const saved = this.favorites?.names.has(button.dataset.favorite) ?? false;
+    updateFavoriteButton(button: HTMLButtonElement) {
+        const saved = this.favorites?.names.has(button.dataset.favorite ?? '') ?? false;
         button.textContent = saved ? '★' : '☆';
         button.setAttribute('aria-pressed', String(saved));
         button.title = saved ? Text.favoritesRemove : Text.favoritesAdd;
@@ -221,10 +273,10 @@ export class SoundSearchBrowser
     }
 
     renderFavorites() {
-        const list = document.getElementById('favorites-list');
+        const list = requireElement('favorites-list');
         list.querySelectorAll('canvas').forEach(canvas => this.waveforms.unobserve(canvas));
         list.replaceChildren();
-        document.getElementById('favorites-status').textContent = !this.favorites ? Text.favoritesFailure :
+        requireElement('favorites-status').textContent = !this.favorites ? Text.favoritesFailure :
             !this.index ? Text.searchLoading : this.favorites.names.size ? '' : Text.favoritesEmpty;
         if (!this.index || !this.favorites) return;
         for (const name of this.favorites.names) {
@@ -235,27 +287,27 @@ export class SoundSearchBrowser
         }
     }
 
-    searchSimilar(name) {
+    searchSimilar(name: string) {
         clearTimeout(this.timer);
         this.element('form-container').reset();
         this.element('base').value = name;
-        document.getElementById('search-tab').click();
+        requireElement('search-tab').click();
         this.search();
     }
 
-    previewSound(name, candidate, button, settings = null) {
+    previewSound(name: string, candidate: SearchCandidate | null, button: HTMLButtonElement, settings: SoundCommand | null = null) {
                 this.composition.stop();
                 const manager = SoundManager.Instance;
                 const command = new MCCommandSound(name, settings?.source ?? manager.GetSource(), MCCommandSelector.All, settings?.volume ?? manager.GetVolume(), settings?.pitch ?? manager.GetPitch(), settings?.minVolume ?? manager.GetMinVolume());
-                manager.Play(command, candidate ? new MCRawSound(candidate) : null);
+                manager.Play(command, candidate ? new MCRawSound({ ...candidate }) : null);
                 this.outputArea.SetText(command.ToString());
                 document.querySelectorAll('.browser-panel .selected, .composition-row .selected').forEach(element => element.classList.remove('selected'));
                 this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
                 button.classList.add('selected');
     }
 
-    appendRow(entry, container) {
-            const candidates = this.index.events.find(event => event.name === entry.name)?.candidates ?? [];
+    appendRow(entry: BrowserResult, container: HTMLElement) {
+            const candidates = this.index?.events.find(event => event.name === entry.name)?.candidates ?? [];
             const row = document.createElement('div'); row.className = 'search-row';
             const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'search-preview';
             const name = document.createElement('span'); name.textContent = entry.name;
@@ -269,7 +321,7 @@ export class SoundSearchBrowser
             else metadata.textContent = Text.favoritesUnavailable;
             preview.append(name);
             preview.disabled = !candidates.length;
-            const playCandidate = (candidate, button) => {
+            const playCandidate = (candidate: SearchCandidate | null, button: HTMLButtonElement) => {
                 this.previewSound(entry.name, candidate, button);
             };
             preview.addEventListener('click', () => playCandidate(null, preview));
@@ -280,9 +332,9 @@ export class SoundSearchBrowser
                 this.searchSimilar(entry.name);
             });
             const main = document.createElement('div'); main.className = 'search-row-main';
-            main.classList.toggle('search-row-base', entry.name === this.resultBase && !document.getElementById('favorites-panel').contains(container));
+            main.classList.toggle('search-row-base', entry.name === this.resultBase && !requireElement('favorites-panel').contains(container));
             main.addEventListener('click', event => {
-                if (event.target.closest('button')) return;
+                if (event.target instanceof Element && event.target.closest('button')) return;
                 preview.click();
             });
             const content = document.createElement('div'); content.className = 'search-row-content';
@@ -294,10 +346,11 @@ export class SoundSearchBrowser
             favorite.dataset.favorite = entry.name;
             this.updateFavoriteButton(favorite);
             favorite.addEventListener('click', async () => {
+                if (!this.favorites) return;
                 if (this.favorites.names.has(entry.name) && !await confirmAction(Text.favoritesRemoveConfirm(entry.name), { acceptLabel: Text.confirmRemove })) return;
                 try {
                     this.favorites.toggle(entry.name);
-                    document.querySelectorAll('[data-favorite]').forEach(button => this.updateFavoriteButton(button));
+                    document.querySelectorAll<HTMLButtonElement>('[data-favorite]').forEach(button => this.updateFavoriteButton(button));
                     this.renderFavorites();
                 } catch (error) { console.error(error); showToast(Text.favoritesFailure); }
             });
@@ -328,13 +381,12 @@ export class SoundSearchBrowser
                     close.setAttribute('aria-label', Text.close);
                     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
                     heading.append(title, close); panel.append(heading);
-                    const event = this.index.events.find(event => event.name === entry.name);
-                    event.candidates.forEach((candidate, i) => {
+                    candidates.forEach((candidate, i) => {
                         const button = document.createElement('button'); button.type = 'button'; button.className = 'sound-tag-candidate';
                         const label = document.createElement('span');
                         label.textContent = Text.searchCandidateName(i + 1, candidate.name, candidate.pitch);
                         button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
-                        button.append(label, this.createTagBadges(this.index.audioTags[candidate.hash]));
+                        button.append(label, this.createTagBadges(this.index?.audioTags[candidate.hash] ?? []));
                         button.addEventListener('click', () => playCandidate(candidate, button));
                         panel.append(button);
                     });

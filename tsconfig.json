@@ -11,8 +11,6 @@
     "types": [
       "vite/client"
     ],
-    "allowJs": true,
-    "checkJs": false,
     "strict": true,
     "noEmit": true,
     "isolatedModules": true,
@@ -21,11 +19,9 @@
     "allowImportingTsExtensions": true
   },
   "include": [
-    "Scripts/**/*.js",
     "Scripts/**/*.ts"
   ],
   "exclude": [
-    "Scripts/SoundSearchWorker.js",
     "Scripts/SoundSearchWorker.ts"
   ]
 }

@@ -8,7 +8,7 @@ import { applyText } from "./ApplyText.ts";
 import { Text } from "./Text.ts";
 import { PreviewPlayer } from "./PreviewPlayer.ts";
 import { initializeBrowserTabs } from "./BrowserTabs.ts";
-import { SoundSearchBrowser } from "./SoundSearchBrowser.js";
+import { SoundSearchBrowser } from "./SoundSearchBrowser.ts";
 import { MCSoundHashResource } from "./MCSoundHashResource.ts";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.ts";
 import { NetworkFileLoader } from "./NetworkFileLoader.ts";
@@ -18,8 +18,14 @@ import { OutputArea } from "./OutputArea.ts";
 import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.ts";
 import { ResourceManager } from "./Singletons/ResourceManager.ts";
 
+function requireElement(id: string): HTMLElement {
+    const element = document.getElementById(id);
+    if (!element) throw new Error(`Missing element: ${id}`);
+    return element;
+}
+
 applyText();
-document.getElementById('clear-local-storage').addEventListener('click', async () => {
+requireElement('clear-local-storage').addEventListener('click', async () => {
     if (!await confirmAction(Text.clearLocalStorageConfirm, { acceptLabel: Text.confirmDelete })) return;
     try {
         localStorageStore.clear();
@@ -50,7 +56,7 @@ new PreviewPlayer(SoundManager.Instance.GetAudio());
 let outputArea = new OutputArea(".output");
 
 // 各パラメータ選択エリアの追加
-mountSoundSettings(document.getElementById('command-settings'), {
+mountSoundSettings(requireElement('command-settings'), {
     read: () => {
         const manager = SoundManager.Instance;
         return { source: manager.GetSource(), volume: manager.GetVolume(), pitch: manager.GetPitch(), minVolume: manager.GetMinVolume() };
@@ -66,10 +72,10 @@ mountSoundSettings(document.getElementById('command-settings'), {
 
 new SelectMasterVolumeArea("#select-master-volume");
 initializeBrowserTabs();
-const composition = new SoundComposition({
+const composition: SoundComposition = new SoundComposition({
     onPreview: (row, button) => searchBrowser.previewSound(row.name, null, button, row),
     onSimilar: name => searchBrowser.searchSimilar(name),
 });
-const searchBrowser = new SoundSearchBrowser(outputArea, paths, composition);
+const searchBrowser: SoundSearchBrowser = new SoundSearchBrowser(outputArea, paths, composition);
 new SavedCompositions(composition, paths.Version);
 searchBrowser.load();

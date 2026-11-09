@@ -4,7 +4,7 @@
 
 ## Viteへの移行状況
 
-ViteとTypeScriptの設定を追加しています。依存パッケージ取得後にビルド検証を行う段階です。組み合わせ再生・保存一覧を含む計48ファイルをTS化し、共通型とJSON検証の2ファイルを追加しています。残りのJSとCSSは移行中で、全ファイルのTS化・vanilla-extractへの移行はまだ完了していません。
+既存50ファイルすべてをTypeScriptへ移行し、共通型とJSON検証の2ファイルを追加しています。HTMLの起動先もMain.tsへ変更しました。依存パッケージ取得後に静的型チェックとViteビルドを検証する段階で、vanilla-extractへのCSS移行は未着手です。
 
 Node.js 24.13.0を使用します（`.node-version`参照）。初回は次を実行します。
 
@@ -29,7 +29,7 @@ npm run preview
 
 - `test`: 36件のNodeテスト。TS化にあわせてテスト環境も移行します。
 - `verify:data`: 先頭バージョンの実データを使い、検索・Worker・チェックサムを検証します。
-- `typecheck`: TS設定と移行済みTSを検査します。現段階のJSは`checkJs: false`なので厳格な検査の対象外です。
+- `typecheck`: Scripts内の全TSファイルを検査します。JS混在用の設定は削除しています。
 - `build`: 型チェック、Viteビルド、`resource/`から`dist/resource/`への配布データコピーを行います。Pythonによるデータ生成は実行しません。
 - `preview`: 生成済みの`dist/`を <http://127.0.0.1:8000/SoundEnum2/> で確認します。ソース変更後は再ビルドが必要です。
 
