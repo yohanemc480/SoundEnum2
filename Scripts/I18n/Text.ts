@@ -98,6 +98,7 @@ export const Text = Object.freeze({
     searchRunning: "検索中…",
     searchSameAudio: "同一音源",
     searchScore: (score: number) => `${String(score).padStart(2, '\u2007')}%類似`,
+    searchSelectedCandidate: (number: number, name: string) => `検索基準: 候補${number}（${name}）`,
     searchSimilar: "似た音を検索",
     searchSimilarTo: (name: string) => `${name}に似た音を検索`,
     searchTags: "タグ",

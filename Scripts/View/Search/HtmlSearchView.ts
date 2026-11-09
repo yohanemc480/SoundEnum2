@@ -37,6 +37,7 @@ export class HtmlSearchView implements SearchView {
     private favoriteNames = new Set<string>();
     private favoritesAvailable = false;
     private resultBase = '';
+    private referenceCandidateIndex: number | null = null;
     readonly candidatePopover: HTMLElement;
     private candidateAnchor?: HTMLElement;
     private readonly form: HTMLFieldSetElement;
@@ -57,21 +58,17 @@ export class HtmlSearchView implements SearchView {
         this.candidatePopover.popover = 'auto';
         this.candidatePopover.setAttribute('aria-label', Text.searchAssignedTags);
         document.body.append(this.candidatePopover);
-        this.candidatePopover.addEventListener('toggle', () => {
-            if (!this.candidatePopover.matches(':popover-open') || !this.candidateAnchor) return;
-            const anchor = this.candidateAnchor.getBoundingClientRect();
-            const panel = this.candidatePopover;
-            panel.style.left = `${Math.max(12, Math.min(anchor.right - panel.offsetWidth, window.innerWidth - panel.offsetWidth - 12))}px`;
-            panel.style.top = `${Math.max(12, Math.min(anchor.bottom + 8, window.innerHeight - panel.offsetHeight - 12))}px`;
-        });
-        const closeCandidates = () => this.candidatePopover.hidePopover();
-        window.addEventListener('resize', closeCandidates, { signal: this.lifecycle.signal });
+        const positionCandidates = () => this.positionCandidatePopover();
+        this.candidatePopover.addEventListener('toggle', positionCandidates, { signal: this.lifecycle.signal });
+        window.addEventListener('resize', positionCandidates, { signal: this.lifecycle.signal });
         window.addEventListener('scroll', event => {
-            if (!(event.target instanceof Node && this.candidatePopover.contains(event.target))) closeCandidates();
+            if (!(event.target instanceof Node && this.candidatePopover.contains(event.target))) positionCandidates();
         }, { capture: true, signal: this.lifecycle.signal });
+        const closeCandidates = () => this.candidatePopover.hidePopover();
         document.querySelectorAll('[data-browser-tab]').forEach(tab => tab.addEventListener('click', closeCandidates, { signal: this.lifecycle.signal }));
 
         this.form = this.element('form');
+        this.element('base').addEventListener('input', () => { this.referenceCandidateIndex = null; }, { signal: this.lifecycle.signal });
         const query = this.element('query');
         this.querySuggestions = new InputSuggestions(query, {
             label: Text.searchQueryHistory, limit: 7, filterByInput: false,
@@ -118,7 +115,7 @@ export class HtmlSearchView implements SearchView {
 
     /** 入力欄と選択タグを、HTML要素を含まない検索条件へ変換する。 */
     private readOptions(): Required<SearchOptions> {
-        return { query: this.element('query').value, referenceSoundName: this.element('base').value,
+        return { referenceCandidateIndex: this.referenceCandidateIndex, query: this.element('query').value, referenceSoundName: this.element('base').value,
             tags: [...this.element('tags').querySelectorAll<HTMLInputElement>('input:checked')].map(input => input.value),
             excludeMultipleCandidates: this.element('exclude-multiple').checked };
     }
@@ -146,6 +143,7 @@ export class HtmlSearchView implements SearchView {
     }
 
     setOptions(options: Required<SearchOptions>): void {
+        this.referenceCandidateIndex = options.referenceCandidateIndex ?? null;
         this.element('query').value = options.query;
         this.element('base').value = options.referenceSoundName;
         this.element('exclude-multiple').checked = options.excludeMultipleCandidates;
@@ -240,6 +238,61 @@ export class HtmlSearchView implements SearchView {
         return badges;
     }
 
+    /** 押したボタンに隣接させ、上下の空きに応じて方向と一覧の高さを調整する。 */
+    private positionCandidatePopover(): void {
+        const panel = this.candidatePopover;
+        if (!panel.matches(':popover-open') || !this.candidateAnchor) return;
+        const anchor = this.candidateAnchor.getBoundingClientRect();
+        const margin = 12;
+        const gap = 8;
+        const below = Math.max(0, window.innerHeight - anchor.bottom - gap - margin);
+        const above = Math.max(0, anchor.top - gap - margin);
+        // 前回の高さ制限を解除してから、今回の内容に必要な高さを測る。
+        panel.style.maxHeight = `${Math.max(0, Math.min(520, window.innerHeight - margin * 2))}px`;
+        const preferredHeight = panel.offsetHeight;
+        const useAbove = below < preferredHeight && above > below;
+        const available = useAbove ? above : below;
+        // ボタン自体が画面外なら、画面内に収めることを優先する。
+        if (available >= 80) panel.style.maxHeight = `${Math.min(preferredHeight, available)}px`;
+        const top = useAbove ? anchor.top - gap - panel.offsetHeight : anchor.bottom + gap;
+        panel.style.left = `${Math.max(margin, Math.min(anchor.right - panel.offsetWidth, window.innerWidth - panel.offsetWidth - margin))}px`;
+        panel.style.top = `${Math.max(margin, Math.min(top, window.innerHeight - panel.offsetHeight - margin))}px`;
+    }
+
+    /** 候補の試聴と、その候補を基準にした類似検索を共通の一覧で提供する。 */
+    showCandidateChoices(name: string, anchor: HTMLElement = this.element('base')): void {
+        this.candidateAnchor = anchor;
+        const candidates = this.index?.events.find(sound => sound.name === name)?.candidates ?? [];
+        const panel = this.candidatePopover;
+        panel.replaceChildren();
+        const heading = document.createElement('div'); heading.className = layout.sectionHeading;
+        const title = document.createElement('h2'); title.textContent = name;
+        const close = document.createElement('button'); close.type = 'button'; close.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`;
+        close.setAttribute('aria-label', Text.close);
+        close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
+        heading.append(title, close); panel.append(heading);
+        candidates.forEach((candidate, i) => {
+            const button = document.createElement('button'); button.type = 'button'; button.className = styles.soundTagCandidate;
+            const label = document.createElement('span');
+            label.textContent = Text.searchCandidateName(i + 1, candidate.name, candidate.pitch);
+            button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
+            button.append(label, this.createTagBadges(this.index?.audioTags[candidate.hash] ?? []));
+            button.addEventListener('click', () => { selectSoundPreview(button); this.actions?.preview({ name, candidate }); });
+            const candidateRow = document.createElement('div'); candidateRow.className = styles.candidateRow;
+            const find = document.createElement('button'); find.type = 'button'; find.className = styles.candidateSearch;
+            find.textContent = Text.searchSimilar;
+            find.setAttribute('aria-label', `${Text.searchSimilar}: ${candidate.name}`);
+            find.addEventListener('click', () => {
+                panel.hidePopover();
+                this.actions?.searchSimilar(name, i);
+            });
+            candidateRow.append(button, find);
+            panel.append(candidateRow);
+        });
+        panel.showPopover();
+        this.positionCandidatePopover();
+    }
+
     /** 結果行と操作ボタンを描画し、試聴・候補表示・波形監視を接続する。業務操作は値で通知する。 */
     private appendRow(entry: SearchRow, container: HTMLElement) {
             const candidates = this.index?.events.find(event => event.name === entry.name)?.candidates ?? [];
@@ -252,6 +305,11 @@ export class HtmlSearchView implements SearchView {
                 entry.sameAudio ? Text.searchSameAudio : ''].filter(Boolean).join(' · ');
             const metadata = document.createElement('span'); metadata.className = styles.searchRowMetadata;
             if (detail.textContent) metadata.append(detail);
+            if (entry.referenceCandidateIndex !== undefined && entry.candidate) {
+                const reference = document.createElement('small');
+                reference.textContent = Text.searchSelectedCandidate(entry.referenceCandidateIndex + 1, entry.candidate.name);
+                metadata.append(reference);
+            }
             if (candidates.length) metadata.append(this.createTagBadges(entry.tags));
             else metadata.textContent = Text.favoritesUnavailable;
             preview.append(name);
@@ -260,12 +318,13 @@ export class HtmlSearchView implements SearchView {
                 selectSoundPreview(button);
                 this.actions?.preview({ name: entry.name, candidate });
             };
-            preview.addEventListener('click', () => playCandidate(null, preview));
+            preview.addEventListener('click', () => playCandidate(entry.referenceCandidateIndex === undefined ? null : entry.candidate ?? null, preview));
             const similar = document.createElement('button'); similar.type = 'button'; similar.textContent = Text.searchSimilar;
             similar.disabled = !candidates.length;
             similar.setAttribute('aria-label', Text.searchSimilarTo(entry.name));
             similar.addEventListener('click', () => {
-                this.actions?.searchSimilar(entry.name);
+                if (candidates.length <= 1) this.actions?.searchSimilar(entry.name);
+                else this.showCandidateChoices(entry.name, similar);
             });
             const main = document.createElement('div'); main.className = styles.searchRowMain;
             main.classList.toggle(styles.searchRowBase, entry.name === this.resultBase && !requireElement('favorites-panel').contains(container));
@@ -282,7 +341,7 @@ export class HtmlSearchView implements SearchView {
             favorite.dataset.favorite = entry.name;
             this.updateFavoriteButton(favorite);
             favorite.addEventListener('click', () => this.actions?.toggleFavorite(entry.name));
-            const add = document.createElement('button'); add.type = 'button'; add.textContent = '+';
+            const add = document.createElement('button'); add.type = 'button';
             add.className = styles.compositionAdd; add.title = Text.compositionAdd;
             add.setAttribute('aria-label', `${Text.compositionAdd}: ${entry.name}`);
             add.disabled = !candidates.length;
@@ -297,34 +356,13 @@ export class HtmlSearchView implements SearchView {
                 trigger.textContent = Text.searchCandidate(entry.candidateCount);
                 trigger.setAttribute('aria-label', Text.searchCandidateTags(entry.candidateCount));
                 trigger.title = Text.searchCandidateTags(entry.candidateCount);
-                trigger.popoverTargetElement = this.candidatePopover;
-                trigger.popoverTargetAction = 'show';
                 trigger.addEventListener('click', () => {
-                    this.candidateAnchor = trigger;
-                    const panel = this.candidatePopover;
-                    panel.replaceChildren();
-                    const heading = document.createElement('div'); heading.className = layout.sectionHeading;
-                    const title = document.createElement('h2'); title.textContent = entry.name;
-                    const close = document.createElement('button'); close.type = 'button'; close.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`;
-                    close.setAttribute('aria-label', Text.close);
-                    close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
-                    heading.append(title, close); panel.append(heading);
-                    candidates.forEach((candidate, i) => {
-                        const button = document.createElement('button'); button.type = 'button'; button.className = styles.soundTagCandidate;
-                        const label = document.createElement('span');
-                        label.textContent = Text.searchCandidateName(i + 1, candidate.name, candidate.pitch);
-                        button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
-                        button.append(label, this.createTagBadges(this.index?.audioTags[candidate.hash] ?? []));
-                        button.addEventListener('click', () => playCandidate(candidate, button));
-                        panel.append(button);
-                    });
-                    // 別の行から開き直した場合も、新しい位置でtoggleイベントを受ける。
-                    panel.hidePopover();
+                    this.showCandidateChoices(entry.name, trigger);
                 });
                 trigger.className = styles.searchCandidateTrigger;
                 heading.append(trigger);
             }
             container.append(row);
-            if (entry.candidate) this.waveforms.observe(waveform, candidates.map(candidate => candidate.hash), entry.candidate.hash);
+            if (entry.candidate) this.waveforms.observe(waveform, entry.referenceCandidateIndex === undefined ? candidates.map(candidate => candidate.hash) : [entry.candidate.hash], entry.candidate.hash);
     }
 }

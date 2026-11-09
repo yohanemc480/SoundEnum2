@@ -1,11 +1,14 @@
 import type { SearchIndex, SearchOptions, SearchResult } from './SearchTypes.ts';
 
 /** DOMと独立した検索処理。候補音声単位でAND条件を評価する。 */
-export function searchSounds(index: SearchIndex, vectors: Float32Array, { query = '', tags = [], referenceSoundName = '', excludeMultipleCandidates = false }: SearchOptions = {}): SearchResult[]
+export function searchSounds(index: SearchIndex, vectors: Float32Array, { query = '', tags = [], referenceSoundName = '', referenceCandidateIndex = null, excludeMultipleCandidates = false }: SearchOptions = {}): SearchResult[]
 {
     const baseline = referenceSoundName ? index.events.find(event => event.name === referenceSoundName) : null;
     if (referenceSoundName && !baseline) throw new Error('Unknown base sound');
-    const baseRows = new Set(baseline?.candidates.map(candidate => candidate.vectorRow) ?? []);
+    if (referenceCandidateIndex !== null && (!baseline || !Number.isInteger(referenceCandidateIndex) ||
+        referenceCandidateIndex < 0 || !baseline.candidates[referenceCandidateIndex])) throw new Error('Unknown base candidate');
+    const baseCandidates = baseline ? (referenceCandidateIndex === null ? baseline.candidates : [baseline.candidates[referenceCandidateIndex]!]) : [];
+    const baseRows = new Set(baseCandidates.map(candidate => candidate.vectorRow));
     const scores = new Map<number, number>();
     // 同じ音源を共有するイベントでは内積を再利用し、基準の全候補中の最大値を使う。
     const scoreRow = (row: number): number => {

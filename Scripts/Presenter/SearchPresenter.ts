@@ -9,7 +9,7 @@ import type { CompositionActions } from '../Contracts/Services/CompositionAction
 import type { SoundPreviewRequest, SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
 import type { SearchInteractionServices } from '../Contracts/Services/SearchInteractionServices.ts';
 
-const emptyOptions = (): Required<SearchOptions> => ({ query: '', tags: [], referenceSoundName: '', excludeMultipleCandidates: false });
+const emptyOptions = (): Required<SearchOptions> => ({ query: '', tags: [], referenceSoundName: '', referenceCandidateIndex: null, excludeMultipleCandidates: false });
 
 /** 検索条件・要求の順序・ページを管理し、HTMLを知らずに表示と他機能を調整する。 */
 export class SearchPresenter {
@@ -18,6 +18,7 @@ export class SearchPresenter {
     private options = emptyOptions();
     private results: SearchResult[] = [];
     private resultReferenceName = '';
+    private resultCandidateIndex: number | null = null;
     private pageIndex = 0;
     private requestId = 0;
     private loading: Promise<void> | null = null;
@@ -68,7 +69,7 @@ export class SearchPresenter {
             retry: () => { void this.retry(); },
             clear: () => { this.setOptions(emptyOptions()); void this.search(); },
             changePage: delta => { this.pageIndex += delta; this.render(); },
-            searchSimilar: name => { void this.searchSimilar(name); },
+            searchSimilar: (name, candidateIndex) => { void this.searchSimilar(name, candidateIndex); },
             preview: request => { void this.preview(request); },
             addToComposition: name => this.composition.add(name),
             toggleFavorite: name => { void this.toggleFavorite(name); },
@@ -143,11 +144,21 @@ export class SearchPresenter {
         await this.load();
     }
 
-    /** 値だけで類似検索を依頼する。読み込み前に呼ばれても指定した基準を維持する。 */
-    async searchSimilar(name: string): Promise<void> {
+    /** 他画面からの類似検索も、複数候補なら基準選択を先に表示する。 */
+    async requestSimilar(name: string): Promise<void> {
         await this.load();
         if (!this.index || this.disposed) return;
-        this.setOptions({ ...emptyOptions(), referenceSoundName: name });
+        if ((this.index.events.find(sound => sound.name === name)?.candidates.length ?? 0) > 1) {
+            this.view.activateSearchTab();
+            this.view.showCandidateChoices(name);
+        } else await this.searchSimilar(name);
+    }
+
+    /** 値だけで類似検索を依頼する。読み込み前に呼ばれても指定した基準を維持する。 */
+    async searchSimilar(name: string, candidateIndex?: number): Promise<void> {
+        await this.load();
+        if (!this.index || this.disposed) return;
+        this.setOptions({ ...emptyOptions(), referenceSoundName: name, referenceCandidateIndex: candidateIndex ?? null });
         this.view.activateSearchTab();
         await this.search();
     }
@@ -168,6 +179,7 @@ export class SearchPresenter {
             if (id !== this.requestId || this.disposed) return;
             this.results = results.filter(result => result.name !== options.referenceSoundName);
             this.resultReferenceName = options.referenceSoundName;
+            this.resultCandidateIndex = options.referenceCandidateIndex ?? null;
             this.pageIndex = 0;
             this.view.setStatus('ready');
             this.render();
@@ -177,10 +189,10 @@ export class SearchPresenter {
     }
 
     /** サウンド名から表示行を作る。利用できないお気に入りも候補なしの行として残す。 */
-    private createRow(name: string): SearchRow {
+    private createRow(name: string, candidateIndex: number | null = null): SearchRow {
         const sound = this.index?.events.find(sound => sound.name === name);
-        const candidate = sound?.candidates[0];
-        return { name, candidate, candidateCount: sound?.candidates.length ?? 0, score: null,
+        const candidate = sound?.candidates[candidateIndex ?? 0];
+        return { name, candidate, ...(candidateIndex !== null ? { referenceCandidateIndex: candidateIndex } : {}), candidateCount: sound?.candidates.length ?? 0, score: null,
             sameAudio: false, tags: candidate ? this.index!.audioTags[candidate.hash] : [] };
     }
 
@@ -190,7 +202,7 @@ export class SearchPresenter {
         const pageCount = Math.ceil(this.results.length / 50);
         this.pageIndex = Math.max(0, Math.min(this.pageIndex, pageCount - 1));
         this.view.showPage({ rows: this.results.slice(this.pageIndex * 50, (this.pageIndex + 1) * 50),
-            baseline: this.resultReferenceName ? this.createRow(this.resultReferenceName) : null,
+            baseline: this.resultReferenceName ? this.createRow(this.resultReferenceName, this.resultCandidateIndex) : null,
             total: this.results.length, pageIndex: this.pageIndex, pageCount });
         this.renderFavorites();
     }

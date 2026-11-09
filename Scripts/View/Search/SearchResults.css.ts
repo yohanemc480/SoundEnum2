@@ -75,6 +75,8 @@ export const soundCandidatesPopover = style({
     "position": "fixed",
     "inset": "auto",
     "margin": "0",
+    "height": "fit-content",
+    "boxSizing": "border-box",
     "width": "min(440px, calc(100vw - 24px))",
     "maxHeight": "min(520px, calc(100dvh - 24px))",
     "overflowY": "auto",
@@ -145,26 +147,12 @@ globalStyle(`.${soundCandidatesPopover} h2`, {
     "flex": "1"
 });
 globalStyle(`.${soundCandidatesPopover} .${soundTagCandidate}`, {
-    "border": "1px solid var(--line)",
-    "borderRadius": "6px",
-    "background": "var(--surface)",
-    "color": "var(--text)",
-    "padding": "10px",
-    "cursor": "pointer",
-    "font": "inherit",
-    "display": "flex",
-    "flexDirection": "column",
-    "gap": "6px",
-    "width": "100%",
-    "marginTop": "6px",
-    "textAlign": "left",
-    "overflowWrap": "anywhere",
-    "fontSize": "12px"
+    border: 0, background: 'transparent', color: 'var(--text)', padding: '8px 10px',
+    cursor: 'pointer', font: 'inherit', display: 'flex', flexDirection: 'column',
+    gap: '6px', minWidth: 0, width: '100%', textAlign: 'left',
+    overflowWrap: 'anywhere', fontSize: '12px', borderRadius: '6px',
 });
-globalStyle(`.${soundCandidatesPopover} .${soundTagCandidate}:hover, .${soundCandidatesPopover} .${soundTagCandidate}.${selected}`, {
-    "background": "#283f33",
-    "borderColor": "#42634d"
-});
+
 globalStyle(`.${searchRowActions}`, {
     "@media": {
         "(max-width: 560px)": {
@@ -189,8 +177,26 @@ globalStyle(`.${searchRow} button[data-favorite][aria-pressed="true"]`, {
     "color": "#f5c451"
 });
 globalStyle(`.${searchRow} button.${compositionAdd}`, {
-    "fontSize": "20px",
-    "lineHeight": "18px",
-    "width": "34px",
-    "padding": "6px"
+    position: 'relative', width: '34px', minHeight: '32px', padding: '6px',
+});
+// フォントの字面やベースラインに左右されず、プラス記号をボタン中央に描く。
+globalStyle(`.${compositionAdd}::before, .${compositionAdd}::after`, {
+    content: '""', position: 'absolute', left: '50%', top: '50%',
+    transform: 'translate(-50%, -50%)', background: 'currentColor', pointerEvents: 'none',
+});
+globalStyle(`.${compositionAdd}::before`, { width: '14px', height: '2px' });
+globalStyle(`.${compositionAdd}::after`, { width: '2px', height: '14px' });
+
+export const candidateRow = style({
+    display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'center',
+    gap: '8px', marginTop: '6px', paddingRight: '6px',
+    border: '1px solid var(--line)', borderRadius: '6px', background: 'var(--surface)',
+});
+export const candidateSearch = style({
+    border: '1px solid var(--line)', borderRadius: '6px', background: 'var(--surface)',
+    color: 'var(--text)', padding: '6px 10px', font: 'inherit', fontSize: '12px', cursor: 'pointer',
+    whiteSpace: 'nowrap',
+});
+globalStyle(`.${candidateRow}:hover, .${candidateRow}:has(.${soundTagCandidate}.${selected})`, {
+    background: '#283f33', borderColor: '#42634d',
 });

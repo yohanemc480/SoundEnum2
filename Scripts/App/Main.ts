@@ -89,7 +89,7 @@ try {
     const compositionScreen: ReturnType<typeof createCompositionScreen> = scope.own(createCompositionScreen(playback, commandSettings,
         selectSoundPreview,
         row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
-        name => { void searchScreen.presenter.searchSimilar(name); }, copyText));
+        name => { void searchScreen.presenter.requestSimilar(name); }, copyText));
     const composition = compositionScreen.presenter;
     const searchScreen = scope.own(createSearchScreen(paths, composition, playbackPresenter, browserPreferences));
     scope.own(createSavedCompositionsScreen(composition, paths.Version, copyText));

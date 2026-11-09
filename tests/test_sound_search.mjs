@@ -155,3 +155,16 @@ test('複数候補の除外はタグ絞り込み前の候補数で判断する',
     assert.ok(!searchSounds(index, vectors, { referenceSoundName: 'base', excludeMultipleCandidates: true }).some(r => r.name === 'split'));
     assert.ok(searchSounds(index, vectors, {}).some(r => r.name === 'split'));
 });
+
+test('複数候補の単音検索は選択した音だけを基準にし、全候補検索と順位が変わる', () => {
+    const single = searchSounds(fixture(), vectors, { referenceSoundName: 'split', referenceCandidateIndex: 1 });
+    assert.equal(single.find(row => row.name === 'base').score, 0);
+    assert.equal(single.find(row => row.name === 'base').sameAudio, false);
+    assert.ok(single.findIndex(row => row.name === 'both') < single.findIndex(row => row.name === 'base'));
+    const all = searchSounds(fixture(), vectors, { referenceSoundName: 'split' });
+    assert.equal(all.find(row => row.name === 'base').score, 1);
+    assert.equal(all.find(row => row.name === 'base').sameAudio, true);
+    for (const referenceCandidateIndex of [-1, 2, 0.5]) {
+        assert.throws(() => searchSounds(fixture(), vectors, { referenceSoundName: 'split', referenceCandidateIndex }), /Unknown base candidate/);
+    }
+});

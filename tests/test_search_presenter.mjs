@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SearchPresenter } from '../Scripts/Presenter/SearchPresenter.ts';
 
-const options = { query: '', tags: [], referenceSoundName: '', excludeMultipleCandidates: false };
+const options = { query: '', tags: [], referenceSoundName: '', referenceCandidateIndex: null, excludeMultipleCandidates: false };
 const candidate = { name: 'raw', hash: 'a', pitch: 1, volume: 1, weight: 1, duration: 1, vectorRow: 0 };
 const result = name => ({ name, candidate, candidateCount: 1, score: null, sameAudio: false, tags: [] });
 const index = { schemaVersion: 3, version: 'test', tags: [{ id: 'metal' }], audioTags: { a: [] },
@@ -24,6 +24,7 @@ function setup(overrides = {}) {
         setStatus(value) { state.statuses.push(value); },
         showPage(value) { state.pages.push(value); },
         showFavorites(rows, available) { state.favorites.push({ rows, available }); },
+        showCandidateChoices(name) { state.candidateChoices = name; },
         activateSearchTab() { state.activated = true; },
     };
     const service = { load: async () => index, search: async () => [], dispose() { state.disposed++; }, ...overrides.service };
@@ -172,5 +173,35 @@ test('検索履歴は確定時だけ7件まで保存し、再利用では他の�
     assert.deepEqual(h.state.options.tags, ['metal']);
     assert.equal(h.state.queryHistory[0], 'query3');
     assert.equal(h.state.queryHistory[1], 'typing');
+    h.presenter.dispose();
+});
+
+test('選んだ候補だけを検索サービスと基準表示へ渡し、全候補へ切り替えられる', async () => {
+    const h = setup(); await h.presenter.load();
+    let received;
+    h.service.search = async value => { received = value; return []; };
+    await h.presenter.searchSimilar('reference', 0);
+    assert.equal(received.referenceCandidateIndex, 0);
+    assert.equal(h.state.pages.at(-1).baseline.referenceCandidateIndex, 0);
+    assert.equal(h.state.pages.at(-1).baseline.candidate.hash, candidate.hash);
+    await h.presenter.searchSimilar('reference');
+    assert.equal(received.referenceCandidateIndex, null);
+    assert.equal(h.state.pages.at(-1).baseline.referenceCandidateIndex, undefined);
+    h.presenter.dispose();
+});
+
+test('他画面から複数候補の類似検索を要求すると、検索せず候補一覧を開く', async () => {
+    const multipleIndex = { ...index, events: [{ name: 'multiple', candidates: [candidate, { ...candidate, name: 'secondRaw' }] }] };
+    const h = setup({ service: { load: async () => multipleIndex } });
+    await h.presenter.load();
+    let searches = 0;
+    h.service.search = async () => { searches++; return []; };
+    await h.presenter.requestSimilar('multiple');
+    assert.equal(h.state.candidateChoices, 'multiple');
+    assert.equal(searches, 0);
+    h.state.actions.searchSimilar('multiple', 1); await flush();
+    assert.equal(searches, 1);
+    assert.equal(h.state.pages.at(-1).baseline.candidate.name, 'secondRaw');
+    assert.equal(h.state.pages.at(-1).baseline.referenceCandidateIndex, 1);
     h.presenter.dispose();
 });
