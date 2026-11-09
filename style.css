@@ -33,39 +33,12 @@ h2 { font-size: 14px; font-weight: 650; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 
 [hidden] { display: none !important; }
-.browser-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; border-bottom: 2px solid var(--line); }
-.browser-tabs { display: flex; gap: 4px; padding: 0 4px; }
-.browser-tabs [role="tab"] { position: relative; padding: 10px 19px; color: var(--muted); background: var(--surface); border: 2px solid transparent; border-radius: 8px 8px 0 0; font: inherit; cursor: pointer; transition: color .15s, background .15s; }
-.browser-tabs [role="tab"]:hover { color: var(--text); background: #22312b; }
-.browser-tabs [role="tab"][aria-selected="true"] { margin-bottom: -2px; padding-bottom: 12px; color: var(--text); background: var(--panel); border-color: var(--line); border-bottom-color: var(--panel); font-weight: 600; }
-.browser-tabs [role="tab"]:focus-visible { outline: 2px solid var(--accent); outline-offset: -5px; }
-.search-pagination button { padding: 9px 16px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; font: inherit; cursor: pointer; }
-.search-text-field, .search-tags-field { min-width: 0; display: grid; gap: 6px; font-size: 12px; color: var(--muted); }
-.search-text-field input { width: 100%; }
 .search-list { max-height: clamp(320px, 52vh, 650px); overflow-y: auto; scrollbar-width: thin; }
-#search-base-preview { margin-bottom: 8px; }
-.search-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
-.search-pagination button:disabled { opacity: .4; cursor: default; }
-
-/* 類似音・タグ検索 */
-#search-form { border: 0; padding: 0; margin: 0; min-width: 0; }
-#search-form-container { border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 12px; }
-#search-status { min-height: 1.5em; }
-.search-filters { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: minmax(140px, 1fr) minmax(180px, 1fr) minmax(260px, 1.6fr); align-items: start; }
-.search-tags { display: flex; flex-wrap: wrap; gap: 6px 12px; min-height: 38px; align-content: center; }
-.search-tags label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-#search-form:disabled { opacity: .5; }
-@media (max-width: 700px) { .search-filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .search-tags-field { grid-column: 1 / -1; } }
 
 
 .version-selector { display: flex; align-items: center; gap: .5rem; font-size: .85rem; flex: 0 0 auto; }
 .version-selector > span { flex: 0 0 auto; white-space: nowrap; }
 .version-selector select { flex: 0 0 auto; width: auto; min-width: 7rem; max-width: 12rem; }
-
-.search-options-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0; }
-.search-options-row #search-clear { margin-left: auto; padding: 6px 10px; }
-.search-option { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; }
-.search-option input[type="checkbox"] { height: auto; padding: 0; flex: 0 0 auto; }
 
 
 /* 広い画面では残りの高さを一覧に割り当て、一覧内でスクロールする。 */
@@ -75,7 +48,6 @@ h2 { font-size: 14px; font-weight: 650; }
   .workspace { width: 100%; margin: 0 auto; flex: 1; min-height: 0; grid-template-rows: minmax(0, 1fr); }
   .main, .sub { min-height: 0; }
   .browser-panel { display: flex; flex-direction: column; min-height: 0; overflow-y: auto; }
-  .browser-header { flex: 0 0 auto; }
   #search-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   #search-panel > :not(.search-list) { flex-shrink: 0; }
   .search-list { flex: 1; min-height: 0; max-height: none; }
@@ -86,19 +58,6 @@ h2 { font-size: 14px; font-weight: 650; }
   #favorites-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   #favorites-status { flex-shrink: 0; }
 }
-@media (max-width: 560px) {
-  .browser-header { flex-wrap: wrap; }
-}
-
-
-
-
-.clearable-input { position: relative; min-width: 0; }
-.clearable-input input:not([type="range"]) { padding-right: 40px; }
-.clearable-input input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
-.input-clear { position: absolute; right: 1px; top: 1px; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--muted); cursor: pointer; }
-.input-clear:hover { background: #283f33; color: var(--text); }
-.clearable-input:has(input:placeholder-shown) .input-clear { visibility: hidden; }
 
 .composition-toolbar { margin-bottom: 12px; }
 #composition-count { font-size: 12px; }

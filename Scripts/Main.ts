@@ -1,3 +1,4 @@
+import { applySearchStyles } from './ApplySearchStyles.ts';
 import { applyPlaybackStyles } from './ApplyPlaybackStyles.ts';
 import { applySettingsStyles } from './ApplySettingsStyles.ts';
 import { SavedCompositions } from './SavedCompositions.ts';
@@ -28,6 +29,7 @@ function requireElement(id: string): HTMLElement {
 
 applySettingsStyles();
 applyPlaybackStyles();
+applySearchStyles();
 applyText();
 requireElement('clear-local-storage').addEventListener('click', async () => {
     if (!await confirmAction(Text.clearLocalStorageConfirm, { acceptLabel: Text.confirmDelete })) return;

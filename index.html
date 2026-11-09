@@ -29,8 +29,8 @@
   <main class="workspace">
     <section class="main" data-i18n-aria-label="soundSelection">
       <section class="panel browser-panel">
-        <div class="browser-header">
-          <div class="browser-tabs" role="tablist" data-i18n-aria-label="browserTabs">
+        <div data-search-style="browserHeader">
+          <div data-search-style="browserTabs" role="tablist" data-i18n-aria-label="browserTabs">
             <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="search-panel" data-i18n="searchTitle"></button>
             <button type="button" id="favorites-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="favorites-panel" tabindex="-1" data-i18n="favoritesTitle"></button>
             <button type="button" id="compositions-tab" data-browser-tab role="tab" aria-selected="false" aria-controls="compositions-panel" tabindex="-1" data-i18n="savedCompositionsTitle"></button>
@@ -39,13 +39,13 @@
         <div id="search-panel" role="tabpanel" aria-labelledby="search-tab">
           <form id="search-form-container">
             <fieldset id="search-form" disabled>
-              <div class="search-filters">
-                <div class="search-text-field"><label for="search-query" data-i18n="soundName"></label><div class="clearable-input"><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"><button id="search-clear-query" type="button" class="input-clear" data-settings-style="closeButton" data-i18n-aria-label="searchClearQuery"></button></div></div>
-                <div class="search-text-field"><label for="search-base" data-i18n="searchBase"></label><div class="clearable-input"><input id="search-base" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><button id="search-clear-base" type="button" class="input-clear" data-settings-style="closeButton" data-i18n-aria-label="searchClearBase"></button></div></div>
-                <div class="search-tags-field"><span data-i18n="searchTags"></span><div id="search-tags" class="search-tags" role="group" data-i18n-aria-label="searchTags"></div></div>
+              <div data-search-style="searchFilters">
+                <div data-search-style="searchTextField"><label for="search-query" data-i18n="soundName"></label><div data-search-style="clearableInput"><input id="search-query" type="search" data-i18n-placeholder="queryPlaceholder"><button id="search-clear-query" type="button" data-search-style="inputClear" data-settings-style="closeButton" data-i18n-aria-label="searchClearQuery"></button></div></div>
+                <div data-search-style="searchTextField"><label for="search-base" data-i18n="searchBase"></label><div data-search-style="clearableInput"><input id="search-base" data-i18n-placeholder="searchBasePlaceholder" autocomplete="off"><button id="search-clear-base" type="button" data-search-style="inputClear" data-settings-style="closeButton" data-i18n-aria-label="searchClearBase"></button></div></div>
+                <div data-search-style="searchTagsField"><span data-i18n="searchTags"></span><div id="search-tags" data-search-style="searchTags" role="group" data-i18n-aria-label="searchTags"></div></div>
               </div>
-              <div class="search-options-row">
-                <label class="search-option"><input id="search-exclude-multiple" type="checkbox"><span data-i18n="searchExcludeMultiple"></span></label>
+              <div data-search-style="searchOptionsRow">
+                <label data-search-style="searchOption"><input id="search-exclude-multiple" type="checkbox"><span data-i18n="searchExcludeMultiple"></span></label>
                 <button id="search-clear" type="button" data-i18n="searchClear"></button>
               </div>
             </fieldset>
@@ -54,7 +54,7 @@
           <p id="search-status" role="status"></p>
           <button id="search-retry" type="button" hidden data-i18n="retry"></button>
           <div id="search-list" class="search-list"></div>
-          <nav id="search-pagination" class="search-pagination" hidden data-i18n-aria-label="selectPage">
+          <nav id="search-pagination" data-search-style="searchPagination" hidden data-i18n-aria-label="selectPage">
             <button id="search-previous" type="button" data-i18n="previous"></button><span id="search-page"></span><button id="search-next" type="button" data-i18n="next"></button>
           </nav>
         </div>
