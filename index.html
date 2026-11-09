@@ -1,14 +1,27 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-startup="loading">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- First-paint styles must be available before module/CSS downloads. -->
+  <style>
+    html { background: #111617; color-scheme: dark; }
+    html[data-startup] body > :not(#startup-status):not(noscript) { visibility: hidden !important; }
+    #startup-status { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; gap: 16px; margin: 0; padding: 24px; background: #111617; color: #e6eeeb; font: 14px/1.5 sans-serif; text-align: center; }
+    #startup-status[hidden] { display: none; }
+    #startup-status button { padding: 8px 16px; cursor: pointer; }
+  </style>
   <title data-i18n="appTitle">Minecraft Sound Browser</title>
   <link rel="icon" href="favicon.ico?v=waveform" sizes="16x16 32x32 48x48 64x64 128x128 256x256">
   <link rel="icon" type="image/png" sizes="256x256" href="favicon.png">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+  <div id="startup-status" role="status" aria-live="polite">
+    <p id="startup-message">読み込み中…</p>
+    <button id="startup-retry" type="button" hidden>再読み込み</button>
+  </div>
+  <noscript>このページを使うにはJavaScriptを有効にしてください。<style>#startup-status { display: none; }</style></noscript>
   <header data-layout-style="appHeader">
     <div data-layout-style="appHeaderIdentity">
       <h1 data-layout-style="appBrand" data-i18n-aria-label="appTitle"><span data-layout-style="eyebrow" data-i18n="appEyebrow">MINECRAFT</span><span data-layout-style="brandName" data-i18n="appName">Sound Browser</span></h1>
@@ -122,7 +135,6 @@
   <section id="command-settings" data-settings-style="settingsPopover soundSettings" popover="auto" data-i18n-aria-label="commandSettings">
   </section>
   <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
-  <script src="Scripts/SettingsPopovers.ts" type="module"></script>
-  <script src="Scripts/Main.ts" type="module"></script>
+  <script src="Scripts/Bootstrap.ts" type="module"></script>
 </body>
 </html>
