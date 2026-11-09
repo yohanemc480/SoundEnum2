@@ -10,7 +10,6 @@ export function initializeSettingsPopovers(): () => void {
     try {
         applyLayoutStyles(); applySettingsStyles();
         scope.defer(bindSettingsPopover(document.querySelector<HTMLElement>(`.${settingsStyles.appSettingsButton}`), document.getElementById('app-settings')));
-        scope.defer(bindSettingsPopover(document.getElementById('command-settings-button'), document.getElementById('command-settings')));
         return () => scope.dispose();
     } catch (error) { scope.dispose(); throw error; }
 }

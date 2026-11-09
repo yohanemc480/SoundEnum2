@@ -95,3 +95,18 @@ test('単音の検索基準を保存し、候補が消失した場合は基準�
         assert.equal(searchPreferences.read().referenceCandidateIndex, null);
     } finally { delete globalThis.localStorage; }
 });
+
+
+test('除外バージョンを保存・解除でき、配布一覧から消えた場合は復元時に解除する', () => {
+    let value = null;
+    globalThis.localStorage = { getItem: () => value, setItem: (_, next) => { value = next; } };
+    try {
+        saveSearchOptions({ ...searchPreferences.read(), excludedVersion: '26.2' });
+        const saved = searchPreferences.read();
+        assert.equal(saved.excludedVersion, '26.2');
+        assert.equal(restoreSearchOptions(saved, { events: [], tags: [], availableVersions: ['26.2', '26.3'] }).excludedVersion, '26.2');
+        assert.equal(restoreSearchOptions(saved, { events: [], tags: [], availableVersions: ['26.3'] }).excludedVersion, '');
+        saveSearchOptions({ ...saved, excludedVersion: '' });
+        assert.equal(searchPreferences.read().excludedVersion, '');
+    } finally { delete globalThis.localStorage; }
+});

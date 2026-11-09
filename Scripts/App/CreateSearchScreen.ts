@@ -14,11 +14,11 @@ import type { CompositionActions } from '../Contracts/Services/CompositionAction
 import type { SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
 
 /** 検索のMVPを生成する。再生サービスはAppから注入し、検索側では実装を知らない。 */
-export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService, preferences: BrowserPreferencesStore) {
+export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService, preferences: BrowserPreferencesStore, versions: readonly string[]) {
     const scope = new DisposalScope();
     try {
-        const view = scope.own(new HtmlSearchView({ load: getWaveform }));
-        const searchService = scope.own(new WorkerSearchService(paths));
+        const view = scope.own(new HtmlSearchView({ load: getWaveform }, versions));
+        const searchService = scope.own(new WorkerSearchService(paths, versions));
         const presenter = scope.own(new SearchPresenter(view, searchService, new StoredSearchPreferences(preferences), composition, preview, new LocalFavoriteSoundsStore(), {
             schedule: (callback, milliseconds) => {
                 const timer = setTimeout(callback, milliseconds);

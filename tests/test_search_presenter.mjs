@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SearchPresenter } from '../Scripts/Presenter/SearchPresenter.ts';
 
-const options = { query: '', tags: [], referenceSoundName: '', referenceCandidateIndex: null, excludeMultipleCandidates: false };
+const options = { query: '', tags: [], referenceSoundName: '', referenceCandidateIndex: null, excludeMultipleCandidates: false, excludedVersion: '' };
 const candidate = { name: 'raw', hash: 'a', pitch: 1, volume: 1, weight: 1, duration: 1, vectorRow: 0 };
 const result = name => ({ name, candidate, candidateCount: 1, score: null, sameAudio: false, tags: [] });
 const index = { schemaVersion: 3, version: 'test', tags: [{ id: 'metal' }], audioTags: { a: [] },

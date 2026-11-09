@@ -118,3 +118,53 @@ test('既存の保存キーと旧形式の既定値を維持し、破損デー�
         saved = '{'; assert.throws(() => store.read());
     } finally { if (oldStorage === undefined) delete globalThis.localStorage; else globalThis.localStorage = oldStorage; }
 });
+
+
+test('同じ内容の再保存は既存名を通知し、保存・ID採番・一覧切替を行わない', () => {
+    const f = fixture({ items: [] });
+    f.actions.save();
+    assert.equal(f.writes, 1);
+    f.actions.save();
+    assert.equal(f.writes, 1);
+    assert.equal(f.revealed, 1);
+    assert.deepEqual(f.notices.at(-1), { type: 'duplicate', name: '組み合わせ(1)' });
+    f.change({ rows: [{ ...row, pitch: 1.5 }] });
+    f.actions.save();
+    assert.equal(f.saved[1].id, 'new2');
+    f.presenter.dispose();
+});
+
+test('並び順や保存バージョンが違っても全設定と個数が同じなら重複とし、上限より優先して通知する', () => {
+    const otherRow = { ...row, name: 'b', pitch: 1 };
+    const f = fixture({
+        rows: [otherRow, row],
+        items: Array.from({ length: 30 }, (_, i) => ({ ...item, id: String(i), sounds: [row, otherRow] })),
+    });
+    assert.equal(f.shown.canSave, true);
+    f.actions.save();
+    assert.equal(f.writes, 0);
+    assert.deepEqual(f.notices.at(-1), { type: 'duplicate', name: '効果音' });
+    f.presenter.dispose();
+});
+
+test('各音の設定や個数が違う組み合わせは別内容として保存する', () => {
+    for (const patch of [{ name: 'b' }, { source: 'music' }, { volume: 1.251 }, { pitch: .751 }, { minVolume: .101 }]) {
+        const f = fixture({ items: [{ ...item, sounds: [row] }], rows: [{ ...row, ...patch }] });
+        f.actions.save();
+        assert.equal(f.writes, 1);
+        f.presenter.dispose();
+    }
+    const f = fixture({ rows: [row, row, row] });
+    f.actions.save();
+    assert.equal(f.writes, 1);
+    f.presenter.dispose();
+});
+
+test('上書きでも別項目と同じ内容は保存せず、その保存名を通知する', async () => {
+    const f = fixture({ items: [item, { ...item, id: 'two', name: '別の効果音', sounds: [row] }] });
+    f.actions.overwrite('one');
+    await flush();
+    assert.equal(f.writes, 0);
+    assert.deepEqual(f.notices.at(-1), { type: 'duplicate', name: '別の効果音' });
+    f.presenter.dispose();
+});

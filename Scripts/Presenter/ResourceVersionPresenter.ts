@@ -34,6 +34,9 @@ export class ResourceVersionPresenter {
             this.view.showVersions(this.versions, selected); return selected;
         } catch (error) { if (!this.disposed) this.view.showFailure(); throw error; }
     }
+    /** 読み込み済みのバージョン一覧を独立した配列で返す。 */
+    availableVersions(): string[] { return [...this.versions]; }
+
     /** 一覧に存在する選択だけを保存し、画面遷移を依頼する。 */
     private changeVersion(version: string): void {
         if (this.disposed || !this.versions.includes(version)) return;

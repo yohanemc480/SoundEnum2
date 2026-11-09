@@ -77,7 +77,7 @@ try {
     const playbackView = scope.own(new HtmlPlaybackView());
     const copyText = createCommandCopier();
     const outputArea = scope.own(new OutputArea('#preview-output', copyText));
-    new CommandSettingsPresenter(commandSettings, createCommandSettingsView(requireElement('command-settings')),
+    new CommandSettingsPresenter(commandSettings, createCommandSettingsView(requireElement('playback-settings'), undefined, true),
         settingsStore, () => console.warn('Cannot save or load command settings'));
     const playbackPresenter = scope.own(new PlaybackPresenter(playback, playbackView,
         playbackResources, { load: getWaveform },
@@ -91,7 +91,7 @@ try {
         row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
         name => { void searchScreen.presenter.requestSimilar(name); }, copyText));
     const composition = compositionScreen.presenter;
-    const searchScreen = scope.own(createSearchScreen(paths, composition, playbackPresenter, browserPreferences));
+    const searchScreen = scope.own(createSearchScreen(paths, composition, playbackPresenter, browserPreferences, versionSelector.availableVersions()));
     scope.own(createSavedCompositionsScreen(composition, paths.Version, copyText));
     void searchScreen.presenter.load();
 

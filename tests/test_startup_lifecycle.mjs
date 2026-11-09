@@ -31,15 +31,15 @@ test('終了後に届いたリソースを即座に解放し、初期化を続�
 test('起動時の取得内容を維持し、HTTPエラーと終了時の通信中断を扱う', async t => {
     const controller = new AbortController();
     const mock = t.mock.method(globalThis, 'fetch', async (path, options) => {
-        assert.equal(path, 'resource/example.json'); assert.equal(options.signal, controller.signal);
-        return { ok: true, text: async () => '{"example":1}' };
+        assert.equal(path, 'resource/example.json'); assert.equal(options.signal.aborted, false);
+        return new Response('{"example":1}');
     });
     assert.equal(await fetchTextResource('resource/example.json', controller.signal), '{"example":1}');
     mock.mock.mockImplementation(async () => ({ ok: false, status: 404 }));
-    await assert.rejects(fetchTextResource('resource/example.json', controller.signal), /404/);
+    await assert.rejects(fetchTextResource('resource/missing.json', controller.signal), /404/);
     mock.mock.mockImplementation((_, options) => new Promise((resolve, reject) => {
         options.signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
     }));
-    const pending = fetchTextResource('resource/example.json', controller.signal); controller.abort();
-    await assert.rejects(pending, /aborted/);
+    const pending = fetchTextResource('resource/pending.json', controller.signal); controller.abort();
+    await assert.rejects(pending, /Aborted/);
 });

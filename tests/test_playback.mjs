@@ -1,3 +1,4 @@
+import { audioResourceCache } from '../Scripts/Infrastructure/Resources/ResourceCache.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { BrowserAudioPlayback } from '../Scripts/Infrastructure/Audio/BrowserAudioPlayback.ts';
@@ -30,7 +31,7 @@ test('音量・ピッチを維持し、古い取得結果を無視してエラ�
         assert.equal(audio.currentTime, 4); assert.equal(audio.paused, true);
         await playback.resume(); assert.equal(audio.plays, 2);
         playback.stop(); assert.equal(audio.currentTime, 0); assert.equal(audio.paused, true);
-        const failed = playback.play(request); requests[2].resolve(new Response('', { status: 404 })); await failed;
+        const failed = playback.play({ ...request, url: '/missing' }); requests[2].resolve(new Response('', { status: 404 })); await failed;
         assert.equal(playback.read().error, 'load'); assert.equal(playback.read().loading, false);
     } finally { playback.dispose(); Object.assign(globalThis, previous); }
 });
@@ -51,7 +52,7 @@ test('一時停止・破棄後は遅れて届いた音源を再生せず、生�
         playback.dispose(); playback.dispose(); audio.dispatchEvent(new Event('timeupdate'));
         assert.equal(updates, 1); assert.equal(revoked.length, 1);
         const other = new BrowserAudioPlayback(new FakeAudio());
-        const late = other.play(request); other.dispose(); finish(new Response(new Blob(['late']))); await late;
+        const late = other.play({ ...request, url: '/late-other' }); other.dispose(); finish(new Response(new Blob(['late']))); await late;
         assert.equal(revoked.length, 1);
     } finally { playback.dispose(); globalThis.fetch = oldFetch; URL.revokeObjectURL = oldRevoke; }
 });
@@ -60,3 +61,6 @@ test('音源ハッシュがない場合は不正なURLを作る前に失敗す�
     const resources = new SoundPlaybackResources({ event: { sounds: ['missing'] } }, {});
     assert.throws(() => resources.candidates('event'), /Missing audio hash/);
 });
+
+test.beforeEach(() => audioResourceCache.clear());
+test.afterEach(() => audioResourceCache.clear());
