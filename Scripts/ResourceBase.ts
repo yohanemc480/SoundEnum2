@@ -3,8 +3,8 @@
  */
 export class ResourceBase
 {
-    _rawResource = null;
-    constructor(rawResource)
+    _rawResource: string;
+    constructor(rawResource: string)
     {
         this._rawResource = rawResource;
     }

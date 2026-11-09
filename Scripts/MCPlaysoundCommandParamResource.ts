@@ -1,5 +1,7 @@
+import { parseSoundEvents } from './ResourceData.ts';
+import type { SoundEntry } from './SearchTypes.ts';
 import { resolveSoundEvents } from "./ResolveSoundEvents.ts";
-import { ResourceBase } from "./ResourceBase.js";
+import { ResourceBase } from "./ResourceBase.ts";
 
 /**
  * command引数としてのsound名とraw_soundの対応付を行うクラス。
@@ -8,7 +10,9 @@ import { ResourceBase } from "./ResourceBase.js";
  */
 export class MCPlaysoundCommandParamResource extends ResourceBase
 {
-    constructor(rawResource)
+    _jsonData: Record<string, { sounds: SoundEntry[] }> = Object.create(null);
+
+    constructor(rawResource: string)
     {
         super(rawResource);
     }
@@ -19,7 +23,7 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
      */
     ParseResource()
     {
-        const events = JSON.parse(this._rawResource);
+        const events = parseSoundEvents(JSON.parse(this._rawResource));
         const resolved = resolveSoundEvents(events);
         this._jsonData = Object.fromEntries(Object.entries(events).map(([name, event]) => [name, { ...event, sounds: resolved[name] }]));
     }
@@ -29,7 +33,7 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
      * @param {*} soundCommandName "ambient.warped_forest.mood"みたいな形式
      * @returns [{"name":"~","type":"sounds",,},{},{},,,]
      */
-    GetSoundParameters(soundCommandName)
+    GetSoundParameters(soundCommandName: string)
     {
         if (!this.IsSoundCommandExist(soundCommandName))
         {
@@ -43,7 +47,7 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
      * 指定した名前のplaysoundコマンドが存在しているかを調べる。
      * @param {*} soundCommandName "ambient.warped_forest.mood"みたいな形式
      */
-    IsSoundCommandExist(soundCommandName)
+    IsSoundCommandExist(soundCommandName: string)
     {
         let keys = Object.keys(this._jsonData);
         if (!keys.includes(soundCommandName))

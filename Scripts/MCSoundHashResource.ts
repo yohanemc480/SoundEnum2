@@ -1,4 +1,5 @@
-import { ResourceBase } from "./ResourceBase.js";
+import { parseHashMap } from './ResourceData.ts';
+import { ResourceBase } from "./ResourceBase.ts";
 
 /**
  * raw_soundとhashの対応付を行うクラス。
@@ -7,7 +8,9 @@ import { ResourceBase } from "./ResourceBase.js";
  */
 export class MCSoundHashResource extends ResourceBase
 {
-    constructor(rawResource)
+    _jsonData: Record<string, string | undefined> = Object.create(null);
+
+    constructor(rawResource: string)
     {
         super(rawResource);
     }
@@ -18,7 +21,7 @@ export class MCSoundHashResource extends ResourceBase
      */
     ParseResource()
     {
-        this._jsonData = JSON.parse(this._rawResource);
+        this._jsonData = parseHashMap(JSON.parse(this._rawResource));
     }
 
     /**
@@ -26,7 +29,7 @@ export class MCSoundHashResource extends ResourceBase
      * @param {*} rawSoundResourceName "ambient/nether/warped_forest/here1" のような形式
      * @returns "abb0ffaa8df2bc05ba4b95457afa42ec67d785e8"
      */
-    NameToHash(rawSoundResourceName)
+    NameToHash(rawSoundResourceName: string)
     {
         // 存在しないリソースを渡されたらnullを返す。
         if (!this.IsSoundResourceExist(rawSoundResourceName))
@@ -42,7 +45,7 @@ export class MCSoundHashResource extends ResourceBase
      * @param {*} rawSoundResourceName "ambient/nether/warped_forest/here1" のような形式
      * @returns bool
      */
-    IsSoundResourceExist(rawSoundResourceName) {
+    IsSoundResourceExist(rawSoundResourceName: string) {
         return Object.prototype.hasOwnProperty.call(
             this._jsonData, this.NameToFullPath(rawSoundResourceName));
     }
@@ -52,7 +55,7 @@ export class MCSoundHashResource extends ResourceBase
      * @param {*} rawSoundResourceName "ambient/nether/warped_forest/here1" のような形式
      * @returns "minecraft/sounds/ambient/nether/warped_forest/here1.ogg"のような形式
      */
-    NameToFullPath(rawSoundResourceName)
+    NameToFullPath(rawSoundResourceName: string)
     {
         return `minecraft/sounds/${rawSoundResourceName}.ogg`
     }

@@ -5,7 +5,7 @@ import { showToast } from './Toast.js';
 import { Favorites } from './Favorites.ts';
 import { Text } from './Text.js';
 import { SearchWaveforms } from './SearchWaveforms.js';
-import { SoundSearchResource } from './SoundSearchResource.js';
+import { SoundSearchResource } from './SoundSearchResource.ts';
 import { SoundManager } from './Singletons/SoundManager.js';
 import { MCCommandSound } from './MCCommandSound.js';
 import { MCCommandSelector } from './Constants/MCCommandSelector.ts';

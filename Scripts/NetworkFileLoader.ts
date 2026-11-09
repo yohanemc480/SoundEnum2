@@ -1,13 +1,13 @@
 export class NetworkFileLoader {
-    _filePath = null;
-    constructor(filePath)
+    _filePath: string;
+    constructor(filePath: string)
     {
         this._filePath = filePath;
     }
     // パスに指定されているデータを非同期で取得してくる。
-    FetchData()
+    FetchData(): Promise<string>
     {
-        return new Promise((resolve, reject) =>
+        return new Promise<string>((resolve, reject) =>
         {
             const xhr = new XMLHttpRequest();
 

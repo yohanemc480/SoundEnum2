@@ -72,7 +72,7 @@ test('worker initializes little-endian vectors, searches and reports errors', as
     const messages = [];
     globalThis.self = { postMessage: message => messages.push(message) };
     try {
-        await import('../Scripts/SoundSearchWorker.js');
+        await import('../Scripts/SoundSearchWorker.ts');
         const binary = encodeFixture();
         self.onmessage({ data: { type: 'init', id: 1, index: { ...fixture(), hashes: undefined, dimensions: undefined, events: fixture().events.map(e => ({ ...e, candidates: e.candidates.map(({ row, ...c }) => c) })) }, binary, version: 'test' } });
         assert.equal(messages.pop().ready, true);
@@ -81,6 +81,10 @@ test('worker initializes little-endian vectors, searches and reports errors', as
         assert.equal(result.id, 2); assert.equal(result.results[0].name, 'both');
         self.onmessage({ data: { type: 'search', id: 3, options: { base: 'missing' } } });
         assert.equal(messages.pop().error, 'Unknown base sound');
+        self.onmessage({ data: { type: 'init', id: 4, binary: new ArrayBuffer(0), index: {}, version: 'test' } });
+        assert.equal(messages.pop().error, 'Invalid vector header');
+        self.onmessage({ data: { type: 'search', id: 5, options: {} } });
+        assert.equal(messages.pop().error, 'Search worker is not initialized');
     } finally { delete globalThis.self; }
 });
 

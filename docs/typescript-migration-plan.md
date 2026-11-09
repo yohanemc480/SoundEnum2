@@ -10,8 +10,11 @@
 - 配布データのコピーと、公開前に任意実行する容量検査を追加。
 - 既存31テストと実データ検証（1,984イベント・4,941音源）が通過。
 - npm installはregistry.npmjs.orgのENOTFOUNDで失敗。lockfile生成、型チェック、Viteによるビルド・previewは未完了。
+- リソース・Worker関連6ファイル（ResourceBase、NetworkFileLoader、MCSoundHashResource、MCPlaysoundCommandParamResource、SoundSearchResource、SoundSearchWorker）をTS化。既存ファイル21個を移行済み、追加ファイル込みで23個のTSファイル。
+- ResourceData.tsで外部JSONをunknownから検証。Worker要求・応答型とtsconfig.worker.jsonを追加し、ブラウザとWorkerの型チェック環境を分離。
+- Worker初期化失敗時の古い状態の破棄と、postMessage失敗時のpending解放を実装。34テストと実データ検証が通過。静的型チェックとViteビルドは依存未取得のため未検証。
 - 検索処理4ファイル（ResolveSoundEvents、BuildSearchEvents、SearchVectors、SoundSearchEngine）をTS化。SearchTypes.tsにイベント・候補音・検索条件・検索結果の共通型を追加。既存ファイル15個を移行済み、型定義の新規ファイルを含めて16個のTSファイル。
-- 検索処理の移行後も既存31テストと実データ検証が通過。Worker側はまだJSであり、外部データ境界の型保証と通信型は後続工程で対応する。型チェックとViteビルドは依存未取得のため未検証。
+- 検索処理の移行後も既存31テストと実データ検証が通過。この段階ではWorker側はJSだったが、上記のリソース移行でTS化・通信型・JSON検証を追加した。型チェックとViteビルドは依存未取得のため未検証。
 - 保存処理4ファイル（LocalStorage、LocalStorageSchema、Favorites、SearchPreferences）をTS化。保存データをunknownで受け取り、実行時検証後に型を確定する。保存キー・JSON形式は維持。
 - この段階で移行済みは計11ファイル。今回も既存31テストと実データ検証が通過。npmレジストリへの接続は引き続き失敗しており、静的型チェック・ブラウザビルドは未検証。
 - 基礎処理7ファイル（Constantsの4ファイル、FormatSoundCommand、SelectWeightedCandidate、ResourcePathProvider）をTS化。定数のリテラル型、コマンドの引数型、抽選のジェネリック、バージョンのreadonlyフィールドを導入。

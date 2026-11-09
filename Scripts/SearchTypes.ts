@@ -47,3 +47,28 @@ export interface SearchResult {
     tags: string[];
     count: number;
 }
+
+/** ベクトルの行番号を付ける前の検索データ。 */
+export interface SearchSourceIndex extends Omit<SearchIndex, 'hashes' | 'dimensions' | 'events'> {
+    events: SearchEvent[];
+    vectorHash?: string;
+}
+export interface SearchTagData extends Omit<SearchSourceIndex, 'events'> {
+    vectorHash: string;
+}
+export interface SearchInitRequest {
+    type: 'init';
+    index: SearchSourceIndex;
+    binary: ArrayBuffer;
+    version: string;
+}
+export interface SearchQueryRequest {
+    type: 'search';
+    options?: SearchOptions;
+}
+export type SearchRequest = SearchInitRequest | SearchQueryRequest;
+export type SearchWorkerRequest = SearchRequest & { id: number };
+export interface SearchReadyResponse { id: number; ready: true }
+export interface SearchResultsResponse { id: number; results: SearchResult[] }
+export type SearchSuccessResponse = SearchReadyResponse | SearchResultsResponse;
+export type SearchWorkerResponse = SearchSuccessResponse | { id: number; error: string };

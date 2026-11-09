@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { Worker as NodeWorker } from 'node:worker_threads';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
-import { SoundSearchResource } from '../Scripts/SoundSearchResource.js';
+import { SoundSearchResource } from '../Scripts/SoundSearchResource.ts';
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 import { Text } from '../Scripts/Text.js';
 import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.ts';
