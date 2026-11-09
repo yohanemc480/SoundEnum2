@@ -1,5 +1,5 @@
 import { Text } from "./Text.js";
-import { SoundManager } from "./Singletons/SoundManager.js";
+import { SoundManager } from "./Singletons/SoundManager.ts";
 import { SettingDefine } from "./Constants/SettingDefine.ts";
 
 /**

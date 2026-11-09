@@ -6,10 +6,10 @@ import { Favorites } from './Favorites.ts';
 import { Text } from './Text.js';
 import { SearchWaveforms } from './SearchWaveforms.js';
 import { SoundSearchResource } from './SoundSearchResource.ts';
-import { SoundManager } from './Singletons/SoundManager.js';
-import { MCCommandSound } from './MCCommandSound.js';
+import { SoundManager } from './Singletons/SoundManager.ts';
+import { MCCommandSound } from './MCCommandSound.ts';
 import { MCCommandSelector } from './Constants/MCCommandSelector.ts';
-import { MCRawSound } from './MCRawSound.js';
+import { MCRawSound } from './MCRawSound.ts';
 
 export class SoundSearchBrowser
 {

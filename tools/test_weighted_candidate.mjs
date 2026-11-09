@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { selectWeightedCandidate } from '../Scripts/SelectWeightedCandidate.ts';
-import { MCRawSound } from '../Scripts/MCRawSound.js';
+import { MCRawSound } from '../Scripts/MCRawSound.ts';
 
 test('selection respects weights and default weight including boundaries', () => {
     const sounds = [new MCRawSound({name: 'a'}), new MCRawSound({name: 'b', weight: 3})];

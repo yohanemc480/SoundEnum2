@@ -13,10 +13,10 @@ import { MCSoundHashResource } from "./MCSoundHashResource.ts";
 import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResource.ts";
 import { NetworkFileLoader } from "./NetworkFileLoader.ts";
 import { ResourcePathProvider } from "./ResourcePathProvider.ts";
-import { SoundManager } from "./Singletons/SoundManager.js";
+import { SoundManager } from "./Singletons/SoundManager.ts";
 import { OutputArea } from "./OutputArea.js";
 import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.js";
-import { ResourceManager } from "./Singletons/ResourceManager.js";
+import { ResourceManager } from "./Singletons/ResourceManager.ts";
 
 applyText();
 document.getElementById('clear-local-storage').addEventListener('click', async () => {

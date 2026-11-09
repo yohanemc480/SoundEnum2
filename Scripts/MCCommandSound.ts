@@ -1,9 +1,10 @@
+import type { SoundSource } from './Constants/MCCommandSoundSource.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { selectWeightedCandidate } from './SelectWeightedCandidate.ts';
 import { MCCommandSoundSource } from "./Constants/MCCommandSoundSource.ts";
 import { MCCommandSelector } from "./Constants/MCCommandSelector.ts";
-import { MCRawSound } from "./MCRawSound.js";
-import { ResourceManager } from "./Singletons/ResourceManager.js";
+import { MCRawSound } from "./MCRawSound.ts";
+import { ResourceManager } from "./Singletons/ResourceManager.ts";
 
 /**
  * playsoundコマンドを打つときに指定する音を表すクラス
@@ -20,15 +21,15 @@ export class MCCommandSound
     static MaxMinVolume = 1;
     static DefaultMinVolume = 0;
     _soundName = "";
-    _source = MCCommandSoundSource.master;
+    _source: SoundSource = MCCommandSoundSource.Master;
     _volume = 1;
     _pitch = 1;
     _minVolume = 1;
-    _selector = MCCommandSelector.Executer;// いったん定数とする。
+    _selector: string = MCCommandSelector.Executer;// いったん定数とする。
     _position = "~ ~ ~";// いったん定数とする。
-    _rawSounds = [];
+    _rawSounds: MCRawSound[] = [];
 
-    constructor(soundName, source, selector, volume, pitch, minVolume, position = "~ ~ ~")
+    constructor(soundName: string, source: SoundSource, selector: string, volume: number, pitch: number, minVolume: number, position = "~ ~ ~")
     {
         let rawSounds = ResourceManager.Instance.GetPlaysoundComandParamResource().GetSoundParameters(soundName);// GetSoundParameters(soundName);
         for (let i = 0; i < rawSounds.length; i++) {

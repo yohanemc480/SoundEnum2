@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
 import { SoundComposition } from '../Scripts/SoundComposition.js';
-import { SoundManager } from '../Scripts/Singletons/SoundManager.js';
+import { SoundManager } from '../Scripts/Singletons/SoundManager.ts';
 
 test('composition keeps duplicates and precision, rejecting invalid settings', () => {
     const row = { name: 'a', source: 'block', volume: 2.3, pitch: .75, minVolume: .35 };

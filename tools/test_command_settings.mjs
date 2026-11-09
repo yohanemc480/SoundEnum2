@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SoundManager } from '../Scripts/Singletons/SoundManager.js';
+import { SoundManager } from '../Scripts/Singletons/SoundManager.ts';
 import { normalizeCommandSettings } from '../Scripts/LocalStorageSchema.ts';
 
 test('command settings restore and persist precise values across instances', () => {

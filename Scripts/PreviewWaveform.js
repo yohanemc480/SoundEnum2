@@ -1,4 +1,4 @@
-import { getWaveform } from "./WaveformResource.js";
+import { getWaveform } from "./WaveformResource.ts";
 export class PreviewWaveform
 {
     constructor(audio, canvas)

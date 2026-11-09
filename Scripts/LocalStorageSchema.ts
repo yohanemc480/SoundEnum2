@@ -1,4 +1,4 @@
-import { MCCommandSound } from './MCCommandSound.js';
+import { MCCommandSound } from './MCCommandSound.ts';
 import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
 import { LocalStorageKey } from './Constants/LocalStorageKey.ts';
 import type { SoundSource } from './Constants/MCCommandSoundSource.ts';

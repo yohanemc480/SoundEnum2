@@ -1,3 +1,5 @@
+import type { SoundEntry } from './SearchTypes.ts';
+import type { MCSoundHashResource } from './MCSoundHashResource.ts';
 import { SharedAudioPaths } from "./ResourcePathProvider.ts";
 
 /**
@@ -13,28 +15,29 @@ export class MCRawSound
     /**
      * @param {*} soundData {"name":"entity/player/attack/crit2","pitch":""}みたいな形式
      */
-    constructor(soundData)
+    constructor(soundData: SoundEntry)
     {
         this._rawSoundName = soundData["name"];
-        let keys = Object.keys(soundData);
 
-        if (keys.includes("volume"))
+        if (soundData.volume !== undefined)
         {
             this._volume = soundData["volume"];
         }
-        if (keys.includes("pitch"))
+        if (soundData.pitch !== undefined)
         {
             this._pitch = soundData["pitch"];
         }
-        if (keys.includes("weight"))
+        if (soundData.weight !== undefined)
         {
             this._weight = soundData["weight"];
         }
     }
 
-    GetHash(soundHashResource)
+    GetHash(soundHashResource: MCSoundHashResource): string
     {
-        return soundHashResource.NameToHash(this._rawSoundName);
+        const hash = soundHashResource.NameToHash(this._rawSoundName);
+        if (hash === undefined) throw new Error(`Missing audio hash: ${this._rawSoundName}`);
+        return hash;
     }
 
     GetWeight()
@@ -53,7 +56,7 @@ export class MCRawSound
     }
 
     /** サイト内に保存した音声ファイルの参照先を返す。 */
-    CreateLink(soundHashResource) {
+    CreateLink(soundHashResource: MCSoundHashResource): string {
         let hash = this.GetHash(soundHashResource);
         return SharedAudioPaths.Audio(hash);
     }

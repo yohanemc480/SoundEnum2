@@ -10,6 +10,9 @@
 - 配布データのコピーと、公開前に任意実行する容量検査を追加。
 - 既存31テストと実データ検証（1,984イベント・4,941音源）が通過。
 - npm installはregistry.npmjs.orgのENOTFOUNDで失敗。lockfile生成、型チェック、Viteによるビルド・previewは未完了。
+- 再生関連6ファイル（MCRawSound、MCCommandSound、SingletonBase、ResourceManager、SoundManager、WaveformResource）をTS化。既存27ファイルを移行済み、追加2ファイルを含めTSは29ファイル。
+- 既存の共有インスタンス生成方式を維持し、派生クラスごとの型を宣言。MCCommandSoundの誤ったsource定数名をMasterへ修正し、未定義ハッシュでのURL生成を防止。波形JSONはunknownから検証する。
+- 再生のピッチ・音量、ダウンロードの切り替え、HTTPエラー、ハッシュ欠落のテストを追加。36テストと実データ検証が通過。静的型チェックとViteビルドは依存取得後に実施する。
 - リソース・Worker関連6ファイル（ResourceBase、NetworkFileLoader、MCSoundHashResource、MCPlaysoundCommandParamResource、SoundSearchResource、SoundSearchWorker）をTS化。既存ファイル21個を移行済み、追加ファイル込みで23個のTSファイル。
 - ResourceData.tsで外部JSONをunknownから検証。Worker要求・応答型とtsconfig.worker.jsonを追加し、ブラウザとWorkerの型チェック環境を分離。
 - Worker初期化失敗時の古い状態の破棄と、postMessage失敗時のpending解放を実装。34テストと実データ検証が通過。静的型チェックとViteビルドは依存未取得のため未検証。

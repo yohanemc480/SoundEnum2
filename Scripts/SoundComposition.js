@@ -10,7 +10,7 @@ import { localStorageStore } from './LocalStorage.ts';
 import { LocalStorageSchema } from './LocalStorageSchema.ts';
 import { selectWeightedCandidate } from './SelectWeightedCandidate.ts';
 import { SharedAudioPaths } from './ResourcePathProvider.ts';
-import { SoundManager } from './Singletons/SoundManager.js';
+import { SoundManager } from './Singletons/SoundManager.ts';
 import { showToast } from './Toast.js';
 
 export class SoundComposition {

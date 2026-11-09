@@ -1,19 +1,22 @@
+import type { SoundSource } from '../Constants/MCCommandSoundSource.ts';
+import type { MCRawSound } from '../MCRawSound.ts';
 import { localStorageStore } from '../LocalStorage.ts';
 import { LocalStorageSchema, normalizeCommandSettings } from '../LocalStorageSchema.ts';
 import { MCCommandSoundSource } from "../Constants/MCCommandSoundSource.ts";
 import { SettingDefine } from "../Constants/SettingDefine.ts";
-import { MCCommandSound } from "../MCCommandSound.js";
-import { ResourceManager } from "./ResourceManager.js";
-import { SingletonBase } from "./SingletonBase.js";
+import { MCCommandSound } from "../MCCommandSound.ts";
+import { ResourceManager } from "./ResourceManager.ts";
+import { SingletonBase } from "./SingletonBase.ts";
 
 export class SoundManager extends SingletonBase
 {
-    _audio;
+    declare static Instance: SoundManager;
+    _audio: HTMLAudioElement;
     _soundVolume = 1;
-    _audioUrl;
-    _loadController;
-    _masterVolume = SettingDefine.DefaultMasterVolume;
-    _source = MCCommandSoundSource.Master;
+    _audioUrl: string | null = null;
+    _loadController: AbortController | undefined;
+    _masterVolume: number = SettingDefine.DefaultMasterVolume;
+    _source: SoundSource = MCCommandSoundSource.Master;
     _pitch = MCCommandSound.DefaultPitch;
     _volume = MCCommandSound.DefaultVolume;
     _minVolume = MCCommandSound.DefaultMinVolume;
@@ -46,7 +49,7 @@ export class SoundManager extends SingletonBase
         return this._audio;
     }
 
-    async Play(commandSound, selectedRawSound = null)
+    async Play(commandSound: MCCommandSound, selectedRawSound: MCRawSound | null = null): Promise<void>
     {
         this._loadController?.abort();
         const controller = new AbortController();
@@ -89,13 +92,13 @@ export class SoundManager extends SingletonBase
 
     GetMasterVolume() { return this._masterVolume; }
 
-    SetMasterVolume(volume)
+    SetMasterVolume(volume: number): void
     {
         this._masterVolume = volume;
         this._audio.volume = Math.min(1, Math.max(0, volume * this._soundVolume));
     }
 
-    SetPitch(pitch)
+    SetPitch(pitch: number): void
     {
         this._pitch = normalizeCommandSettings({ pitch }).pitch;
         this.SaveCommandSettings();
@@ -106,7 +109,7 @@ export class SoundManager extends SingletonBase
         return this._pitch;
     }
 
-    SetSource(source)
+    SetSource(source: SoundSource): void
     {
         this._source = normalizeCommandSettings({ source }).source;
         this.SaveCommandSettings();
@@ -117,7 +120,7 @@ export class SoundManager extends SingletonBase
         return this._source;
     }
 
-    SetVolume(volume)
+    SetVolume(volume: number): void
     {
         this._volume = normalizeCommandSettings({ volume }).volume;
         this.SaveCommandSettings();
@@ -128,7 +131,7 @@ export class SoundManager extends SingletonBase
         return this._volume;
     }
 
-    SetMinVolume(minVolume)
+    SetMinVolume(minVolume: number): void
     {
         this._minVolume = normalizeCommandSettings({ minVolume }).minVolume;
         this.SaveCommandSettings();
