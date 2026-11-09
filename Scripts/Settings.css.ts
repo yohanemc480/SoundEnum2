@@ -1,3 +1,4 @@
+import * as fields from './InputFields.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 export const settingsButton = style({
     "padding": "6px 12px",
@@ -81,21 +82,21 @@ globalStyle(`.${settingsButton}.${closeButton}:hover`, {
     "background": "var(--surface)",
     "color": "var(--text)"
 });
-globalStyle(`.${settingsPopover} .params`, {
+globalStyle(`.${settingsPopover} .${fields.fields}`, {
     "gridTemplateColumns": "minmax(0, 1fr)"
 });
 globalStyle(`.${soundSettings} .section-heading`, {
     "marginBottom": "12px"
 });
-globalStyle(`.${soundSettings} .params`, {
+globalStyle(`.${soundSettings} .${fields.fields}`, {
     "gap": "10px"
 });
-globalStyle(`.${soundSettings} .param`, {
+globalStyle(`.${soundSettings} .${fields.field}`, {
     "display": "grid",
     "gridTemplateColumns": "70px minmax(0, 1fr) 64px",
     "gap": "8px"
 });
-globalStyle(`.${soundSettings} .param-label`, {
+globalStyle(`.${soundSettings} .${fields.label}`, {
     "fontSize": "12px"
 });
 globalStyle(`.${soundSettings} input[type="range"]`, {

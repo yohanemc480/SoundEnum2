@@ -1,3 +1,4 @@
+import * as fieldStyles from './InputFields.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import type { CommandSettingsValue } from './LocalStorageSchema.ts';
 import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
@@ -20,10 +21,10 @@ export function mountSoundSettings(panel: HTMLElement | null, { read, save, onIn
     close.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`; close.setAttribute('aria-label', Text.closeCommandSettings);
     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
     heading.append(title, close);
-    const controls = document.createElement('div'); controls.className = 'params';
+    const controls = document.createElement('div'); controls.className = fieldStyles.fields;
     const fields = new Map<NumericSetting, { input: HTMLInputElement; slider: HTMLInputElement }>();
-    const sourceLabel = document.createElement('label'); sourceLabel.className = 'param';
-    const caption = document.createElement('span'); caption.className = 'param-label'; caption.textContent = Text.source;
+    const sourceLabel = document.createElement('label'); sourceLabel.className = fieldStyles.field;
+    const caption = document.createElement('span'); caption.className = fieldStyles.label; caption.textContent = Text.source;
     const source = document.createElement('select'); source.className = settingsStyles.soundSettingsSource;
     for (const value of Object.values(MCCommandSoundSource)) source.append(new Option(value, value));
     sourceLabel.append(caption, source); controls.append(sourceLabel);
@@ -39,8 +40,8 @@ export function mountSoundSettings(panel: HTMLElement | null, { read, save, onIn
     source.addEventListener('change', () => commit({ ...read(), source: source.value }));
     const definitions: [NumericSetting, string, number, number?][] = [['volume', Text.volume, 0], ['pitch', Text.pitch, .5, 2], ['minVolume', Text.minVolume, 0, 1]];
     for (const [key, text, min, max] of definitions) {
-        const label = document.createElement('div'); label.className = 'param';
-        const caption = document.createElement('span'); caption.className = 'param-label'; caption.textContent = text;
+        const label = document.createElement('div'); label.className = fieldStyles.field;
+        const caption = document.createElement('span'); caption.className = fieldStyles.label; caption.textContent = text;
         const input = document.createElement('input'); input.type = 'number'; input.min = String(min); input.step = 'any';
         if (max !== undefined) input.max = String(max);
         input.setAttribute('aria-label', text);

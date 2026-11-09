@@ -1,3 +1,4 @@
+import * as fields from './InputFields.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const control = style({
@@ -23,7 +24,7 @@ export const control = style({
 export const open = style({
     selectors: { [`${control}&`]: { width: 112 } },
 });
-globalStyle(`.${control}.${open} .param`, { opacity: 1, visibility: 'visible' });
+globalStyle(`.${control}.${open} .${fields.field}`, { opacity: 1, visibility: 'visible' });
 export const slider = style({ flex: 1, width: '100%', minWidth: 0, margin: 0, padding: 0 });
 
 globalStyle(`.${control} > button`, {
@@ -38,7 +39,7 @@ globalStyle(`.${control} > button:focus-visible`, {
     "outlineOffset": "-3px"
 });
 
-globalStyle(`.${control} .param`, {
+globalStyle(`.${control} .${fields.field}`, {
     "display": "flex",
     "flex": "1",
     "minWidth": "0",

@@ -1,3 +1,4 @@
+import { field } from './InputFields.css.ts';
 import * as styles from './VolumeControl.css.ts';
 import { Text } from "./Text.ts";
 import { SoundManager } from "./Singletons/SoundManager.ts";
@@ -15,6 +16,7 @@ export class SelectMasterVolumeArea
         this.onChange = onChange;
         const panel = document.querySelector<HTMLElement>(appendTarget);
         if (!panel) throw new Error(`Missing volume panel: ${appendTarget}`);
+        panel.classList.add(field);
         const slider = document.createElement('input');
         slider.type = 'range';
         slider.className = styles.slider;
