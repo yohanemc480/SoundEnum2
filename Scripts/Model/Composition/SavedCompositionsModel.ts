@@ -1,6 +1,6 @@
 import type { SoundCommand } from '../Command/FormatSoundCommand.ts';
-import { normalizeCompositionName, normalizeSavedCompositions } from './CompositionData.ts';
-import type { SavedCompositionsValue } from './CompositionData.ts';
+import { normalizeComposition, normalizeCompositionName, normalizeSavedCompositions } from './CompositionData.ts';
+import type { SavedComposition, SavedCompositionsValue } from './CompositionData.ts';
 
 /** 表示文言を受け取り、使われていない最小の連番を付けた名前を返す。 */
 export function nextCompositionName(items: readonly { name: string }[], defaultName: (number: number) => string): string {
@@ -8,6 +8,12 @@ export function nextCompositionName(items: readonly { name: string }[], defaultN
     let number = 1;
     while (names.has(normalizeCompositionName(defaultName(number)))) number++;
     return normalizeCompositionName(defaultName(number));
+}
+
+/** 同時再生する行の順序を除き、各音の全設定と重複数を比較できるキーにする。 */
+function compositionContentKey(sounds: SoundCommand[]): string {
+    return JSON.stringify(normalizeComposition(sounds).map(row =>
+        JSON.stringify([row.name, row.source, row.volume, row.pitch, row.minVolume])).sort());
 }
 
 /** 保存一覧の値と編集ルールを所有する。候補作成と保存後の確定を分ける。 */
@@ -27,6 +33,12 @@ export class SavedCompositionsModel {
         if (result.length > SavedCompositionsModel.MaxItems && result.length > this.items.length)
             throw new Error('Saved composition limit exceeded');
         return result;
+    }
+
+    /** 名前・保存バージョン・行順に依存せず、同じ設定と個数の保存項目を探す。 */
+    findSameContent(sounds: SoundCommand[], excludedId?: string): SavedComposition | undefined {
+        const key = compositionContentKey(sounds);
+        return this.read().find(item => item.id !== excludedId && compositionContentKey(item.sounds) === key);
     }
 
     /** 現在の行を独立した保存項目にする。IDと表示名は呼び出し元で用意する。 */
