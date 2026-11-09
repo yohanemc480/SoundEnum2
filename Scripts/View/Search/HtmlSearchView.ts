@@ -1,7 +1,7 @@
 import type { WaveformSource } from '../../Contracts/Services/PlaybackResources.ts';
 import * as layout from '../Layout/Layout.css.ts';
-import * as settingsStyles from '../Settings/Settings.css.ts';
-import { compositionRow } from '../Composition/Compositions.css.ts';
+import * as settingsStyles from '../Components/SoundSettings.css.ts';
+import { row as previewRow, selected } from '../Components/SoundPreviewRow.css.ts';
 import * as styles from './SearchResults.css.ts';
 import { SoundAutocomplete } from './SoundAutocomplete.ts';
 import { SearchWaveforms } from './SearchWaveforms.ts';
@@ -186,11 +186,11 @@ export class HtmlSearchView implements SearchView {
 
     activateSearchTab(): void { requireElement('search-tab').click(); }
 
-    /** 移行中の組み合わせ画面からも利用する表示処理。ボタンをPresenterへ渡さない。 */
+    /** 検索結果と組み合わせ行の試聴選択を共通クラスで切り替える。ボタンをPresenterへ渡さない。 */
     selectPreviewButton(button: HTMLButtonElement): void {
-        document.querySelectorAll(`.${layout.browserPanel} .${styles.selected}, .${compositionRow} .${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
-        this.candidatePopover.querySelectorAll(`.${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
-        button.classList.add(styles.selected);
+        document.querySelectorAll(`.${layout.browserPanel} .${selected}, .${previewRow} .${selected}`).forEach(element => element.classList.remove(selected));
+        this.candidatePopover.querySelectorAll(`.${selected}`).forEach(element => element.classList.remove(selected));
+        button.classList.add(selected);
     }
 
     /** グローバル購読、補完UI、波形監視をまとめて解放する。 */

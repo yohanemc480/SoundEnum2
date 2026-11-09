@@ -1,4 +1,4 @@
-import * as settingsStyles from '../../Settings/Settings.css.ts';
+import * as settingsStyles from '../SoundSettings.css.ts';
 import * as styles from './ConfirmDialog.css.ts';
 import { Text } from '../../../I18n/Text.ts';
 

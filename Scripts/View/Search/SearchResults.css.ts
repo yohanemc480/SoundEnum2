@@ -1,8 +1,8 @@
-import { compositionRow, compositionName } from '../Composition/Compositions.css.ts';
+import { selected } from '../Components/SoundPreviewRow.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const compositionAdd = style({});
-export const selected = style({});
+
 export const searchRow = style({
     "display": "flex",
     "flexDirection": "column",
@@ -124,7 +124,7 @@ globalStyle(`.${searchRow} .${searchCandidateTrigger}`, {
     "fontSize": "12px",
     "flexShrink": "0"
 });
-globalStyle(`.${searchRowMain}:hover, .${searchRowMain}:has(.${searchPreview}.${selected}), .${compositionRow}:has(.${compositionName}:not(:disabled)):hover, .${compositionRow}:has(.${compositionName}.${selected})`, {
+globalStyle(`.${searchRowMain}:hover, .${searchRowMain}:has(.${searchPreview}.${selected})`, {
     "background": "#283f33",
     "borderColor": "var(--row-highlight-border, #42634d)"
 });
@@ -193,7 +193,4 @@ globalStyle(`.${searchRow} button.${compositionAdd}`, {
     "lineHeight": "18px",
     "width": "34px",
     "padding": "6px"
-});
-globalStyle(`.${compositionRow} .${compositionName}:hover:not(:disabled), .${compositionRow} .${compositionName}.${selected}`, {
-    "color": "var(--accent)"
 });

@@ -1,3 +1,4 @@
+import { playing } from '../Components/PlaybackState.css.ts';
 import * as layout from '../Layout/Layout.css.ts';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 const spin = keyframes({ to: { transform: 'rotate(360deg)' } });
@@ -159,8 +160,7 @@ globalStyle(`.${transport} #preview-time, .${transport} #composition-time`, {
         }
     }
 });
-// Icon elements remain in HTML; the generated state is shared by both players.
-export const playing = style({});
+// HTMLのアイコンは共通の再生状態クラスで切り替える。
 globalStyle(`#preview-toggle .${pauseIcon}, #preview-toggle.${playing} .${playIcon}`, { display: 'none' });
 globalStyle(`#preview-toggle.${playing} .${pauseIcon}`, { display: 'block' });
 globalStyle(`#composition-play .${stopIcon}, #composition-play.${playing} .${compositionPlayIcon}`, { display: 'none' });

@@ -68,6 +68,12 @@ test('application imports follow MVP boundaries and have no cycles including typ
             const target = resolve(dirname(file), specifier);
             assert.ok(files.includes(target), `参照先が検査対象に存在しない: ${file} -> ${specifier}`);
             assert.ok(allowed[layer].includes(layerOf(target)), `層の依存方向違反: ${file} -> ${specifier}`);
+            if (layer === 'View' && target.endsWith('.css.ts')) {
+                const sourceArea = relative(root, file).split(/[\\/]/)[1];
+                const targetArea = relative(root, target).split(/[\\/]/)[1];
+                assert.ok(sourceArea === targetArea || ['Components', 'Layout'].includes(targetArea),
+                    `機能間のCSS参照は共通部品へ移す: ${file} -> ${specifier}`);
+            }
             edges.push(target);
         }
         graph.set(file, edges);

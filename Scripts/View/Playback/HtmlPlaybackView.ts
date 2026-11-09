@@ -1,4 +1,4 @@
-import { playing as playingClass } from './Playback.css.ts';
+import { playing as playingClass } from '../Components/PlaybackState.css.ts';
 import { Text } from '../../I18n/Text.ts';
 import { PreviewWaveform } from './PreviewWaveform.ts';
 import type { PlaybackActions, PlaybackView } from '../../Contracts/Views/PlaybackView.ts';

@@ -364,5 +364,13 @@ Model・ContractsをDOMなしで検査する `tsconfig.model.json` を前倒し�
 - Mainが依存の生成・接続とライフサイクル管理を担うことを確認した。Scripts内に旧SoundManager・ResourceManager・Singletonの参照は残っていない。旧リソースクラスと保存形式の互換用再公開の削除も既存の実施記録と照合した。
 - 最終検証として `npm test`、`npm run verify:data`、`npm run build` を再実行した。buildはアプリ・Worker・Node・DOMなしのModel/Presenter/Contractsの型チェックを含む。
 - ユーザーの動作確認は確認環境・個別項目の指定がないため、preview、狭い画面、通信失敗の再現、404の監視をそれぞれ実測済みとは記録しない。今回それらの追加ブラウザ確認は行わない。
-- 層間依存・循環参照は自動検査済み。View内には検索と組み合わせの選択表示、再生状態、設定ボタン等のCSS共有が残るため、機能間CSS参照の完全解消までは完了範囲に含めない。見た目を変えない今回の仕上げでは追加分割しない。
+- 層間依存・循環参照は自動検査済み。最初の完了記録では機能間CSS参照が残っていたが、下記の追加整理で解消した。
 - 公開容量確認、GitHub Pagesの設定・デプロイは引き続き対象外とする。
+
+## 共通CSSの配置整理（2026-11-09）
+
+- 設定ボタン・閉じるボタン・サウンド設定パネルを `View/Components/SoundSettings.css.ts` に移した。アプリ全体の設定ボタンとパネルの配置は `View/Settings/Settings.css.ts` に残した。
+- 試聴行と選択状態を `View/Components/SoundPreviewRow.css.ts`、両プレイヤーの再生状態を `View/Components/PlaybackState.css.ts` に集約した。検索画面から組み合わせ画面へのCSS参照、および組み合わせ画面から再生・設定画面へのCSS参照を除去した。
+- 固定HTMLへの設定スタイル適用は画面固有・共通のクラスを組み合わせて行う。既存のHTMLの指定名、CSSの値とセレクターの詳細度を維持した。
+- 依存関係テストで、ViewからのCSS参照先を同じ機能内またはComponents・Layoutに制限した。
+- `npm test` の90件と、型チェックを含む `npm run build` が成功した。今回の変更後のブラウザでの見た目は未確認。

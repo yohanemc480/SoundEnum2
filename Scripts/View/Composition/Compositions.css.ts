@@ -1,22 +1,8 @@
 import * as layout from '../Layout/Layout.css.ts';
-import * as settingsStyles from '../Settings/Settings.css.ts';
+import * as settingsStyles from '../Components/SoundSettings.css.ts';
 import { button as copyButton } from '../Components/CopyButton/CopyButton.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
-export const compositionRow = style({
-    "padding": "4px 8px",
-    "margin": "4px 0",
-    "border": "1px solid var(--line)",
-    "borderRadius": "6px",
-    "background": "var(--surface)"
-});
-export const compositionName = style({
-    "padding": "0",
-    "border": "0",
-    "background": "transparent",
-    "textAlign": "left",
-    "cursor": "pointer"
-});
 export const compositionActions = style({
     "display": "flex",
     "alignItems": "center",
@@ -84,30 +70,12 @@ export const savedCompositionEdit = style({
     "borderColor": "transparent",
     "color": "var(--muted)"
 });
-globalStyle(`.${compositionRow} > .${layout.sectionHeading}`, {
-    "flexWrap": "nowrap",
-    "marginBottom": "0"
-});
-globalStyle(`.${compositionRow} .${compositionName}`, {
-    "font": "12px/1.5 Consolas, monospace",
-    "color": "var(--text)",
-    "flex": "1",
-    "minWidth": "0",
-    "overflow": "hidden",
-    "textOverflow": "ellipsis",
-    "whiteSpace": "nowrap"
-});
-globalStyle(`.${compositionRow} button:disabled`, {
-    "opacity": ".45",
-    "cursor": "default"
-});
+
 globalStyle(`.${compositionActions} > .${settingsStyles.settingsButton}:not(.${settingsStyles.closeButton})`, {
     "padding": "3px 8px",
     "minHeight": "28px"
 });
-globalStyle(`.${compositionRow} .${compositionName}`, {
-    "minHeight": "28px"
-});
+
 globalStyle(`.${savedComposition} .${layout.sectionHeading}`, {
     "marginBottom": "8px",
     "overflowWrap": "anywhere"

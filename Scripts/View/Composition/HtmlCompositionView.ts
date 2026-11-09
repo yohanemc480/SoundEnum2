@@ -1,8 +1,9 @@
+import * as previewRow from '../Components/SoundPreviewRow.css.ts';
 import type { CopyText } from '../../Contracts/Services/Clipboard.ts';
 import * as layout from '../Layout/Layout.css.ts';
-import * as settingsStyles from '../Settings/Settings.css.ts';
+import * as settingsStyles from '../Components/SoundSettings.css.ts';
 import * as styles from './Compositions.css.ts';
-import { playing as playingClass } from '../Playback/Playback.css.ts';
+import { playing as playingClass } from '../Components/PlaybackState.css.ts';
 import { OutputArea } from '../Components/OutputArea/OutputArea.ts';
 import { SelectMasterVolumeArea } from '../Components/VolumeControl/SelectMasterVolumeArea.ts';
 import { revealAddedItem } from '../Components/RevealAddedItem.ts';
@@ -61,9 +62,9 @@ export class HtmlCompositionView implements CompositionView {
         this.disposePopovers.forEach(dispose => dispose()); this.disposePopovers = []; this.settingsViews.clear();
         list.replaceChildren();
         rows.forEach(({ command: row, available, missing }, index) => {
-            const item = document.createElement('div'); item.className = styles.compositionRow;
+            const item = document.createElement('div'); item.className = previewRow.row;
             const heading = document.createElement('div'); heading.className = layout.sectionHeading;
-            const name = document.createElement('button'); name.type = 'button'; name.className = styles.compositionName; name.textContent = row.name; name.title = row.name;
+            const name = document.createElement('button'); name.type = 'button'; name.className = previewRow.name; name.textContent = row.name; name.title = row.name;
             name.disabled = !available;
             name.addEventListener('click', () => { this.selectPreview(name); this.actions?.preview(index); });
             item.addEventListener('click', event => {

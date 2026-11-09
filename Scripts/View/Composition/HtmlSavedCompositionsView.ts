@@ -1,6 +1,6 @@
 import type { CopyText } from '../../Contracts/Services/Clipboard.ts';
 import * as layout from '../Layout/Layout.css.ts';
-import * as settingsStyles from '../Settings/Settings.css.ts';
+import * as settingsStyles from '../Components/SoundSettings.css.ts';
 import * as styles from './Compositions.css.ts';
 import { createCopyButton } from '../Components/CopyButton/CopyButton.ts';
 import { revealAddedItem } from '../Components/RevealAddedItem.ts';
