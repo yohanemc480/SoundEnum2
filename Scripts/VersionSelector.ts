@@ -1,21 +1,26 @@
 import { readPreferences, savePreferences } from './SearchPreferences.ts';
 import { Text } from './Text.ts';
 
-export function selectResourceVersion(versions, requested)
-{
+function validateVersions(versions: unknown): asserts versions is string[] {
     if (!Array.isArray(versions) || !versions.length || new Set(versions).size !== versions.length ||
-        versions.some(v => typeof v !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(v)))
+        versions.some((version: unknown) => typeof version !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(version)))
         throw new Error('Invalid available versions');
-    return versions.includes(requested) ? requested : versions[0];
 }
 
-export async function initializeVersionSelector()
+export function selectResourceVersion(versions: unknown, requested: string | null): string {
+    validateVersions(versions);
+    return requested !== null && versions.includes(requested) ? requested : versions[0];
+}
+
+export async function initializeVersionSelector(): Promise<string>
 {
-    const select = document.getElementById('resource-version');
+    const select = document.querySelector<HTMLSelectElement>('#resource-version');
+    if (!select) throw new Error('Missing resource version selector');
     try {
         const response = await fetch('resource/available-versions.json', { cache: 'no-cache' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const versions = await response.json();
+        const versions: unknown = await response.json();
+        validateVersions(versions);
         const url = new URL(location.href);
         const version = selectResourceVersion(versions, url.searchParams.get('version') ?? readPreferences().version);
         select.replaceChildren(...versions.map(v => new Option(v, v)));
@@ -32,7 +37,7 @@ export async function initializeVersionSelector()
         const message = document.createElement('p');
         message.setAttribute('role', 'alert');
         message.textContent = Text.versionLoadFailure;
-        select.parentElement.append(message);
+        select.parentElement?.append(message);
         throw error;
     }
 }

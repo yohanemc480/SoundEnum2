@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mountSoundSettings } from '../Scripts/SoundSettings.js';
+import { mountSoundSettings } from '../Scripts/SoundSettings.ts';
 import { LocalStorageSchema } from '../Scripts/LocalStorageSchema.ts';
 
 test('shared settings preserve precision and reset only their own saved values', () => {
@@ -28,7 +28,7 @@ test('shared settings preserve precision and reset only their own saved values',
         assert.equal(first.volume, 3.25);
         panel.children[2].listeners.click();
         assert.deepEqual(first, defaults);
-        assert.equal(volumeInput.value, defaults.volume);
+        assert.equal(volumeInput.value, String(defaults.volume));
         assert.equal(second.pitch, 1.5);
         assert.equal(second.source, 'music');
     } finally { globalThis.document = oldDocument; globalThis.Option = oldOption; }

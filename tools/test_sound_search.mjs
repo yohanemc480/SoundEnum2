@@ -1,5 +1,5 @@
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
-import { selectResourceVersion } from '../Scripts/VersionSelector.js';
+import { selectResourceVersion } from '../Scripts/VersionSelector.ts';
 import { buildSearchEvents } from '../Scripts/BuildSearchEvents.ts';
 import { decodeSearchVectors } from '../Scripts/SearchVectors.ts';
 import test from 'node:test';

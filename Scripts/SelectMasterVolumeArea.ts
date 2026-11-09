@@ -7,25 +7,29 @@ import { SettingDefine } from "./Constants/SettingDefine.ts";
  */
 export class SelectMasterVolumeArea
 {
-    _slider;
-    constructor(appendTarget, { value = SoundManager.Instance.GetMasterVolume(), onChange = value => SoundManager.Instance.SetMasterVolume(value) } = {})
+    _slider: HTMLInputElement;
+    onChange: (value: number) => void;
+    constructor(appendTarget: string, { value = SoundManager.Instance.GetMasterVolume(), onChange = value => SoundManager.Instance.SetMasterVolume(value) }: { value?: number; onChange?: (value: number) => void } = {})
     {
         this.onChange = onChange;
-        const panel = document.querySelector(appendTarget);
+        const panel = document.querySelector<HTMLElement>(appendTarget);
+        if (!panel) throw new Error(`Missing volume panel: ${appendTarget}`);
         const slider = document.createElement('input');
         slider.type = 'range';
         slider.className = 'preview-volume-slider';
         slider.setAttribute('aria-label', Text.previewVolume);
-        slider.min = SettingDefine.MinMasterVolume;
-        slider.max = SettingDefine.MaxMasterVolume;
+        slider.min = String(SettingDefine.MinMasterVolume);
+        slider.max = String(SettingDefine.MaxMasterVolume);
         slider.step = '0.01';
-        slider.value = value;
+        slider.value = String(value);
         slider.addEventListener('input', () => this.OnUpdateValue(slider.value));
         panel.replaceChildren(slider);
         this._slider = slider;
-        const control = panel.closest('.preview-volume-control');
+        const control = panel.closest<HTMLElement>('.preview-volume-control');
+        if (!control) throw new Error('Missing volume control');
         const button = control.querySelector('button');
-        const setOpen = open => {
+        if (!button) throw new Error('Missing volume button');
+        const setOpen = (open: boolean) => {
             control.classList.toggle('is-open', open);
             panel.inert = !open;
             panel.setAttribute('aria-hidden', String(!open));
@@ -39,11 +43,11 @@ export class SelectMasterVolumeArea
         });
         control.addEventListener('focusin', () => setOpen(true));
         control.addEventListener('focusout', event => {
-            if (!control.contains(event.relatedTarget)) setOpen(false);
+            if (!(event.relatedTarget instanceof Node) || !control.contains(event.relatedTarget)) setOpen(false);
         });
         button.addEventListener('click', () => setOpen(true));
         document.addEventListener('pointerdown', event => {
-            if (!control.contains(event.target)) setOpen(false);
+            if (!(event.target instanceof Node) || !control.contains(event.target)) setOpen(false);
         });
         control.addEventListener('keydown', event => {
             if (event.key === 'Escape') {
@@ -54,9 +58,9 @@ export class SelectMasterVolumeArea
         setOpen(false);
     }
 
-    OnUpdateValue(value)
+    OnUpdateValue(value: string | number): void
     {
         this.onChange(Number(value));
-        this._slider.value = value;
+        this._slider.value = String(value);
     }
 }

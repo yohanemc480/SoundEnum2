@@ -1,9 +1,18 @@
+import type { CommandSettingsValue } from './LocalStorageSchema.ts';
 import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
 import { LocalStorageSchema, normalizeCommandSettings } from './LocalStorageSchema.ts';
 import { Text } from './Text.ts';
 
+interface SoundSettingsOptions {
+    read: () => CommandSettingsValue;
+    save: (value: CommandSettingsValue) => void;
+    onInput?: () => void;
+}
+type NumericSetting = 'volume' | 'pitch' | 'minVolume';
+
 /** 単音・組み合わせ共通の設定UI。保存先は呼び出し側から渡す。 */
-export function mountSoundSettings(panel, { read, save, onInput = () => {} }) {
+export function mountSoundSettings(panel: HTMLElement | null, { read, save, onInput = () => {} }: SoundSettingsOptions): void {
+    if (!panel) throw new Error('Missing sound settings panel');
     const heading = document.createElement('div'); heading.className = 'section-heading';
     const title = document.createElement('h2'); title.textContent = Text.commandSettings;
     const close = document.createElement('button'); close.type = 'button';
@@ -11,7 +20,7 @@ export function mountSoundSettings(panel, { read, save, onInput = () => {} }) {
     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
     heading.append(title, close);
     const controls = document.createElement('div'); controls.className = 'params';
-    const fields = new Map();
+    const fields = new Map<NumericSetting, { input: HTMLInputElement; slider: HTMLInputElement }>();
     const sourceLabel = document.createElement('label'); sourceLabel.className = 'param';
     const caption = document.createElement('span'); caption.className = 'param-label'; caption.textContent = Text.source;
     const source = document.createElement('select'); source.className = 'sound-settings-source';
@@ -21,20 +30,21 @@ export function mountSoundSettings(panel, { read, save, onInput = () => {} }) {
         const value = read();
         source.value = value.source;
         for (const [key, { input, slider }] of fields) {
-            input.value = value[key]; slider.value = value[key];
+            input.value = String(value[key]); slider.value = String(value[key]);
         }
         onInput();
     }
-    function commit(value) { save(normalizeCommandSettings(value)); refresh(); }
+    function commit(value: unknown) { save(normalizeCommandSettings(value)); refresh(); }
     source.addEventListener('change', () => commit({ ...read(), source: source.value }));
-    for (const [key, text, min, max] of [['volume', Text.volume, 0], ['pitch', Text.pitch, .5, 2], ['minVolume', Text.minVolume, 0, 1]]) {
+    const definitions: [NumericSetting, string, number, number?][] = [['volume', Text.volume, 0], ['pitch', Text.pitch, .5, 2], ['minVolume', Text.minVolume, 0, 1]];
+    for (const [key, text, min, max] of definitions) {
         const label = document.createElement('div'); label.className = 'param';
         const caption = document.createElement('span'); caption.className = 'param-label'; caption.textContent = text;
-        const input = document.createElement('input'); input.type = 'number'; input.min = min; input.step = 'any';
-        if (max !== undefined) input.max = max;
+        const input = document.createElement('input'); input.type = 'number'; input.min = String(min); input.step = 'any';
+        if (max !== undefined) input.max = String(max);
         input.setAttribute('aria-label', text);
         const slider = document.createElement('input'); slider.type = 'range';
-        slider.min = min; slider.max = max ?? 1; slider.step = '0.1'; slider.setAttribute('aria-label', text);
+        slider.min = String(min); slider.max = String(max ?? 1); slider.step = '0.1'; slider.setAttribute('aria-label', text);
         slider.addEventListener('input', () => commit({ ...read(), [key]: slider.valueAsNumber }));
         input.addEventListener('input', onInput);
         input.addEventListener('change', () => {

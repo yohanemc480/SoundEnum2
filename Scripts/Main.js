@@ -1,9 +1,9 @@
 import { SavedCompositions } from './SavedCompositions.js';
 import { SoundComposition } from './SoundComposition.js';
-import { mountSoundSettings } from './SoundSettings.js';
-import { confirmAction } from './ConfirmDialog.js';
+import { mountSoundSettings } from './SoundSettings.ts';
+import { confirmAction } from './ConfirmDialog.ts';
 import { localStorageStore } from './LocalStorage.ts';
-import { initializeVersionSelector } from './VersionSelector.js';
+import { initializeVersionSelector } from './VersionSelector.ts';
 import { applyText } from "./ApplyText.ts";
 import { Text } from "./Text.ts";
 import { PreviewPlayer } from "./PreviewPlayer.js";
@@ -15,7 +15,7 @@ import { NetworkFileLoader } from "./NetworkFileLoader.ts";
 import { ResourcePathProvider } from "./ResourcePathProvider.ts";
 import { SoundManager } from "./Singletons/SoundManager.ts";
 import { OutputArea } from "./OutputArea.js";
-import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.js";
+import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.ts";
 import { ResourceManager } from "./Singletons/ResourceManager.ts";
 
 applyText();

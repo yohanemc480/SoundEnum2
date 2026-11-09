@@ -3,7 +3,7 @@ import { createCopyButton } from './CopyButton.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { localStorageStore } from './LocalStorage.ts';
 import { LocalStorageSchema, normalizeCompositionName } from './LocalStorageSchema.ts';
-import { confirmAction, promptText } from './ConfirmDialog.js';
+import { confirmAction, promptText } from './ConfirmDialog.ts';
 import { showToast } from './Toast.ts';
 import { Text } from './Text.ts';
 
