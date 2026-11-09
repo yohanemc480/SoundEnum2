@@ -3,8 +3,14 @@ import { createCopyButton } from "./CopyButton.ts";
 
 export class OutputArea
 {
-    constructor(appendTarget)
+    value: string;
+    readonly text: HTMLDivElement;
+    readonly copyButton: HTMLButtonElement;
+
+    constructor(appendTarget: string)
     {
+        const target = document.querySelector<HTMLElement>(appendTarget);
+        if (!target) throw new Error(`Missing command output element: ${appendTarget}`);
         this.value = '';
         this.text = document.createElement('div');
         this.text.className = 'output-text';
@@ -13,10 +19,10 @@ export class OutputArea
         this.text.addEventListener('click', () => {
             if (!this.copyButton.disabled) copyCommand(this.value);
         });
-        document.querySelector(appendTarget).append(this.text, this.copyButton);
+        target.append(this.text, this.copyButton);
     }
 
-    SetText(text)
+    SetText(text: string): void
     {
         this.value = text;
         const lines = text.split('\n');

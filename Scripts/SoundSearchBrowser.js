@@ -1,4 +1,4 @@
-import { SoundAutocomplete } from './SoundAutocomplete.js';
+import { SoundAutocomplete } from './SoundAutocomplete.ts';
 import { confirmAction } from './ConfirmDialog.ts';
 import { readPreferences, savePreferences, restoreSearchPreferences } from './SearchPreferences.ts';
 import { showToast } from './Toast.ts';

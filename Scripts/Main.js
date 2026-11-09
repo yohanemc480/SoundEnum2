@@ -14,7 +14,7 @@ import { MCPlaysoundCommandParamResource } from "./MCPlaysoundCommandParamResour
 import { NetworkFileLoader } from "./NetworkFileLoader.ts";
 import { ResourcePathProvider } from "./ResourcePathProvider.ts";
 import { SoundManager } from "./Singletons/SoundManager.ts";
-import { OutputArea } from "./OutputArea.js";
+import { OutputArea } from "./OutputArea.ts";
 import { SelectMasterVolumeArea } from "./SelectMasterVolumeArea.ts";
 import { ResourceManager } from "./Singletons/ResourceManager.ts";
 

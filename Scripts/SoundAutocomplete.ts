@@ -2,7 +2,14 @@ import { Text } from './Text.ts';
 
 /** 基準音入力専用の候補リスト。フォーカスは入力欄に保持する。 */
 export class SoundAutocomplete {
-    constructor(input) {
+    readonly input: HTMLInputElement;
+    readonly list: HTMLDivElement;
+    names: readonly string[];
+    matches: string[] = [];
+    active: number;
+
+    constructor(input: HTMLInputElement | null) {
+        if (!input) throw new Error('Missing autocomplete input');
         this.input = input;
         this.names = [];
         this.active = -1;
@@ -36,10 +43,10 @@ export class SoundAutocomplete {
         this.list.addEventListener('pointerdown', event => event.preventDefault());
         window.addEventListener('resize', () => this.hide());
         window.addEventListener('scroll', event => {
-            if (!this.list.contains(event.target)) this.hide();
+            if (!(event.target instanceof Node) || !this.list.contains(event.target)) this.hide();
         }, true);
     }
-    setNames(names) { this.names = names; }
+    setNames(names: readonly string[]): void { this.names = names; }
     hide() {
         this.list.hidden = true;
         this.input.setAttribute('aria-expanded', 'false');
@@ -79,11 +86,14 @@ export class SoundAutocomplete {
     highlight() {
         [...this.list.children].forEach((option, index) => option.setAttribute('aria-selected', String(index === this.active)));
         const option = this.list.children[this.active];
+        if (!option) return;
         this.input.setAttribute('aria-activedescendant', option.id);
         option.scrollIntoView({ block: 'nearest' });
     }
-    choose(index) {
-        this.input.value = this.matches[index];
+    choose(index: number): void {
+        const name = this.matches[index];
+        if (name === undefined) return;
+        this.input.value = name;
         this.input.dispatchEvent(new Event('input', { bubbles: true }));
         this.hide();
     }

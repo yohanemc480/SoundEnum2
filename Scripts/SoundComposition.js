@@ -1,5 +1,5 @@
 import { revealAddedItem } from './RevealAddedItem.ts';
-import { OutputArea } from './OutputArea.js';
+import { OutputArea } from './OutputArea.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { SelectMasterVolumeArea } from './SelectMasterVolumeArea.ts';
 import { CompositionWaveform } from './CompositionWaveform.ts';
