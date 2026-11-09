@@ -1,7 +1,20 @@
+import type { SearchCandidate } from './SearchTypes.ts';
 import { getWaveform } from './WaveformResource.ts';
 
+interface WaveformRow { candidate: SearchCandidate; pitch: number; volume: number }
+interface WaveformLayer { peaks: Float32Array; duration: number; volume: number; index: number }
+
 export class CompositionWaveform {
-    constructor(canvas, timeOutput) {
+    readonly canvas: HTMLCanvasElement;
+    readonly timeOutput: HTMLElement;
+    readonly resize: ResizeObserver;
+    totalDuration: number;
+    layers: WaveformLayer[];
+    revision: number;
+    time: number;
+    duration: number | null = null;
+    frame: number | null = null;
+    constructor(canvas: HTMLCanvasElement, timeOutput: HTMLElement) {
         this.timeOutput = timeOutput;
         this.totalDuration = 0;
         this.canvas = canvas;
@@ -11,7 +24,7 @@ export class CompositionWaveform {
         this.resize = new ResizeObserver(() => this.draw());
         this.resize.observe(canvas);
     }
-    async setRows(rows) {
+    async setRows(rows: readonly WaveformRow[]): Promise<void> {
         const revision = ++this.revision;
         this.totalDuration = Math.max(0, ...rows.map(row => row.candidate.duration / row.pitch));
         this.layers = [];
@@ -24,10 +37,10 @@ export class CompositionWaveform {
             } catch (error) { console.warn('Cannot load composition waveform', error); return null; }
         }));
         if (revision !== this.revision) return;
-        this.layers = layers.filter(Boolean);
+        this.layers = layers.filter((layer): layer is WaveformLayer => layer !== null);
         this.draw();
     }
-    play(context, start, duration) {
+    play(context: BaseAudioContext, start: number, duration: number): void {
         this.stop();
         this.duration = duration;
         const tick = () => {
@@ -38,7 +51,7 @@ export class CompositionWaveform {
         tick();
     }
     stop() {
-        cancelAnimationFrame(this.frame);
+        if (this.frame !== null) cancelAnimationFrame(this.frame);
         this.frame = null;
         this.time = 0;
         this.duration = null;
@@ -46,7 +59,7 @@ export class CompositionWaveform {
     }
     draw() {
         const duration = this.duration ?? this.totalDuration;
-        const format = seconds => {
+        const format = (seconds: number) => {
             const tenths = Math.floor(Math.max(0, Number.isFinite(seconds) ? seconds : 0) * 10);
             return `${Math.floor(tenths / 600)}:${((tenths % 600) / 10).toFixed(1).padStart(4, '0')}`;
         };
@@ -56,6 +69,7 @@ export class CompositionWaveform {
         const ratio = window.devicePixelRatio || 1;
         this.canvas.width = Math.round(width * ratio); this.canvas.height = Math.round(height * ratio);
         const ctx = this.canvas.getContext('2d');
+        if (!ctx) return;
         ctx.scale(ratio, ratio);
         if (!duration) return;
         for (const layer of this.layers) {

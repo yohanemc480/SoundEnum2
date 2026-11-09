@@ -10,6 +10,9 @@
 - 配布データのコピーと、公開前に任意実行する容量検査を追加。
 - 既存31テストと実データ検証（1,984イベント・4,941音源）が通過。
 - npm installはregistry.npmjs.orgのENOTFOUNDで失敗。lockfile生成、型チェック、Viteによるビルド・previewは未完了。
+- 波形・再生UI4ファイル（PreviewWaveform、CompositionWaveform、SearchWaveforms、PreviewPlayer）をTS化。既存44ファイルを移行済み、追加2ファイル込みでTSは46ファイル。残りのJSはMain、OutputArea、SavedCompositions、SoundAutocomplete、SoundComposition、SoundSearchBrowserの6ファイル。
+- Canvas・音声要素・波形配列・Observer・タイマーとフレームIDを型付け。描画コンテキストやキュー要素の欠落を処理し、シーク入力の値を文字列として設定する。
+- 36テストと実データ検証が通過。ドラッグ操作・波形描画の実ブラウザ確認、静的型チェック、Viteビルドは依存取得後に実施する。
 - 設定・ダイアログ関連4ファイル（ConfirmDialog、SoundSettings、VersionSelector、SelectMasterVolumeArea）をTS化。既存40ファイルを移行済み、共通定義を含めTSは42ファイル。残りのJSは10ファイル。
 - 確認と文字入力のPromise戻り値を区別し、設定コールバック・数値入力・DOMイベントを型付け。バージョン一覧はunknownから検証。HTML入力要素のvalue/min/maxは文字列として設定する。
 - 設定保存を含む36テストと実データ検証が通過。静的型チェック・ブラウザ表示・Viteビルドは未検証。

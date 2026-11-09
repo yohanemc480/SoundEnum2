@@ -1,20 +1,22 @@
 import { Text } from "./Text.ts";
-import { PreviewWaveform } from "./PreviewWaveform.js";
+import { PreviewWaveform } from "./PreviewWaveform.ts";
 /** 試聴中の音声と再生ボタン・シークバーを同期する。 */
 export class PreviewPlayer
 {
-    constructor(audio)
+    constructor(audio: HTMLAudioElement)
     {
-        const button = document.querySelector('#preview-toggle');
-        const seek = document.querySelector('#preview-seek');
-        const waveform = new PreviewWaveform(audio, document.querySelector('#preview-waveform'));
-        const time = document.querySelector('#preview-time');
-        const soundId = document.querySelector('#preview-sound-id');
-        const status = document.querySelector('#preview-status');
-        const loading = document.querySelector('#preview-loading');
+        const button = document.querySelector<HTMLButtonElement>('#preview-toggle');
+        const seek = document.querySelector<HTMLInputElement>('#preview-seek');
+        const canvas = document.querySelector<HTMLCanvasElement>('#preview-waveform');
+        const time = document.querySelector<HTMLElement>('#preview-time');
+        const soundId = document.querySelector<HTMLElement>('#preview-sound-id');
+        const status = document.querySelector<HTMLElement>('#preview-status');
+        const loading = document.querySelector<HTMLElement>('#preview-loading');
+        if (!button || !seek || !canvas || !time || !soundId || !status || !loading) throw new Error('Missing preview player element');
+        const waveform = new PreviewWaveform(audio, canvas);
         let dragging = false;
-        let frame = null;
-        const format = seconds => {
+        let frame: number | null = null;
+        const format = (seconds: number) => {
             const value = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
             return `${Math.floor(value / 60)}:${(value % 60).toFixed(1).padStart(4, '0')}`;
         };
@@ -32,8 +34,8 @@ export class PreviewPlayer
             button.setAttribute('aria-label', label);
             button.title = label;
             seek.disabled = !ready;
-            seek.max = ready ? audio.duration : 0;
-            if (!dragging) seek.value = ready ? audio.currentTime : 0;
+            seek.max = String(ready ? audio.duration : 0);
+            if (!dragging) seek.value = String(ready ? audio.currentTime : 0);
             time.textContent = `${format(dragging ? Number(seek.value) : audio.currentTime)} / ${format(audio.duration)}`;
             seek.setAttribute('aria-valuetext', time.textContent);
             waveform.setProgress(ready ? Number(seek.value) / audio.duration : 0);
@@ -48,7 +50,7 @@ export class PreviewPlayer
                 await audio.play();
                 status.textContent = '';
             } catch (error) {
-                if (error.name !== 'AbortError') status.textContent = Text.previewSelectAgain;
+                if (!(error instanceof Error) || error.name !== 'AbortError') status.textContent = Text.previewSelectAgain;
             }
             update();
         });

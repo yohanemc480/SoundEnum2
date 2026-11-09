@@ -6,7 +6,7 @@ import { localStorageStore } from './LocalStorage.ts';
 import { initializeVersionSelector } from './VersionSelector.ts';
 import { applyText } from "./ApplyText.ts";
 import { Text } from "./Text.ts";
-import { PreviewPlayer } from "./PreviewPlayer.js";
+import { PreviewPlayer } from "./PreviewPlayer.ts";
 import { initializeBrowserTabs } from "./BrowserTabs.ts";
 import { SoundSearchBrowser } from "./SoundSearchBrowser.js";
 import { MCSoundHashResource } from "./MCSoundHashResource.ts";

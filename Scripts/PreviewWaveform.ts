@@ -1,7 +1,12 @@
 import { getWaveform } from "./WaveformResource.ts";
 export class PreviewWaveform
 {
-    constructor(audio, canvas)
+    readonly canvas: HTMLCanvasElement;
+    peaks: Float32Array | null;
+    progress: number;
+    generation: number;
+
+    constructor(audio: HTMLAudioElement, canvas: HTMLCanvasElement)
     {
         this.canvas = canvas;
         this.peaks = null;
@@ -11,12 +16,12 @@ export class PreviewWaveform
             ++this.generation;
             this.peaks = null;
             this.setProgress(0);
-            this.load(event.detail);
+            if (event instanceof CustomEvent && typeof event.detail === 'string') this.load(event.detail);
         });
         new ResizeObserver(() => this.draw()).observe(canvas);
     }
 
-    async load(hash)
+    async load(hash: string): Promise<void>
     {
         const generation = this.generation;
         try {
@@ -29,7 +34,7 @@ export class PreviewWaveform
         }
     }
 
-    setProgress(progress)
+    setProgress(progress: number): void
     {
         this.progress = Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : 0;
         this.draw();
@@ -45,10 +50,11 @@ export class PreviewWaveform
         if (canvas.width !== Math.round(width * scale)) canvas.width = Math.round(width * scale);
         if (canvas.height !== Math.round(height * scale)) canvas.height = Math.round(height * scale);
         const context = canvas.getContext('2d');
+        if (!context) return;
         context.setTransform(scale, 0, 0, scale, 0, 0);
         context.clearRect(0, 0, width, height);
         const colors = getComputedStyle(canvas);
-        const paint = color => {
+        const paint = (color: string) => {
             context.fillStyle = color;
             if (!this.peaks) {
                 context.fillRect(0, height / 2 - 1, width, 2);

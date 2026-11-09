@@ -2,7 +2,7 @@ import { revealAddedItem } from './RevealAddedItem.ts';
 import { OutputArea } from './OutputArea.js';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { SelectMasterVolumeArea } from './SelectMasterVolumeArea.ts';
-import { CompositionWaveform } from './CompositionWaveform.js';
+import { CompositionWaveform } from './CompositionWaveform.ts';
 import { mountSoundSettings } from './SoundSettings.ts';
 import { bindSettingsPopover } from './BindSettingsPopover.ts';
 import { Text } from './Text.ts';

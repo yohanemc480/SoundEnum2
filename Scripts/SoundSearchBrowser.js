@@ -4,7 +4,7 @@ import { readPreferences, savePreferences, restoreSearchPreferences } from './Se
 import { showToast } from './Toast.ts';
 import { Favorites } from './Favorites.ts';
 import { Text } from './Text.ts';
-import { SearchWaveforms } from './SearchWaveforms.js';
+import { SearchWaveforms } from './SearchWaveforms.ts';
 import { SoundSearchResource } from './SoundSearchResource.ts';
 import { SoundManager } from './Singletons/SoundManager.ts';
 import { MCCommandSound } from './MCCommandSound.ts';
