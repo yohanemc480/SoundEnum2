@@ -123,34 +123,8 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .search-filters { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: minmax(140px, 1fr) minmax(180px, 1fr) minmax(260px, 1.6fr); align-items: start; }
 .search-tags { display: flex; flex-wrap: wrap; gap: 6px 12px; min-height: 38px; align-content: center; }
 .search-tags label { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-.search-row { display: flex; flex-direction: column; padding: 3px 0; }
-.search-row-main { display: flex; gap: 8px; align-items: center; padding-right: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); cursor: pointer; }
-.search-row-content { flex: 1; min-width: 0; padding: 6px 10px; }
-.search-row-waveform { width: clamp(80px, 14vw, 180px); height: 30px; flex: 0 0 auto; opacity: .65; pointer-events: none; }
-@media (max-width: 900px) { .search-row-waveform { display: none; } }
-.search-row-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
-.search-preview { min-width: 0; text-align: left; }
-.search-row-metadata { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
-.search-preview span { overflow-wrap: anywhere; }
-.search-row-metadata { margin-top: 3px; }
-.search-row-metadata small { opacity: .75; }
-.search-row button, #search-clear, #search-retry { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--text); padding: 10px; font: inherit; cursor: pointer; }
-.search-row .search-preview { padding: 0; border: 0; background: transparent; }
-.search-row .search-candidate-trigger { padding: 2px 6px; font-size: 12px; flex-shrink: 0; }
-.search-row-main:hover, .search-row-main:has(.search-preview.selected), .composition-row:has(.composition-name:not(:disabled)):hover, .composition-row:has(.composition-name.selected) { background: #283f33; border-color: var(--row-highlight-border, #42634d); }
-.search-row-main.search-row-base { --row-highlight-border: var(--accent); border-color: var(--accent); box-shadow: inset 3px 0 var(--accent); }
-.sound-tag-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-.sound-tag-badge { display: inline-block; padding: 1px 7px; border: 1px solid #42634d; border-radius: 999px; background: #283f33; color: var(--accent); font: 12px/1.5 "Segoe UI", "Yu Gothic UI", sans-serif; }
-.sound-tag-empty { color: var(--muted); font-size: 12px; }
-.search-row-actions { display: flex; gap: 5px; flex-shrink: 0; }
-.search-row-actions button { padding: 6px 10px; font-size: 12px; }
-.sound-candidates-popover { position: fixed; inset: auto; margin: 0; width: min(440px, calc(100vw - 24px)); max-height: min(520px, calc(100dvh - 24px)); overflow-y: auto; overscroll-behavior: contain; padding: 16px; border: 1px solid #42634d; border-radius: 12px; background: var(--panel); color: var(--text); box-shadow: 0 12px 40px #0008; }
-.sound-candidates-popover h2 { overflow-wrap: anywhere; min-width: 0; flex: 1; }
-.sound-candidates-popover .sound-tag-candidate { border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--text); padding: 10px; cursor: pointer; font: inherit; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 6px; text-align: left; overflow-wrap: anywhere; font-size: 12px; }
-.sound-candidates-popover .sound-tag-candidate:hover, .sound-candidates-popover .sound-tag-candidate.selected { background: #283f33; border-color: #42634d; }
 #search-form:disabled { opacity: .5; }
 @media (max-width: 700px) { .search-filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .search-tags-field { grid-column: 1 / -1; } }
-@media (max-width: 560px) { .search-row-actions { flex-direction: column; } }
 
 .copy-button { position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 30px; height: 30px; padding: 6px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--muted); cursor: pointer; }
 .copy-button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
@@ -166,7 +140,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .search-option { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; }
 .search-option input[type="checkbox"] { height: auto; padding: 0; flex: 0 0 auto; }
 
-.search-similarity { font-variant-numeric: tabular-nums; white-space: pre; }
 
 /* 広い画面では残りの高さを一覧に割り当て、一覧内でスクロールする。 */
 @media (min-width: 1100px) and (min-height: 700px) {
@@ -182,10 +155,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   .sub > .panel { flex-shrink: 0; }
 }
 
-.search-row button:disabled { opacity: .45; cursor: default; }
-.search-row button[data-favorite] { width: 34px; padding: 6px; font-size: 20px; line-height: 18px; }
-.search-row button[data-favorite][aria-pressed="false"] { color: #71827b; }
-.search-row button[data-favorite][aria-pressed="true"] { color: #f5c451; }
 @media (min-width: 1100px) and (min-height: 700px) {
   #favorites-panel { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   #favorites-status { flex-shrink: 0; }
@@ -221,7 +190,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .composition-row { padding: 4px 8px; margin: 4px 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 .composition-row > .section-heading { flex-wrap: nowrap; margin-bottom: 0; }
 .composition-row .composition-name { font: 12px/1.5 Consolas, monospace; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.search-row button.composition-add { font-size: 20px; line-height: 18px; width: 34px; padding: 6px; }
 #composition-count { font-size: 12px; }
 .composition-panel { display: flex; flex-direction: column; min-height: 0; }
 .composition-panel .section-note { margin-bottom: 8px; }
@@ -241,7 +209,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .composition-title #composition-count { color: var(--muted); font-size: 12px; }
 
 .composition-name { padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
-.composition-row .composition-name:hover:not(:disabled), .composition-row .composition-name.selected { color: var(--accent); }
 .composition-row button:disabled { opacity: .45; cursor: default; }
 .composition-actions { margin-left: auto; white-space: nowrap; }
 

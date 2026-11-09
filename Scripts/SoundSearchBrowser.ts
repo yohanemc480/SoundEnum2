@@ -1,3 +1,4 @@
+import * as styles from './SearchResults.css.ts';
 import type { OutputArea } from './OutputArea.ts';
 import type { ResourcePathProvider } from './ResourcePathProvider.ts';
 import type { SoundComposition } from './SoundComposition.ts';
@@ -75,7 +76,7 @@ export class SoundSearchBrowser
         this.page = 0;
         this.results = [];
         this.candidatePopover = document.createElement('section');
-        this.candidatePopover.className = 'sound-candidates-popover';
+        this.candidatePopover.className = styles.soundCandidatesPopover;
         this.candidatePopover.popover = 'auto';
         this.candidatePopover.setAttribute('aria-label', Text.searchAssignedTags);
         document.body.append(this.candidatePopover);
@@ -216,17 +217,17 @@ export class SoundSearchBrowser
     createTagBadges(tags: readonly string[])
     {
         const badges = document.createElement('span');
-        badges.className = 'sound-tag-badges';
+        badges.className = styles.soundTagBadges;
         badges.setAttribute('aria-label', Text.searchAssignedTags);
         for (const id of tags) {
             const badge = document.createElement('span');
-            badge.className = 'sound-tag-badge';
+            badge.className = styles.soundTagBadge;
             badge.textContent = tagLabel(this.index?.tags.find(tag => tag.id === id)?.textKey);
             badges.append(badge);
         }
         if (!tags.length) {
             const empty = document.createElement('span');
-            empty.className = 'sound-tag-empty';
+            empty.className = styles.soundTagEmpty;
             empty.textContent = Text.searchNoTags;
             badges.append(empty);
         }
@@ -301,21 +302,21 @@ export class SoundSearchBrowser
                 const command = new MCCommandSound(name, settings?.source ?? manager.GetSource(), MCCommandSelector.All, settings?.volume ?? manager.GetVolume(), settings?.pitch ?? manager.GetPitch(), settings?.minVolume ?? manager.GetMinVolume());
                 manager.Play(command, candidate ? new MCRawSound({ ...candidate }) : null);
                 this.outputArea.SetText(command.ToString());
-                document.querySelectorAll('.browser-panel .selected, .composition-row .selected').forEach(element => element.classList.remove('selected'));
-                this.candidatePopover.querySelectorAll('.selected').forEach(element => element.classList.remove('selected'));
-                button.classList.add('selected');
+                document.querySelectorAll(`.browser-panel .${styles.selected}, .composition-row .${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
+                this.candidatePopover.querySelectorAll(`.${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
+                button.classList.add(styles.selected);
     }
 
     appendRow(entry: BrowserResult, container: HTMLElement) {
             const candidates = this.index?.events.find(event => event.name === entry.name)?.candidates ?? [];
-            const row = document.createElement('div'); row.className = 'search-row';
-            const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'search-preview';
+            const row = document.createElement('div'); row.className = styles.searchRow;
+            const preview = document.createElement('button'); preview.type = 'button'; preview.className = styles.searchPreview;
             const name = document.createElement('span'); name.textContent = entry.name;
             const detail = document.createElement('small');
-            detail.className = 'search-similarity';
+            detail.className = styles.searchSimilarity;
             detail.textContent = [entry.score === null ? '' : Text.searchScore(Math.round(entry.score * 100)),
                 entry.sameAudio ? Text.searchSameAudio : ''].filter(Boolean).join(' · ');
-            const metadata = document.createElement('span'); metadata.className = 'search-row-metadata';
+            const metadata = document.createElement('span'); metadata.className = styles.searchRowMetadata;
             if (detail.textContent) metadata.append(detail);
             if (candidates.length) metadata.append(this.createTagBadges(entry.tags));
             else metadata.textContent = Text.favoritesUnavailable;
@@ -331,17 +332,17 @@ export class SoundSearchBrowser
             similar.addEventListener('click', () => {
                 this.searchSimilar(entry.name);
             });
-            const main = document.createElement('div'); main.className = 'search-row-main';
-            main.classList.toggle('search-row-base', entry.name === this.resultBase && !requireElement('favorites-panel').contains(container));
+            const main = document.createElement('div'); main.className = styles.searchRowMain;
+            main.classList.toggle(styles.searchRowBase, entry.name === this.resultBase && !requireElement('favorites-panel').contains(container));
             main.addEventListener('click', event => {
                 if (event.target instanceof Element && event.target.closest('button')) return;
                 preview.click();
             });
-            const content = document.createElement('div'); content.className = 'search-row-content';
-            const heading = document.createElement('div'); heading.className = 'search-row-heading';
+            const content = document.createElement('div'); content.className = styles.searchRowContent;
+            const heading = document.createElement('div'); heading.className = styles.searchRowHeading;
             heading.append(preview);
             content.append(heading, metadata);
-            const actions = document.createElement('div'); actions.className = 'search-row-actions';
+            const actions = document.createElement('div'); actions.className = styles.searchRowActions;
             const favorite = document.createElement('button'); favorite.type = 'button';
             favorite.dataset.favorite = entry.name;
             this.updateFavoriteButton(favorite);
@@ -361,7 +362,7 @@ export class SoundSearchBrowser
             add.addEventListener('click', () => this.composition.add(entry.name));
             actions.append(favorite, add, similar);
             const waveform = document.createElement('canvas');
-            waveform.className = 'search-row-waveform';
+            waveform.className = styles.searchRowWaveform;
             waveform.setAttribute('aria-hidden', 'true');
             main.append(content, waveform, actions); row.append(main);
             if (entry.count > 1) {
@@ -382,7 +383,7 @@ export class SoundSearchBrowser
                     close.popoverTargetElement = panel; close.popoverTargetAction = 'hide';
                     heading.append(title, close); panel.append(heading);
                     candidates.forEach((candidate, i) => {
-                        const button = document.createElement('button'); button.type = 'button'; button.className = 'sound-tag-candidate';
+                        const button = document.createElement('button'); button.type = 'button'; button.className = styles.soundTagCandidate;
                         const label = document.createElement('span');
                         label.textContent = Text.searchCandidateName(i + 1, candidate.name, candidate.pitch);
                         button.setAttribute('aria-label', Text.searchPreviewCandidate(i + 1, candidate.name));
@@ -393,7 +394,7 @@ export class SoundSearchBrowser
                     // 別の行から開き直した場合も、新しい位置でtoggleイベントを受ける。
                     panel.hidePopover();
                 });
-                trigger.className = 'search-candidate-trigger';
+                trigger.className = styles.searchCandidateTrigger;
                 heading.append(trigger);
             }
             container.append(row);
