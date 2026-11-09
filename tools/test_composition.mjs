@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.js';
+import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
 import { SoundComposition } from '../Scripts/SoundComposition.js';
 import { SoundManager } from '../Scripts/Singletons/SoundManager.js';
 

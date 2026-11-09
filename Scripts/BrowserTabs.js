@@ -1,4 +1,4 @@
-import { readPreferences, savePreferences } from './SearchPreferences.js';
+import { readPreferences, savePreferences } from './SearchPreferences.ts';
 /** 各検索画面から独立したタブの操作とキーボード移動。 */
 export function initializeBrowserTabs()
 {

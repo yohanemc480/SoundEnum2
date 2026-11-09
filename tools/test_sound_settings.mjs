@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mountSoundSettings } from '../Scripts/SoundSettings.js';
-import { LocalStorageSchema } from '../Scripts/LocalStorageSchema.js';
+import { LocalStorageSchema } from '../Scripts/LocalStorageSchema.ts';
 
 test('shared settings preserve precision and reset only their own saved values', () => {
     const oldDocument = globalThis.document, oldOption = globalThis.Option;

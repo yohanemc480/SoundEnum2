@@ -1,5 +1,5 @@
-import { localStorageStore } from '../LocalStorage.js';
-import { LocalStorageSchema, normalizeCommandSettings } from '../LocalStorageSchema.js';
+import { localStorageStore } from '../LocalStorage.ts';
+import { LocalStorageSchema, normalizeCommandSettings } from '../LocalStorageSchema.ts';
 import { MCCommandSoundSource } from "../Constants/MCCommandSoundSource.ts";
 import { SettingDefine } from "../Constants/SettingDefine.ts";
 import { MCCommandSound } from "../MCCommandSound.js";

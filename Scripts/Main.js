@@ -2,7 +2,7 @@ import { SavedCompositions } from './SavedCompositions.js';
 import { SoundComposition } from './SoundComposition.js';
 import { mountSoundSettings } from './SoundSettings.js';
 import { confirmAction } from './ConfirmDialog.js';
-import { localStorageStore } from './LocalStorage.js';
+import { localStorageStore } from './LocalStorage.ts';
 import { initializeVersionSelector } from './VersionSelector.js';
 import { applyText } from "./ApplyText.js";
 import { Text } from "./Text.js";

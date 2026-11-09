@@ -1,7 +1,7 @@
-import { LocalStorage } from '../Scripts/LocalStorage.js';
+import { LocalStorage } from '../Scripts/LocalStorage.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Favorites } from '../Scripts/Favorites.js';
+import { Favorites } from '../Scripts/Favorites.ts';
 
 test('favorites persist only IDs and survive new instances', () => {
     let value = null;

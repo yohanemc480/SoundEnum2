@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SoundManager } from '../Scripts/Singletons/SoundManager.js';
-import { normalizeCommandSettings } from '../Scripts/LocalStorageSchema.js';
+import { normalizeCommandSettings } from '../Scripts/LocalStorageSchema.ts';
 
 test('command settings restore and persist precise values across instances', () => {
     let saved = JSON.stringify({ source: 'block', volume: 3.25, pitch: 1.23, minVolume: .37 });

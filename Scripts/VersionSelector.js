@@ -1,4 +1,4 @@
-import { readPreferences, savePreferences } from './SearchPreferences.js';
+import { readPreferences, savePreferences } from './SearchPreferences.ts';
 import { Text } from './Text.js';
 
 export function selectResourceVersion(versions, requested)

@@ -1,8 +1,8 @@
 import { revealAddedItem } from './RevealAddedItem.js';
 import { createCopyButton } from './CopyButton.js';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
-import { localStorageStore } from './LocalStorage.js';
-import { LocalStorageSchema, normalizeCompositionName } from './LocalStorageSchema.js';
+import { localStorageStore } from './LocalStorage.ts';
+import { LocalStorageSchema, normalizeCompositionName } from './LocalStorageSchema.ts';
 import { confirmAction, promptText } from './ConfirmDialog.js';
 import { showToast } from './Toast.js';
 import { Text } from './Text.js';

@@ -1,7 +1,7 @@
 import { nextCompositionName } from '../Scripts/SavedCompositions.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSavedCompositions, normalizePreferences, normalizeCompositionName } from '../Scripts/LocalStorageSchema.js';
+import { normalizeSavedCompositions, normalizePreferences, normalizeCompositionName } from '../Scripts/LocalStorageSchema.ts';
 
 test('saved compositions copy settings, retain duplicate sounds and validate limits', () => {
     const row = { name: 'block.anvil.destroy', source: 'block', volume: .35, pitch: 1.2, minVolume: .1 };

@@ -1,5 +1,5 @@
 import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
-import { LocalStorageSchema, normalizeCommandSettings } from './LocalStorageSchema.js';
+import { LocalStorageSchema, normalizeCommandSettings } from './LocalStorageSchema.ts';
 import { Text } from './Text.js';
 
 /** 単音・組み合わせ共通の設定UI。保存先は呼び出し側から渡す。 */
