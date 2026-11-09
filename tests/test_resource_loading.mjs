@@ -36,3 +36,39 @@ test('Workerへの送信に失敗した要求を保留一覧から除去する',
     await assert.rejects(resource.search({}), /clone failed/);
     assert.equal(resource.pending.size, 0);
 });
+
+
+test('指定バージョンのIDだけを除外し、同じ音源の別IDは残して通常の検索条件も渡す', async t => {
+    const service = new WorkerSearchService(new ResourcePathProvider('new'), ['old', 'new']);
+    const results = [{ name: 'existing', candidate: { hash: 'same' } }, { name: 'added', candidate: { hash: 'same' } }];
+    const requests = [], fetched = [];
+    service.request = async request => { requests.push(request.options); return { results }; };
+    t.mock.method(globalThis, 'fetch', async (url, options) => {
+        fetched.push({ url, options });
+        return { ok: true, json: async () => ({ existing: { sounds: [] } }) };
+    });
+    const options = { query: 'bell', tags: ['metal'], referenceSoundName: 'base', excludedVersion: 'old' };
+    assert.deepEqual((await service.search(options)).map(row => row.name), ['added']);
+    assert.deepEqual(requests[0], options);
+    await service.search(options);
+    assert.equal(fetched.length, 1);
+    assert.equal(fetched[0].url, 'resource/old/sound-events.json');
+    assert.equal((await service.search({ ...options, excludedVersion: '' })).length, 2);
+    service.dispose();
+    assert.equal(fetched[0].options.signal.aborted, true);
+});
+
+test('除外元の取得失敗で未除外の結果を返さず、再試行できる', async t => {
+    const service = new WorkerSearchService(new ResourcePathProvider('new'), ['old', 'new']);
+    service.request = async () => ({ results: [{ name: 'existing' }] });
+    let attempts = 0;
+    t.mock.method(globalThis, 'fetch', async () => {
+        if (++attempts === 1) return { ok: false, status: 404 };
+        return { ok: true, json: async () => ({ existing: {} }) };
+    });
+    await assert.rejects(service.search({ excludedVersion: 'old' }), /404/);
+    assert.deepEqual(await service.search({ excludedVersion: 'old' }), []);
+    await assert.rejects(service.search({ excludedVersion: '../bad' }), /Unknown/);
+    assert.equal(attempts, 2);
+    service.dispose();
+});

@@ -46,6 +46,8 @@ export interface SearchOptions {
     /** 基準イベント内の候補番号。nullまたは省略時は全候補を比較する。 */
     referenceCandidateIndex?: number | null;
     excludeMultipleCandidates?: boolean;
+    /** このバージョンに定義されたサウンドIDを結果から除外する。空文字は除外なし。 */
+    excludedVersion?: string;
 }
 /** イベント単位の検索結果。candidateは条件に合う代表候補、candidateCountは元の候補数。scoreは全再生候補の類似度の中央値。 */
 export interface SearchResult {
@@ -61,6 +63,8 @@ export interface SearchResult {
 export interface SearchSourceIndex extends Omit<SearchIndex, 'hashes' | 'dimensions' | 'events'> {
     events: SearchSound[];
     vectorHash?: string;
+    /** 検索画面で除外対象として指定できる配布済みバージョン。 */
+    availableVersions?: string[];
 }
 /** タグ定義ファイルの内容。vectorHashで対応するベクトルファイルを照合する。 */
 export interface SearchTagData extends Omit<SearchSourceIndex, 'events'> {

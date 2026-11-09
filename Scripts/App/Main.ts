@@ -91,7 +91,7 @@ try {
         row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
         name => { void searchScreen.presenter.requestSimilar(name); }, copyText));
     const composition = compositionScreen.presenter;
-    const searchScreen = scope.own(createSearchScreen(paths, composition, playbackPresenter, browserPreferences));
+    const searchScreen = scope.own(createSearchScreen(paths, composition, playbackPresenter, browserPreferences, versionSelector.availableVersions()));
     scope.own(createSavedCompositionsScreen(composition, paths.Version, copyText));
     void searchScreen.presenter.load();
 

@@ -11,7 +11,7 @@ export function createResourceVersionSelector(preferences: BrowserPreferencesSto
     try {
         const view = scope.own(new HtmlResourceVersionView());
         const presenter = scope.own(new ResourceVersionPresenter(view, new FetchResourceVersions(), preferences, new BrowserResourceVersionNavigation()));
-        return { load: () => presenter.load(), dispose: () => scope.dispose() };
+        return { load: () => presenter.load(), availableVersions: () => presenter.availableVersions(), dispose: () => scope.dispose() };
     } catch (error) {
         try { scope.dispose(); } catch (cleanupError) { console.error(cleanupError); }
         throw error;

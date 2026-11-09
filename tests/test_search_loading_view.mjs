@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 // Viewの要素型定義だけを読み込むため、Nodeに存在しないDOMコンストラクターを補う。
-const elementTypes = ['HTMLFieldSetElement', 'HTMLFormElement', 'HTMLInputElement', 'HTMLButtonElement', 'HTMLElement'];
+const elementTypes = ['HTMLFieldSetElement', 'HTMLFormElement', 'HTMLInputElement', 'HTMLSelectElement', 'HTMLButtonElement', 'HTMLElement'];
 const originalTypes = new Map(elementTypes.map(name => [name, globalThis[name]]));
 for (const name of elementTypes) globalThis[name] = class {};
 const { HtmlSearchView } = await import('../Scripts/View/Search/HtmlSearchView.ts');

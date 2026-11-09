@@ -10,7 +10,7 @@ import type { SearchCandidate, SearchOptions, SearchSourceIndex } from '../../Mo
 import type { SearchView, SearchViewActions, SearchRow, SearchPage, SearchStatus } from '../../Contracts/Views/SearchView.ts';
 const searchElementTypes = {
     form: HTMLFieldSetElement, 'form-container': HTMLFormElement,
-    query: HTMLInputElement, base: HTMLInputElement, 'exclude-multiple': HTMLInputElement,
+    query: HTMLInputElement, 'excluded-version': HTMLSelectElement, base: HTMLInputElement, 'exclude-multiple': HTMLInputElement,
     'clear-query': HTMLButtonElement, 'clear-base': HTMLButtonElement,
     retry: HTMLButtonElement, clear: HTMLButtonElement,
     previous: HTMLButtonElement, next: HTMLButtonElement,
@@ -54,7 +54,7 @@ export class HtmlSearchView implements SearchView {
         return element as InstanceType<(typeof searchElementTypes)[K]>;
     }
 
-    constructor(waveformSource: WaveformSource) {
+    constructor(waveformSource: WaveformSource, versions: readonly string[] = []) {
         this.candidatePopover = document.createElement('section');
         this.candidatePopover.className = styles.soundCandidatesPopover;
         this.candidatePopover.popover = 'auto';
@@ -75,6 +75,8 @@ export class HtmlSearchView implements SearchView {
         }, { signal: this.lifecycle.signal }));
 
         this.form = this.element('form');
+        this.element('excluded-version').replaceChildren(new Option(Text.searchExcludedVersionNone, ''),
+            ...versions.map(version => new Option(version, version)));
         this.element('base').addEventListener('input', () => { this.referenceCandidateIndex = null; }, { signal: this.lifecycle.signal });
         const query = this.element('query');
         this.querySuggestions = new InputSuggestions(query, {
@@ -124,7 +126,7 @@ export class HtmlSearchView implements SearchView {
     private readOptions(): Required<SearchOptions> {
         return { referenceCandidateIndex: this.referenceCandidateIndex, query: this.element('query').value, referenceSoundName: this.element('base').value,
             tags: [...this.element('tags').querySelectorAll<HTMLInputElement>('input:checked')].map(input => input.value),
-            excludeMultipleCandidates: this.element('exclude-multiple').checked };
+            excludedVersion: this.element('excluded-version').value, excludeMultipleCandidates: this.element('exclude-multiple').checked };
     }
 
     initialize(index: SearchSourceIndex, options: Required<SearchOptions>): void {
@@ -151,6 +153,7 @@ export class HtmlSearchView implements SearchView {
 
     setOptions(options: Required<SearchOptions>): void {
         this.referenceCandidateIndex = options.referenceCandidateIndex ?? null;
+        this.element('excluded-version').value = options.excludedVersion ?? '';
         this.element('query').value = options.query;
         this.element('base').value = options.referenceSoundName;
         this.element('exclude-multiple').checked = options.excludeMultipleCandidates;

@@ -92,6 +92,8 @@ export const Text = Object.freeze({
     searchClearQuery: "サウンド名をクリア",
     searchEmpty: "条件に合うサウンドはありません。",
     searchExcludeMultiple: "複数候補があるサウンドを除外",
+    searchExcludedVersion: "このバージョンに含まれるサウンドを除外",
+    searchExcludedVersionNone: "指定なし",
     searchFailure: "検索データを読み込めませんでした。生成ファイルを確認して再試行してください。",
     searchInvalidBase: "候補一覧にあるサウンドIDを基準に指定してください。",
     searchLoading: "検索データを読み込み中…",

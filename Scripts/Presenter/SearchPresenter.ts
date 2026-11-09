@@ -9,7 +9,7 @@ import type { CompositionActions } from '../Contracts/Services/CompositionAction
 import type { SoundPreviewRequest, SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
 import type { SearchInteractionServices } from '../Contracts/Services/SearchInteractionServices.ts';
 
-const emptyOptions = (): Required<SearchOptions> => ({ query: '', tags: [], referenceSoundName: '', referenceCandidateIndex: null, excludeMultipleCandidates: false });
+const emptyOptions = (): Required<SearchOptions> => ({ query: '', tags: [], referenceSoundName: '', referenceCandidateIndex: null, excludeMultipleCandidates: false, excludedVersion: '' });
 
 /** 検索条件・要求の順序・ページを管理し、HTMLを知らずに表示と他機能を調整する。 */
 export class SearchPresenter {

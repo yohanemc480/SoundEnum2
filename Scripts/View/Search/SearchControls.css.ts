@@ -206,3 +206,11 @@ globalStyle(`.${inputClear}:hover`, {
 globalStyle(`.${clearableInput}:has(input:placeholder-shown) .${inputClear}`, {
     "visibility": "hidden"
 });
+
+
+// 除外バージョンは説明と選択欄をまとめ、検索条件の幅に合わせて折り返す。
+export const searchVersionFilter = style({
+    display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px 10px',
+    color: 'var(--muted)', fontSize: '12px',
+});
+globalStyle(`.${searchVersionFilter} select`, { width: '150px', height: '32px', padding: '5px 30px 5px 8px' });
