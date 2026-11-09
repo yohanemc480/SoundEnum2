@@ -1,3 +1,4 @@
+import { audioResourceCache } from '../Scripts/Infrastructure/Resources/ResourceCache.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeComposition } from '../Scripts/Model/Composition/CompositionData.ts';
@@ -111,3 +112,6 @@ test('組み合わせの重複と数値精度を保持し、不正な設定を�
     assert.deepEqual(normalizeComposition([legacy]), [{ ...legacy, source: 'master', minVolume: 0 }]);
     assert.equal(normalizePreferences({ tab: 'composition-tab' }).tab, 'search-tab');
 });
+
+test.beforeEach(() => audioResourceCache.clear());
+test.afterEach(() => audioResourceCache.clear());

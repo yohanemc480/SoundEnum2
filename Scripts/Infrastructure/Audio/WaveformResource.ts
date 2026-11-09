@@ -1,12 +1,11 @@
+import { fetchJsonResource } from '../Resources/ResourceCache.ts';
 import { SharedAudioPaths } from '../Resources/ResourcePathProvider.ts';
 
 let loading: Promise<Record<string, unknown>> | null = null;
 /** 波形ファイルを共有して取得し、指定音源の正規化済みピークを返す。失敗時は再試行できる。 */
 export async function getWaveform(hash: string): Promise<Float32Array>
 {
-    loading ??= fetch(SharedAudioPaths.Waveforms, { cache: 'no-cache' }).then(async response => {
-        if (!response.ok) throw new Error('Waveforms unavailable');
-        const data: unknown = await response.json();
+    loading ??= fetchJsonResource(SharedAudioPaths.Waveforms).then(data => {
         if (!isRecord(data) || data.schemaVersion !== 1 || data.bins !== 256 || !isRecord(data.waveforms)) throw new Error('Invalid waveforms');
         return data.waveforms;
     }).catch(error => { loading = null; throw error; });

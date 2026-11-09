@@ -1,3 +1,4 @@
+import { resourceCache, fetchJsonResource } from '../Resources/ResourceCache.ts';
 import { ResourcePathProvider } from '../Resources/ResourcePathProvider.ts';
 import type { SearchSourceIndex } from '../../Model/Search/SearchTypes.ts';
 import type { SearchRequest, SearchInitRequest, SearchQueryRequest, SearchReadyResponse, SearchResultsResponse, SearchSuccessResponse, SearchWorkerResponse } from './SearchWorkerProtocol.ts';
@@ -15,7 +16,7 @@ export class WorkerSearchService implements SearchService
 
     private readonly excludedIds = new Map<string, Promise<Set<string>>>();
     private readonly versions: readonly string[];
-    private exclusionController = new AbortController();
+    private resourceController = new AbortController();
 
     constructor(paths: ResourcePathProvider, versions: readonly string[] = [])
     {
@@ -30,22 +31,19 @@ export class WorkerSearchService implements SearchService
     async load(): Promise<SearchSourceIndex>
     {
         this.dispose();
-        this.exclusionController = new AbortController();
-        const read = async (url: URL): Promise<Response> => {
-            const response = await fetch(url, { cache: 'no-cache' });
-            if (!response.ok) throw new Error(response.status === 404 ? 'missing' : `HTTP ${response.status}`);
-            return response;
-        };
+        this.resourceController = new AbortController();
+        const signal = this.resourceController.signal;
         const [tagData, binary, sounds, hashes, durations] = await Promise.all([
-            read(new URL(this.paths.SearchTags, location.href)).then(r => r.json()).then(parseSearchTags),
-            read(new URL(this.paths.SearchVectors, location.href)).then(r => r.arrayBuffer()),
-            read(new URL(this.paths.Sounds, location.href)).then(r => r.json()).then(parseSoundEvents),
-            read(new URL(this.paths.Hash, location.href)).then(r => r.json()).then(parseHashMap),
-            read(new URL(this.paths.Durations, location.href)).then(r => r.json()).then(parseDurations)
+            fetchJsonResource(this.paths.SearchTags, signal).then(parseSearchTags),
+            resourceCache.load(this.paths.SearchVectors, signal),
+            fetchJsonResource(this.paths.Sounds, signal).then(parseSoundEvents),
+            fetchJsonResource(this.paths.Hash, signal).then(parseHashMap),
+            fetchJsonResource(this.paths.Durations, signal).then(parseDurations),
         ]);
         const index = { ...tagData, availableVersions: [...this.versions], events: buildSearchSounds(sounds, hashes, durations) };
         // 異なる世代のタグとベクトルを組み合わせて検索しないよう照合する。
         const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', binary))].map(b => b.toString(16).padStart(2, '0')).join('');
+        signal.throwIfAborted();
         if (hash !== index.vectorHash) throw new Error('Vector checksum mismatch');
         this.worker = new Worker(new URL('./SoundSearchWorker.ts', import.meta.url), { type: 'module' });
         this.worker.onmessage = ({ data }: MessageEvent<SearchWorkerResponse>) => {
@@ -75,11 +73,9 @@ export class WorkerSearchService implements SearchService
         const existing = this.excludedIds.get(version);
         if (existing) return existing;
         const path = new ResourcePathProvider(version).Sounds;
-        const pending = fetch(path, { cache: 'no-cache', signal: this.exclusionController.signal })
-            .then(async response => {
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return new Set(Object.keys(parseSoundEvents(await response.json())));
-            }).catch(error => {
+        const pending = fetchJsonResource(path, this.resourceController.signal)
+            .then(data => new Set(Object.keys(parseSoundEvents(data))))
+            .catch(error => {
                 if (this.excludedIds.get(version) === pending) this.excludedIds.delete(version);
                 throw error;
             });
@@ -113,7 +109,7 @@ export class WorkerSearchService implements SearchService
     /** Workerを停止し、応答待ちの処理も失敗として完了させる。繰り返し呼び出せる。 */
     dispose()
     {
-        this.exclusionController.abort();
+        this.resourceController.abort();
         this.excludedIds.clear();
         this.worker?.terminate();
         this.worker = null;

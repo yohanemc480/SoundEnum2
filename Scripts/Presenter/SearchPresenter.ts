@@ -114,7 +114,7 @@ export class SearchPresenter {
             if (this.disposed) return;
             this.index = null;
             this.searchService.dispose();
-            this.view.setStatus(error instanceof Error && error.message === 'missing' ? 'missing' : 'failure');
+            this.view.setStatus(error instanceof Error && error.message.startsWith('missing') ? 'missing' : 'failure');
         }
     }
 

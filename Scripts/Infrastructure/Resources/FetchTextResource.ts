@@ -1,6 +1,6 @@
-/** 起動用のJSONテキストを取得する。終了時は渡されたsignalで通信を取り消す。 */
+import { resourceCache } from './ResourceCache.ts';
+
+/** 共有キャッシュからテキストを取得する。中断はこの呼び出し元だけに適用する。 */
 export async function fetchTextResource(path: string, signal: AbortSignal): Promise<string> {
-    const response = await fetch(path, { signal });
-    if (!response.ok) throw new Error(`Failed to load resource: ${path} (HTTP ${response.status})`);
-    return response.text();
+    return new TextDecoder().decode(await resourceCache.load(path, signal));
 }

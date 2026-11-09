@@ -1,3 +1,4 @@
+import { audioResourceCache } from '../Resources/ResourceCache.ts';
 import type { CompositionPlayback, CompositionPlaybackRow, CompositionPlaybackState } from '../../Contracts/Services/CompositionPlayback.ts';
 
 /** 音源とゲインを対にして所有し、停止時に両方を切断する。 */
@@ -41,9 +42,9 @@ export class BrowserCompositionPlayback implements CompositionPlayback {
             if (generation !== this.generation) return;
             const buffers = new Map<string, AudioBuffer>();
             await Promise.all([...new Set(prepared.map(row => row.candidate.hash))].map(async hash => {
-                const response = await fetch(this.audioUrl(hash), { signal: controller.signal });
-                if (!response.ok) throw new Error(`Audio HTTP ${response.status}`);
-                buffers.set(hash, await context.decodeAudioData(await response.arrayBuffer()));
+                const bytes = await audioResourceCache.load(this.audioUrl(hash), controller.signal);
+                if (controller.signal.aborted) return;
+                buffers.set(hash, await context.decodeAudioData(bytes));
             }));
             if (generation !== this.generation) return;
             /** 準備が完了した音源だけを後続の予約処理へ渡す。 */

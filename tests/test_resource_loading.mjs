@@ -1,3 +1,4 @@
+import { resourceCache } from '../Scripts/Infrastructure/Resources/ResourceCache.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from '../Scripts/Infrastructure/Resources/ParseResourceData.ts';
@@ -45,7 +46,7 @@ test('指定バージョンのIDだけを除外し、同じ音源の別IDは残�
     service.request = async request => { requests.push(request.options); return { results }; };
     t.mock.method(globalThis, 'fetch', async (url, options) => {
         fetched.push({ url, options });
-        return { ok: true, json: async () => ({ existing: { sounds: [] } }) };
+        return new Response(JSON.stringify({ existing: { sounds: [] } }));
     });
     const options = { query: 'bell', tags: ['metal'], referenceSoundName: 'base', excludedVersion: 'old' };
     assert.deepEqual((await service.search(options)).map(row => row.name), ['added']);
@@ -55,7 +56,7 @@ test('指定バージョンのIDだけを除外し、同じ音源の別IDは残�
     assert.equal(fetched[0].url, 'resource/old/sound-events.json');
     assert.equal((await service.search({ ...options, excludedVersion: '' })).length, 2);
     service.dispose();
-    assert.equal(fetched[0].options.signal.aborted, true);
+    assert.equal(fetched[0].options.signal.aborted, false);
 });
 
 test('除外元の取得失敗で未除外の結果を返さず、再試行できる', async t => {
@@ -64,7 +65,7 @@ test('除外元の取得失敗で未除外の結果を返さず、再試行で�
     let attempts = 0;
     t.mock.method(globalThis, 'fetch', async () => {
         if (++attempts === 1) return { ok: false, status: 404 };
-        return { ok: true, json: async () => ({ existing: {} }) };
+        return new Response(JSON.stringify({ existing: {} }));
     });
     await assert.rejects(service.search({ excludedVersion: 'old' }), /404/);
     assert.deepEqual(await service.search({ excludedVersion: 'old' }), []);
@@ -72,3 +73,6 @@ test('除外元の取得失敗で未除外の結果を返さず、再試行で�
     assert.equal(attempts, 2);
     service.dispose();
 });
+
+test.beforeEach(() => resourceCache.clear());
+test.afterEach(() => resourceCache.clear());
