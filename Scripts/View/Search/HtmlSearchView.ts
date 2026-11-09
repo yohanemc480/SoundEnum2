@@ -3,7 +3,7 @@ import * as layout from '../Layout/Layout.css.ts';
 import * as settingsStyles from '../Components/SoundSettings.css.ts';
 import { selectSoundPreview } from '../Components/SelectSoundPreview.ts';
 import * as styles from './SearchResults.css.ts';
-import { SoundAutocomplete } from './SoundAutocomplete.ts';
+import { InputSuggestions } from './InputSuggestions.ts';
 import { SearchWaveforms } from './SearchWaveforms.ts';
 import { Text } from '../../I18n/Text.ts';
 import type { SearchCandidate, SearchOptions, SearchSourceIndex } from '../../Model/Search/SearchTypes.ts';
@@ -40,7 +40,8 @@ export class HtmlSearchView implements SearchView {
     readonly candidatePopover: HTMLElement;
     private candidateAnchor?: HTMLElement;
     private readonly form: HTMLFieldSetElement;
-    private readonly autocomplete: SoundAutocomplete;
+    private readonly baseSuggestions: InputSuggestions;
+    private readonly querySuggestions: InputSuggestions;
     private readonly waveforms: SearchWaveforms;
 
     /** 検索画面のIDから要素を取得する。欠落や想定外の要素型は初期化の誤りとして検出する。 */
@@ -71,14 +72,30 @@ export class HtmlSearchView implements SearchView {
         document.querySelectorAll('[data-browser-tab]').forEach(tab => tab.addEventListener('click', closeCandidates, { signal: this.lifecycle.signal }));
 
         this.form = this.element('form');
-        this.autocomplete = new SoundAutocomplete(this.element('base'));
+        const query = this.element('query');
+        this.querySuggestions = new InputSuggestions(query, {
+            label: Text.searchQueryHistory, limit: 7, filterByInput: false,
+            onSelect: value => this.actions?.selectQuery(value),
+        });
+        query.autocomplete = 'off';
+        query.addEventListener('blur', () => this.actions?.commitQuery(query.value), { signal: this.lifecycle.signal });
+        query.addEventListener('keydown', event => {
+            // 候補のEnter選択は共通Viewが処理済みなので、二重に履歴へ記録しない。
+            if (event.key === 'Enter' && !event.isComposing && !event.defaultPrevented) {
+                event.preventDefault();
+                this.actions?.commitQuery(query.value);
+                this.querySuggestions.hide();
+            }
+        }, { signal: this.lifecycle.signal });
+        this.baseSuggestions = new InputSuggestions(this.element('base'), { label: Text.searchBaseSuggestions });
         for (const name of ['query', 'base'] as const) {
             this.element(`clear-${name}`).addEventListener('click', () => {
                 const input = this.element(name);
                 input.value = '';
                 input.focus();
                 input.dispatchEvent(new Event('input', { bubbles: true }));
-                this.autocomplete.hide();
+                this.baseSuggestions.hide();
+                this.querySuggestions.hide();
             });
         }
         const browserPanel = document.querySelector<HTMLElement>(`.${layout.browserPanel}`);
@@ -109,7 +126,7 @@ export class HtmlSearchView implements SearchView {
     initialize(index: SearchSourceIndex, options: Required<SearchOptions>): void {
         index.tags.forEach(tag => tagLabel(tag.textKey));
         this.index = index;
-        this.autocomplete.setNames(index.events.map(sound => sound.name));
+        this.baseSuggestions.setValues(index.events.map(sound => sound.name));
         const tags = this.element('tags');
         tags.replaceChildren();
         for (const tag of index.tags) {
@@ -123,12 +140,18 @@ export class HtmlSearchView implements SearchView {
         this.form.disabled = false;
     }
 
+    /** 保存された履歴を、入力欄の共通候補ポップアップへ渡す。 */
+    showQueryHistory(queries: readonly string[]): void {
+        this.querySuggestions.setValues(queries);
+    }
+
     setOptions(options: Required<SearchOptions>): void {
         this.element('query').value = options.query;
         this.element('base').value = options.referenceSoundName;
         this.element('exclude-multiple').checked = options.excludeMultipleCandidates;
         this.element('tags').querySelectorAll('input').forEach(input => { input.checked = options.tags.includes(input.value); });
-        this.autocomplete.hide();
+        this.baseSuggestions.hide();
+        this.querySuggestions.hide();
     }
 
     setStatus(status: SearchStatus): void {
@@ -192,7 +215,8 @@ export class HtmlSearchView implements SearchView {
         this.actions = undefined;
         this.lifecycle.abort();
         this.waveforms.clear();
-        this.autocomplete.dispose();
+        this.baseSuggestions.dispose();
+        this.querySuggestions.dispose();
         this.candidatePopover.remove();
     }
     /** タグIDを表示名付きのバッジに変換する。タグがない場合もその旨を表示する。 */

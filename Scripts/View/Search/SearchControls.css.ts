@@ -20,7 +20,8 @@ export const searchPagination = style({
     "marginTop": "12px",
     "flexWrap": "wrap"
 });
-export const searchTextField = style({});
+// 入力欄の内容によって暗黙の列が広がるのを防ぐ。
+export const searchTextField = style({ gridTemplateColumns: 'minmax(0, 1fr)' });
 export const searchTagsField = style({});
 export const searchFilters = style({
     "display": "grid",
@@ -113,7 +114,10 @@ globalStyle(`.${searchTextField}, .${searchTagsField}`, {
     "color": "var(--muted)"
 });
 globalStyle(`.${searchTextField} input`, {
-    "width": "100%"
+    "width": "100%",
+    "maxWidth": "100%",
+    "minWidth": "0",
+    "boxSizing": "border-box"
 });
 globalStyle(`#search-base-preview`, {
     "marginBottom": "8px"

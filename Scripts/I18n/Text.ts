@@ -93,6 +93,7 @@ export const Text = Object.freeze({
     searchNoTags: "タグなし",
     searchPage: (page: number, total: number) => `${page} / ${total} ページ`,
     searchPreviewCandidate: (number: number, name: string) => `候補${number}の${name}を試聴`,
+    searchQueryHistory: "検索履歴",
     searchResults: (count: number, first: number, last: number) => `${count} 件中 ${first}–${last} 件`,
     searchRunning: "検索中…",
     searchSameAudio: "同一音源",

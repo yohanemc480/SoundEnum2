@@ -6,6 +6,7 @@ import type { SearchOptions } from "./SearchTypes.ts";
 export interface SearchPreferencesValue {
     version: string;
     query: string;
+    queryHistory?: string[];
     base: string;
     tags: string[];
     excludeMultiple: boolean;
@@ -24,6 +25,7 @@ export function normalizePreferences(input: unknown = {}): SearchPreferencesValu
     return {
         version: typeof value.version === 'string' ? value.version : '',
         query: typeof value.query === 'string' ? value.query : '',
+        ...(Array.isArray(value.queryHistory) ? { queryHistory: [...new Set(value.queryHistory.filter((query): query is string => typeof query === 'string').map(query => query.trim()).filter(Boolean))].slice(0, 7) } : {}),
         base: typeof value.base === 'string' ? value.base : '',
         tags: Array.isArray(value.tags) ? [...new Set(value.tags.filter(tag => typeof tag === 'string'))] : [],
         excludeMultiple: value.excludeMultiple === true,

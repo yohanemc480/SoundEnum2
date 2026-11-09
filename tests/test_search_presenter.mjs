@@ -20,6 +20,7 @@ function setup(overrides = {}) {
         bind(actions) { state.actions = actions; return () => { state.unbound = true; }; },
         initialize(_, value) { state.initialOptions = value; },
         setOptions(value) { state.options = value; },
+        showQueryHistory(value) { state.queryHistory = value; },
         setStatus(value) { state.statuses.push(value); },
         showPage(value) { state.pages.push(value); },
         showFavorites(rows, available) { state.favorites.push({ rows, available }); },
@@ -28,6 +29,7 @@ function setup(overrides = {}) {
     const service = { load: async () => index, search: async () => [], dispose() { state.disposed++; }, ...overrides.service };
     const favorites = overrides.favorites === undefined ? { read: () => [], save() {} } : overrides.favorites;
     const presenter = new SearchPresenter(view, service, {
+        readQueryHistory: () => [], saveQueryHistory: value => { state.savedHistory = value; },
         read: () => overrides.options ?? options, save: value => state.saved.push(value),
     }, { setEvents(value) { state.events = value; }, add(name) { state.added = name; }, stop() { state.stopped++; } },
     { async play(value) { state.preview = value; } }, favorites, {
@@ -154,4 +156,21 @@ test('破棄時に待機処理を取り消し、遅れた読込・検索結果�
     const count = h2.state.pages.length; search.resolve([result('late')]); await flush();
     assert.equal(h2.state.pages.length, count);
     assert.equal(h2.state.scheduled.at(-1).cancelled, true);
+});
+
+test('検索履歴は確定時だけ7件まで保存し、再利用では他の検索条件を維持する', async () => {
+    const h = setup(); await h.presenter.load();
+    h.change('typing');
+    assert.deepEqual(h.state.queryHistory, []);
+    for (let i = 0; i < 9; i++) h.state.actions.commitQuery(`query${i}`);
+    h.state.actions.commitQuery('  query3  ');
+    h.state.actions.commitQuery('   ');
+    assert.deepEqual(h.state.savedHistory, ['query3', 'query8', 'query7', 'query6', 'query5', 'query4', 'query2']);
+    h.state.actions.changeOptions({ ...options, query: 'typing', tags: ['metal'] });
+    h.state.actions.selectQuery('query3'); await flush();
+    assert.equal(h.state.options.query, 'query3');
+    assert.deepEqual(h.state.options.tags, ['metal']);
+    assert.equal(h.state.queryHistory[0], 'query3');
+    assert.equal(h.state.queryHistory[1], 'typing');
+    h.presenter.dispose();
 });

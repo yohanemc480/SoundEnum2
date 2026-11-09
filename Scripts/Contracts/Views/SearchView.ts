@@ -18,6 +18,8 @@ export interface SearchPage {
 /** ViewがPresenterへ通知する操作。DOMだけの操作はView内に留める。 */
 export interface SearchViewActions {
     changeOptions(options: Required<SearchOptions>): void;
+    commitQuery(query: string): void;
+    selectQuery(query: string): void;
     activate(): void;
     retry(): void;
     clear(): void;
@@ -34,6 +36,7 @@ export interface SearchView {
     bind(actions: SearchViewActions): () => void;
     initialize(index: SearchSourceIndex, options: Required<SearchOptions>): void;
     setOptions(options: Required<SearchOptions>): void;
+    showQueryHistory(queries: readonly string[]): void;
     setStatus(status: SearchStatus): void;
     showPage(page: SearchPage): void;
     showFavorites(rows: readonly SearchRow[], available: boolean): void;

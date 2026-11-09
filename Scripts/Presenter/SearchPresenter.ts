@@ -13,6 +13,7 @@ const emptyOptions = (): Required<SearchOptions> => ({ query: '', tags: [], refe
 
 /** 検索条件・要求の順序・ページを管理し、HTMLを知らずに表示と他機能を調整する。 */
 export class SearchPresenter {
+    private queryHistory: string[] = [];
     private index: SearchSourceIndex | null = null;
     private options = emptyOptions();
     private results: SearchResult[] = [];
@@ -57,6 +58,13 @@ export class SearchPresenter {
         this.unbind = view.bind({
             activate: () => { void this.load(); },
             changeOptions: options => this.changeOptions(options),
+            commitQuery: query => this.commitQuery(query),
+            selectQuery: query => {
+                this.commitQuery(this.options.query);
+                this.setOptions({ ...this.options, query });
+                this.commitQuery(query);
+                void this.search();
+            },
             retry: () => { void this.retry(); },
             clear: () => { this.setOptions(emptyOptions()); void this.search(); },
             changePage: delta => { this.pageIndex += delta; this.render(); },
@@ -65,6 +73,15 @@ export class SearchPresenter {
             addToComposition: name => this.composition.add(name),
             toggleFavorite: name => { void this.toggleFavorite(name); },
         });
+    }
+
+    /** 確定した検索語だけを新しい順に7件保持し、空欄や重複を除いて保存する。 */
+    private commitQuery(query: string): void {
+        const trimmed = query.trim();
+        if (!trimmed || this.disposed) return;
+        this.queryHistory = [trimmed, ...this.queryHistory.filter(item => item !== trimmed)].slice(0, 7);
+        this.preferences.saveQueryHistory(this.queryHistory);
+        this.view.showQueryHistory(this.queryHistory);
     }
 
     /** 同時に呼ばれても読み込みは共有する。初回だけ保存済みの条件を復元する。 */
@@ -88,6 +105,8 @@ export class SearchPresenter {
             this.index = index;
             this.composition.setEvents(index.events);
             this.view.initialize(index, this.options);
+            this.queryHistory = this.preferences.readQueryHistory();
+            this.view.showQueryHistory(this.queryHistory);
             await this.search();
             this.renderFavorites();
         } catch (error) {
