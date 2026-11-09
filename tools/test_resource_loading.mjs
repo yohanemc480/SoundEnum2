@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from '../Scripts/ResourceData.ts';
-import { SoundSearchResource } from '../Scripts/SoundSearchResource.ts';
+import { WorkerSearchService } from '../Scripts/Infrastructure/Search/WorkerSearchService.ts';
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 
 test('resource parsers reject malformed JSON shapes before search or playback', () => {
@@ -19,20 +19,20 @@ test('resource parsers reject malformed JSON shapes before search or playback', 
 });
 
 test('worker disposal rejects outstanding requests and ignores no pending work', async () => {
-    const resource = new SoundSearchResource(new ResourcePathProvider('test'));
+    const resource = new WorkerSearchService(new ResourcePathProvider('test'));
     let stopped = false;
     resource.worker = { postMessage() {}, terminate() { stopped = true; } };
-    const pending = resource.request({ type: 'search', options: {} });
+    const pending = resource.search({});
     resource.dispose();
     await assert.rejects(pending, /Search worker stopped/);
     assert.equal(stopped, true);
     assert.equal(resource.pending.size, 0);
-    await assert.rejects(resource.request({ type: 'search' }), /Worker unavailable/);
+    await assert.rejects(resource.search({}), /Worker unavailable/);
 });
 
 test('failed worker sends remove pending requests', async () => {
-    const resource = new SoundSearchResource(new ResourcePathProvider('test'));
+    const resource = new WorkerSearchService(new ResourcePathProvider('test'));
     resource.worker = { postMessage() { throw new Error('clone failed'); } };
-    await assert.rejects(resource.request({ type: 'search' }), /clone failed/);
+    await assert.rejects(resource.search({}), /clone failed/);
     assert.equal(resource.pending.size, 0);
 });

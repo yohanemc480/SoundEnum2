@@ -7,7 +7,9 @@ export interface SoundEntry {
     weight?: number;
     [key: string]: unknown;
 }
-export type SoundEvents = Record<string, { sounds?: (string | SoundEntry)[] }>;
+/** イベント名とsounds.jsonの定義の対応。参照先イベントの展開前の形式を表す。 */
+export type SoundEventDefinitions = Record<string, { sounds?: (string | SoundEntry)[] }>;
+/** 参照先を展開した再生候補。durationはピッチ補正後の秒数。 */
 export interface SearchCandidate {
     name: string;
     hash: string;
@@ -16,13 +18,16 @@ export interface SearchCandidate {
     weight: number;
     duration: number;
 }
-export interface SearchEvent<T = SearchCandidate> {
+/** イベント名とその再生候補。型引数でベクトル行番号付きの候補にも対応する。 */
+export interface SearchSound<T = SearchCandidate> {
     name: string;
     candidates: T[];
 }
+/** 類似度計算用のベクトル行番号を持つ再生候補。 */
 export interface IndexedCandidate extends SearchCandidate {
-    row: number;
+    vectorRow: number;
 }
+/** 検証・検索に使う索引。候補のvectorRowはhashesとベクトルの同じ行を指す。 */
 export interface SearchIndex {
     schemaVersion: number;
     version: string;
@@ -31,44 +36,31 @@ export interface SearchIndex {
     hashes: string[];
     audioTags: Record<string, string[]>;
     tags: { id: string; textKey?: string }[];
-    events: SearchEvent<IndexedCandidate>[];
+    events: SearchSound<IndexedCandidate>[];
 }
+/** 検索条件。省略した条件は絞り込まず、referenceSoundName指定時だけ類似度を計算する。 */
 export interface SearchOptions {
     query?: string;
     tags?: string[];
-    base?: string;
-    excludeMultiple?: boolean;
+    referenceSoundName?: string;
+    excludeMultipleCandidates?: boolean;
 }
+/** イベント単位の検索結果。candidateは条件に合う代表候補、candidateCountは元の候補数。 */
 export interface SearchResult {
     name: string;
     candidate: IndexedCandidate;
     score: number | null;
     sameAudio: boolean;
     tags: string[];
-    count: number;
+    candidateCount: number;
 }
 
 /** ベクトルの行番号を付ける前の検索データ。 */
 export interface SearchSourceIndex extends Omit<SearchIndex, 'hashes' | 'dimensions' | 'events'> {
-    events: SearchEvent[];
+    events: SearchSound[];
     vectorHash?: string;
 }
+/** タグ定義ファイルの内容。vectorHashで対応するベクトルファイルを照合する。 */
 export interface SearchTagData extends Omit<SearchSourceIndex, 'events'> {
     vectorHash: string;
 }
-export interface SearchInitRequest {
-    type: 'init';
-    index: SearchSourceIndex;
-    binary: ArrayBuffer;
-    version: string;
-}
-export interface SearchQueryRequest {
-    type: 'search';
-    options?: SearchOptions;
-}
-export type SearchRequest = SearchInitRequest | SearchQueryRequest;
-export type SearchWorkerRequest = SearchRequest & { id: number };
-export interface SearchReadyResponse { id: number; ready: true }
-export interface SearchResultsResponse { id: number; results: SearchResult[] }
-export type SearchSuccessResponse = SearchReadyResponse | SearchResultsResponse;
-export type SearchWorkerResponse = SearchSuccessResponse | { id: number; error: string };

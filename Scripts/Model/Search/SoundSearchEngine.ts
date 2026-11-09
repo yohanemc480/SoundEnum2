@@ -1,12 +1,13 @@
 import type { SearchIndex, SearchOptions, SearchResult } from './SearchTypes.ts';
 
 /** DOMと独立した検索処理。候補音声単位でAND条件を評価する。 */
-export function searchSounds(index: SearchIndex, vectors: Float32Array, { query = '', tags = [], base = '', excludeMultiple = false }: SearchOptions = {}): SearchResult[]
+export function searchSounds(index: SearchIndex, vectors: Float32Array, { query = '', tags = [], referenceSoundName = '', excludeMultipleCandidates = false }: SearchOptions = {}): SearchResult[]
 {
-    const baseline = base ? index.events.find(event => event.name === base) : null;
-    if (base && !baseline) throw new Error('Unknown base sound');
-    const baseRows = new Set(baseline?.candidates.map(candidate => candidate.row) ?? []);
+    const baseline = referenceSoundName ? index.events.find(event => event.name === referenceSoundName) : null;
+    if (referenceSoundName && !baseline) throw new Error('Unknown base sound');
+    const baseRows = new Set(baseline?.candidates.map(candidate => candidate.vectorRow) ?? []);
     const scores = new Map<number, number>();
+    // 同じ音源を共有するイベントでは内積を再利用し、基準の全候補中の最大値を使う。
     const scoreRow = (row: number): number => {
         const cached = scores.get(row);
         if (cached !== undefined) return cached;
@@ -21,19 +22,21 @@ export function searchSounds(index: SearchIndex, vectors: Float32Array, { query 
     };
     const result: SearchResult[] = [];
     for (const event of index.events) {
-        if (excludeMultiple && event.candidates.length > 1) continue;
+        if (excludeMultipleCandidates && event.candidates.length > 1) continue;
         if (!event.name.includes(query.trim().toLowerCase())) continue;
+        // タグANDはイベント全体の和集合ではなく、一つの候補内で成立させる。
         const candidates = event.candidates.filter(c => tags.every(tag => index.audioTags[c.hash].includes(tag)));
         if (!candidates.length) continue;
         let candidate = candidates[0];
-        if (baseline) for (const current of candidates) if (scoreRow(current.row) > scoreRow(candidate.row)) candidate = current;
-        result.push({ name: event.name, candidate, score: baseline ? scoreRow(candidate.row) : null,
-            sameAudio: baseRows.has(candidate.row), tags: index.audioTags[candidate.hash],
-            count: event.candidates.length });
+        if (baseline) for (const current of candidates) if (scoreRow(current.vectorRow) > scoreRow(candidate.vectorRow)) candidate = current;
+        result.push({ name: event.name, candidate, score: baseline ? scoreRow(candidate.vectorRow) : null,
+            sameAudio: baseRows.has(candidate.vectorRow), tags: index.audioTags[candidate.hash],
+            candidateCount: event.candidates.length });
     }
-    return result.sort((a, b) => (baseline ? Number(b.name === base) - Number(a.name === base) || (b.score ?? 0) - (a.score ?? 0) : 0) || a.name.localeCompare(b.name));
+    return result.sort((a, b) => (baseline ? Number(b.name === referenceSoundName) - Number(a.name === referenceSoundName) || (b.score ?? 0) - (a.score ?? 0) : 0) || a.name.localeCompare(b.name));
 }
 
+/** バージョン、ベクトルの正規化、タグと候補の参照整合性を検証し、不正なら例外を投げる。 */
 export function validateSearchData(index: SearchIndex, vectors: Float32Array, version: string): void
 {
     if (index.schemaVersion !== 3 || index.version !== version || index.sample ||
@@ -53,7 +56,7 @@ export function validateSearchData(index: SearchIndex, vectors: Float32Array, ve
         if (typeof event.name !== 'string' || names.has(event.name) || !event.candidates.length) throw new Error('Invalid event');
         names.add(event.name);
         for (const c of event.candidates) {
-            if (!Number.isInteger(c.row) || c.row < 0 || c.row >= index.hashes.length || c.hash !== index.hashes[c.row] ||
+            if (!Number.isInteger(c.vectorRow) || c.vectorRow < 0 || c.vectorRow >= index.hashes.length || c.hash !== index.hashes[c.vectorRow] ||
                 typeof c.name !== 'string' || !Number.isFinite(c.duration) || c.duration < 0 ||
                 !Number.isFinite(c.pitch) || c.pitch <= 0 || !Number.isFinite(c.volume) || c.volume < 0) throw new Error('Invalid candidate');
         }

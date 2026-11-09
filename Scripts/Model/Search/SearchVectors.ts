@@ -1,10 +1,11 @@
+/** 復号したベクトル群。vectorsはhashesの順にdimensions個ずつ並ぶ。 */
 export interface DecodedSearchVectors {
     hashes: string[];
     dimensions: number;
     vectors: Float32Array;
 }
 
-/** SEVB: little-endian header followed by SHA-1 + Float32 vector records. */
+/** SEVB形式のバイナリを復号する。リトルエンディアンのヘッダーにSHA-1とFloat32の組が続く。 */
 export function decodeSearchVectors(binary: ArrayBuffer): DecodedSearchVectors
 {
     const view = new DataView(binary);

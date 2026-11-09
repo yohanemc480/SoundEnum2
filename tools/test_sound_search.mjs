@@ -1,17 +1,17 @@
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 import { selectResourceVersion } from '../Scripts/VersionSelector.ts';
-import { buildSearchEvents } from '../Scripts/BuildSearchEvents.ts';
-import { decodeSearchVectors } from '../Scripts/SearchVectors.ts';
+import { buildSearchSounds } from '../Scripts/Model/Search/BuildSearchSounds.ts';
+import { decodeSearchVectors } from '../Scripts/Model/Search/SearchVectors.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { searchSounds, validateSearchData } from '../Scripts/SoundSearchEngine.ts';
+import { searchSounds, validateSearchData } from '../Scripts/Model/Search/SoundSearchEngine.ts';
 import { Text } from '../Scripts/Text.ts';
 import { readFileSync } from 'node:fs';
-import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.ts';
+import { resolveSoundEventReferences } from '../Scripts/Model/Search/ResolveSoundEventReferences.ts';
 
 function fixture() {
     const hashes = ['a', 'b', 'c'].map(x => x.repeat(40));
-    const candidate = row => ({ row, hash: hashes[row], name: 'raw' + row, pitch: 1, volume: 1, duration: row + 1 });
+    const candidate = row => ({ vectorRow: row, hash: hashes[row], name: 'raw' + row, pitch: 1, volume: 1, duration: row + 1 });
     return { schemaVersion: 3, version: 'test', generation: 'test', dimensions: 2, hashes,
         tags: [{ id: 'water' }, { id: 'metal' }], audioTags: Object.fromEntries(hashes.map((h, i) => [h, [['water'], ['metal'], ['water', 'metal']][i]])),
         events: [{ name: 'base', candidates: [candidate(0)] }, { name: 'shared', candidates: [candidate(0)] },
@@ -23,41 +23,41 @@ test('event aliases preserve nested pitch and volume without changing the source
         middle: { sounds: [{ name: 'leaf', type: 'event', volume: .5 }] },
         leaf: { sounds: [{ name: 'minecraft:raw', pitch: .75 }] } };
     const before = JSON.stringify(events);
-    const resolved = resolveSoundEvents(events);
+    const resolved = resolveSoundEventReferences(events);
     assert.equal(resolved.root[0].pitch, 1.5);
     assert.equal(resolved.root[0].volume, .5);
     assert.equal(resolved.root[0].name, 'raw');
     assert.equal(resolved.leaf[0].pitch, .75);
     assert.equal(JSON.stringify(events), before);
-    assert.throws(() => resolveSoundEvents({ a: { sounds: [{ name: 'a', type: 'event' }] } }), /Circular/);
-    assert.throws(() => resolveSoundEvents({ a: { sounds: [{ name: 'missing', type: 'event' }] } }), /Missing/);
+    assert.throws(() => resolveSoundEventReferences({ a: { sounds: [{ name: 'a', type: 'event' }] } }), /Circular/);
+    assert.throws(() => resolveSoundEventReferences({ a: { sounds: [{ name: 'missing', type: 'event' }] } }), /Missing/);
 });
 test('AND matches one candidate, not a union across an event', () => {
     assert.deepEqual(searchSounds(fixture(), vectors, { tags: ['water', 'metal'] }).map(x => x.name), ['both']);
 });
 test('similarity puts the base first, marks shared audio, and chooses matching candidate', () => {
-    const rows = searchSounds(fixture(), vectors, { base: 'base' });
+    const rows = searchSounds(fixture(), vectors, { referenceSoundName: 'base' });
     assert.equal(rows[0].name, 'base'); assert.equal(rows[0].score, 1);
     assert.equal(rows.find(x => x.name === 'shared').sameAudio, true);
-    const sharedBase = searchSounds(fixture(), vectors, { base: 'shared' });
+    const sharedBase = searchSounds(fixture(), vectors, { referenceSoundName: 'shared' });
     assert.equal(sharedBase[0].name, 'shared');
-    const filtered = searchSounds(fixture(), vectors, { base: 'base', tags: ['metal'] });
+    const filtered = searchSounds(fixture(), vectors, { referenceSoundName: 'base', tags: ['metal'] });
     assert.equal(filtered[0].name, 'both');
-    assert.equal(filtered.find(x => x.name === 'split').candidate.row, 1);
+    assert.equal(filtered.find(x => x.name === 'split').candidate.vectorRow, 1);
 });
 test('unknown base fails', () => {
-    assert.throws(() => searchSounds(fixture(), vectors, { base: 'missing' }));
+    assert.throws(() => searchSounds(fixture(), vectors, { referenceSoundName: 'missing' }));
 });
 test('tag filtering still finds a result beyond the first twenty neighbors', () => {
     const index = fixture();
     for (let i = 0; i < 30; i++) index.events.push({ name: `extra${i}`, candidates: [index.events[0].candidates[0]] });
-    assert.equal(searchSounds(index, vectors, { base: 'base', tags: ['water', 'metal'] })[0].name, 'both');
+    assert.equal(searchSounds(index, vectors, { referenceSoundName: 'base', tags: ['water', 'metal'] })[0].name, 'both');
 });
 test('data validation rejects wrong versions, invalid vectors and references', () => {
     validateSearchData(fixture(), vectors, 'test');
     assert.throws(() => validateSearchData(fixture(), vectors, 'other'));
     assert.throws(() => validateSearchData(fixture(), new Float32Array(6), 'test'));
-    const broken = fixture(); broken.events[0].candidates[0].row = 99;
+    const broken = fixture(); broken.events[0].candidates[0].vectorRow = 99;
     assert.throws(() => validateSearchData(broken, vectors, 'test'));
 });
 test('UI text keys are ordered and HTML/tag labels exist', () => {
@@ -72,14 +72,14 @@ test('worker initializes little-endian vectors, searches and reports errors', as
     const messages = [];
     globalThis.self = { postMessage: message => messages.push(message) };
     try {
-        await import('../Scripts/SoundSearchWorker.ts');
+        await import('../Scripts/Infrastructure/Search/SoundSearchWorker.ts');
         const binary = encodeFixture();
-        self.onmessage({ data: { type: 'init', id: 1, index: { ...fixture(), hashes: undefined, dimensions: undefined, events: fixture().events.map(e => ({ ...e, candidates: e.candidates.map(({ row, ...c }) => c) })) }, binary, version: 'test' } });
+        self.onmessage({ data: { type: 'init', id: 1, index: { ...fixture(), hashes: undefined, dimensions: undefined, events: fixture().events.map(e => ({ ...e, candidates: e.candidates.map(({ vectorRow, ...c }) => c) })) }, binary, version: 'test' } });
         assert.equal(messages.pop().ready, true);
-        self.onmessage({ data: { type: 'search', id: 2, options: { base: 'base', tags: ['metal'] } } });
+        self.onmessage({ data: { type: 'search', id: 2, options: { referenceSoundName: 'base', tags: ['metal'] } } });
         const result = messages.pop();
         assert.equal(result.id, 2); assert.equal(result.results[0].name, 'both');
-        self.onmessage({ data: { type: 'search', id: 3, options: { base: 'missing' } } });
+        self.onmessage({ data: { type: 'search', id: 3, options: { referenceSoundName: 'missing' } } });
         assert.equal(messages.pop().error, 'Unknown base sound');
         self.onmessage({ data: { type: 'init', id: 4, binary: new ArrayBuffer(0), index: {}, version: 'test' } });
         assert.equal(messages.pop().error, 'Invalid vector header');
@@ -120,13 +120,13 @@ test('search candidates derive nested settings and durations from source resourc
     const sounds = { root: { sounds: [{ name: 'leaf', type: 'event', pitch: 2, volume: .5, weight: 3 }] },
         leaf: { sounds: [{ name: 'minecraft:raw', pitch: .5, volume: .4, weight: 2 }] }, empty: {} };
     const hashes = { 'minecraft/sounds/raw.ogg': hash };
-    const events = buildSearchEvents(sounds, hashes, { [hash]: 6 });
+    const events = buildSearchSounds(sounds, hashes, { [hash]: 6 });
     assert.equal(events.length, 2);
     assert.deepEqual(events.find(e => e.name === 'root').candidates[0],
         { name: 'raw', hash, pitch: 1, volume: .2, weight: 6, duration: 6 });
     assert.equal(events.find(e => e.name === 'leaf').candidates[0].duration, 12);
-    assert.throws(() => buildSearchEvents(sounds, {}, { [hash]: 6 }));
-    assert.throws(() => buildSearchEvents(sounds, hashes, {}));
+    assert.throws(() => buildSearchSounds(sounds, {}, { [hash]: 6 }));
+    assert.throws(() => buildSearchSounds(sounds, hashes, {}));
 });
 
 test('version selection accepts only generated versions and falls back to default', () => {
@@ -151,7 +151,7 @@ test('resource providers keep versions isolated and immutable', () => {
 test('exclude multiple checks original candidates before tag filtering', () => {
     const index = fixture();
     assert.ok(searchSounds(index, vectors, { tags: ['metal'] }).some(r => r.name === 'split'));
-    assert.deepEqual(searchSounds(index, vectors, { tags: ['metal'], excludeMultiple: true }).map(r => r.name), ['both']);
-    assert.ok(!searchSounds(index, vectors, { base: 'base', excludeMultiple: true }).some(r => r.name === 'split'));
+    assert.deepEqual(searchSounds(index, vectors, { tags: ['metal'], excludeMultipleCandidates: true }).map(r => r.name), ['both']);
+    assert.ok(!searchSounds(index, vectors, { referenceSoundName: 'base', excludeMultipleCandidates: true }).some(r => r.name === 'split'));
     assert.ok(searchSounds(index, vectors, {}).some(r => r.name === 'split'));
 });

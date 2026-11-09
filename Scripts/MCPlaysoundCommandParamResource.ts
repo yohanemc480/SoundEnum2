@@ -1,6 +1,6 @@
 import { parseSoundEvents } from './ResourceData.ts';
-import type { SoundEntry } from './SearchTypes.ts';
-import { resolveSoundEvents } from "./ResolveSoundEvents.ts";
+import type { SoundEntry } from './Model/Search/SearchTypes.ts';
+import { resolveSoundEventReferences } from "./Model/Search/ResolveSoundEventReferences.ts";
 import { ResourceBase } from "./ResourceBase.ts";
 
 /**
@@ -24,7 +24,7 @@ export class MCPlaysoundCommandParamResource extends ResourceBase
     ParseResource()
     {
         const events = parseSoundEvents(JSON.parse(this._rawResource));
-        const resolved = resolveSoundEvents(events);
+        const resolved = resolveSoundEventReferences(events);
         this._jsonData = Object.fromEntries(Object.entries(events).map(([name, event]) => [name, { ...event, sounds: resolved[name] }]));
     }
 

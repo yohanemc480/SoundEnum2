@@ -1,6 +1,7 @@
-import { decodeSearchVectors } from './SearchVectors.ts';
-import { searchSounds, validateSearchData } from './SoundSearchEngine.ts';
-import type { SearchIndex, SearchWorkerRequest, SearchWorkerResponse } from './SearchTypes.ts';
+import { decodeSearchVectors } from '../../Model/Search/SearchVectors.ts';
+import { searchSounds, validateSearchData } from '../../Model/Search/SoundSearchEngine.ts';
+import type { SearchIndex } from '../../Model/Search/SearchTypes.ts';
+import type { SearchWorkerRequest, SearchWorkerResponse } from './SearchWorkerProtocol.ts';
 
 let index: SearchIndex | undefined;
 let vectors: Float32Array | undefined;
@@ -12,13 +13,14 @@ self.onmessage = ({ data }: MessageEvent<SearchWorkerRequest>) => {
             index = undefined;
             vectors = undefined;
             const decoded = decodeSearchVectors(data.binary);
+            // 音源ハッシュをベクトル行へ結び付け、検証が済んだ索引だけを公開する。
             const rows = new Map(decoded.hashes.map((hash, row) => [hash, row]));
             const nextIndex: SearchIndex = { ...data.index, hashes: decoded.hashes, dimensions: decoded.dimensions,
                 events: data.index.events.map(event => ({ ...event,
                     candidates: event.candidates.map(candidate => {
                         const row = rows.get(candidate.hash);
                         if (row === undefined) throw new Error('Invalid candidate');
-                        return { ...candidate, row };
+                        return { ...candidate, vectorRow: row };
                     }) })) };
             validateSearchData(nextIndex, decoded.vectors, data.version);
             index = nextIndex;

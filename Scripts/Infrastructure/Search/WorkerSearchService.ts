@@ -1,9 +1,14 @@
-import type { ResourcePathProvider } from './ResourcePathProvider.ts';
-import type { SearchRequest, SearchInitRequest, SearchQueryRequest, SearchReadyResponse, SearchResultsResponse, SearchSuccessResponse, SearchWorkerResponse, SearchSourceIndex } from './SearchTypes.ts';
-import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from './ResourceData.ts';
-import { buildSearchEvents } from './BuildSearchEvents.ts';
+import type { ResourcePathProvider } from '../../ResourcePathProvider.ts';
+import type { SearchSourceIndex } from '../../Model/Search/SearchTypes.ts';
+import type { SearchRequest, SearchInitRequest, SearchQueryRequest, SearchReadyResponse, SearchResultsResponse, SearchSuccessResponse, SearchWorkerResponse } from './SearchWorkerProtocol.ts';
+import { parseSoundEvents, parseHashMap, parseDurations, parseSearchTags } from '../../ResourceData.ts';
+import { buildSearchSounds } from '../../Model/Search/BuildSearchSounds.ts';
 
-export class SoundSearchResource
+import type { SearchService } from '../../Contracts/Services/SearchService.ts';
+import type { SearchOptions, SearchResult } from '../../Model/Search/SearchTypes.ts';
+
+/** 検索データを読み込み、Workerの初期化・検索要求・破棄を管理する検索サービス。 */
+export class WorkerSearchService implements SearchService
 {
     readonly paths: ResourcePathProvider;
     worker: Worker | null = null;
@@ -16,6 +21,7 @@ export class SoundSearchResource
     serial = 0;
     pending = new Map<number, { resolve: (value: SearchSuccessResponse) => void; reject: (reason: Error) => void }>();
 
+    /** 既存Workerを破棄し、検証済みデータで初期化して表示用の索引を返す。 */
     async load(): Promise<SearchSourceIndex>
     {
         this.dispose();
@@ -31,7 +37,8 @@ export class SoundSearchResource
             read(new URL(this.paths.Hash, location.href)).then(r => r.json()).then(parseHashMap),
             read(new URL(this.paths.Durations, location.href)).then(r => r.json()).then(parseDurations)
         ]);
-        const index = { ...tagData, events: buildSearchEvents(sounds, hashes, durations) };
+        const index = { ...tagData, events: buildSearchSounds(sounds, hashes, durations) };
+        // 異なる世代のタグとベクトルを組み合わせて検索しないよう照合する。
         const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', binary))].map(b => b.toString(16).padStart(2, '0')).join('');
         if (hash !== index.vectorHash) throw new Error('Vector checksum mismatch');
         this.worker = new Worker(new URL('./SoundSearchWorker.ts', import.meta.url), { type: 'module' });
@@ -42,10 +49,17 @@ export class SoundSearchResource
             if ('error' in data) task.reject(new Error(data.error)); else task.resolve(data);
         };
         this.worker.onerror = () => this.dispose();
+        // 大きなバイナリはコピーせずWorkerへ所有権を移す。以後ここでは使用しない。
         await this.request({ type: 'init', index, binary, version: this.paths.Version }, [binary]);
         return index;
     }
 
+    /** 検索結果だけを返し、Workerの応答IDや通信形式を呼び出し元へ漏らさない。 */
+    async search(options: SearchOptions): Promise<SearchResult[]> {
+        return (await this.request({ type: 'search', options })).results;
+    }
+
+    /** 要求IDで応答を対応付け、送信失敗や不正な応答をPromiseの失敗として返す。 */
     request(message: SearchInitRequest, transfer?: Transferable[]): Promise<SearchReadyResponse>;
     request(message: SearchQueryRequest, transfer?: Transferable[]): Promise<SearchResultsResponse>;
     request(message: SearchRequest, transfer: Transferable[] = []): Promise<SearchSuccessResponse>
@@ -68,6 +82,7 @@ export class SoundSearchResource
         });
     }
 
+    /** Workerを停止し、応答待ちの処理も失敗として完了させる。繰り返し呼び出せる。 */
     dispose()
     {
         this.worker?.terminate();

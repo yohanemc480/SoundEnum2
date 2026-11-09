@@ -1,4 +1,4 @@
-import type { SearchCandidate } from './SearchTypes.ts';
+import type { SearchCandidate } from './Model/Search/SearchTypes.ts';
 import { getWaveform } from './WaveformResource.ts';
 
 interface WaveformRow { candidate: SearchCandidate; pitch: number; volume: number }

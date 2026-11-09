@@ -1,7 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
-import { readPreferences, savePreferences, restoreSearchPreferences } from '../Scripts/SearchPreferences.ts';
+import { readPreferences, savePreferences, restoreSearchPreferences, toSearchOptions, saveSearchOptions } from '../Scripts/SearchPreferences.ts';
+
+test('renamed search options preserve stored keys, version and active tab', () => {
+    let value = JSON.stringify({ version: '26.3', query: 'bell', base: 'old', tags: ['metal'],
+        excludeMultiple: true, tab: 'favorites-tab' });
+    globalThis.localStorage = { getItem: () => value, setItem: (_, next) => { value = next; } };
+    try {
+        const options = toSearchOptions(readPreferences());
+        assert.equal(options.referenceSoundName, 'old');
+        assert.equal(options.excludeMultipleCandidates, true);
+        saveSearchOptions({ ...options, referenceSoundName: 'new', excludeMultipleCandidates: false });
+        assert.deepEqual(JSON.parse(value), { version: '26.3', query: 'bell', base: 'new', tags: ['metal'],
+            excludeMultiple: false, tab: 'favorites-tab' });
+    } finally { delete globalThis.localStorage; }
+});
 
 test('preferences persist all fields and partial updates preserve search conditions', () => {
     let value = null;

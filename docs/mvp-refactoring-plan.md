@@ -2,7 +2,7 @@
 
 ## 目的と範囲
 
-Model・View・Presenterを分離し、HTMLを用意しなくても状態管理と操作の流れを検証できる構成にする。既存の表示、機能、保存データ、リソース形式を維持する。今回は実装計画の作成までとし、以下の実装はすべて未着手。
+Model・View・Presenterを分離し、HTMLを用意しなくても状態管理と操作の流れを検証できる構成にする。既存の表示、機能、保存データ、リソース形式を維持する。段階1まで実装済み。段階2以降は未着手。
 
 Vite・TypeScript・vanilla-extractを継続する。公開容量の調査、デプロイ、新機能、UIの再設計は対象外。既存のTypeScript移行計画とは別の作業として扱う。
 
@@ -60,9 +60,9 @@ Vite・TypeScript・vanilla-extractを継続する。公開容量の調査、デ
 | 現在のファイル群 | 方針 |
 | --- | --- |
 | `SoundSearchBrowser.ts` | DOM・アンカー位置はSearchView、検索進行・ページ切り替え・要求番号はSearchPresenter、検索条件と結果の値はModelに分離 |
-| `SoundSearchEngine.ts`、`SearchVectors.ts`、`BuildSearchEvents.ts`、`ResolveSoundEvents.ts` | ブラウザ依存の有無を確認し、純粋な検索処理をModel/Searchへ移動 |
+| `SoundSearchEngine.ts`、`SearchVectors.ts`、`BuildSearchSounds.ts`、`ResolveSoundEventReferences.ts` | ブラウザ依存の有無を確認し、純粋な検索処理をModel/Searchへ移動 |
 | `SearchTypes.ts` | 検索ドメインの型とWorker通信の型を分ける |
-| `SoundSearchResource.ts`、`SoundSearchWorker.ts` | Infrastructure/Searchへ。PresenterにはWorkerオブジェクトを公開しない |
+| `WorkerSearchService.ts`、`SoundSearchWorker.ts` | Infrastructure/Searchへ。PresenterにはWorkerオブジェクトを公開しない |
 | `SoundComposition.ts` | 行データ・制約はModel、操作と保存・再生の調整はPresenter、DOMはView、AudioContext処理はInfrastructureへ分離 |
 | `SavedCompositions.ts` | 保存項目のルール、操作調整、一覧描画、永続化に分割 |
 | `Singletons/SoundManager.ts` | 設定状態・再生調整・実際の音声API・保存を分離。GetAudioによる音声要素の公開を廃止 |
@@ -85,11 +85,11 @@ Vite・TypeScript・vanilla-extractを継続する。公開容量の調査、デ
 
 ### 1. 基準確認と検索画面の境界設計
 
-- [ ] 現在のテスト・ビルドを実行し、既存の不具合と新しい差分を区別できる基準を記録する。
-- [ ] 検索の入力・結果・エラー・操作と、組み合わせ・再生への接続を一覧化する。
-- [ ] SearchView、検索サービス、保存・再生との最小限の契約を定義する。
-- [ ] 検索計算とWorker通信型を分離し、純粋な検索処理を移動する。
-- [ ] import、WorkerのURL、`tsconfig.worker.json`、テスト・検証ツール内の参照を同時に更新する。
+- [x] 現在のテスト・ビルドを実行し、既存の不具合と新しい差分を区別できる基準を記録する。
+- [x] 検索の入力・結果・エラー・操作と、組み合わせ・再生への接続を一覧化する。
+- [x] SearchView、検索サービス、保存・再生との最小限の契約を定義する。
+- [x] 検索計算とWorker通信型を分離し、純粋な検索処理を移動する。
+- [x] import、WorkerのURL、`tsconfig.worker.json`、テスト・検証ツール内の参照を同時に更新する。
 
 完了条件：既存の画面が動く状態を維持し、検索計算がViewやブラウザAPIに依存しない。
 
@@ -169,4 +169,32 @@ npm run verify:data
 - イベント購読、Worker、タイマー、音声の破棄責任を決め、再初期化時の二重登録を防ぐ。
 - コミットは自動で行わない。対応後は毎回、ステージ済み・未ステージ・未追跡を確認し、変更全体に合う日本語のコミットメッセージ案を提示する。
 
-最初の実装対象は段階1。境界を確認したうえで段階2へ進み、検索画面を以降の分割の具体例にする。
+次の実装対象は段階2。検索画面を以降の分割の具体例にする。
+
+## 段階1の実施記録（2026-11-09）
+
+変更前は36件のテストと本番ビルドに成功。検索の純粋処理5ファイルをModel/Searchへ、WorkerとクライアントをInfrastructure/Searchへ移動し、通信型をSearchWorkerProtocolに分離した。
+
+SearchServiceは実装・画面側とも接続済み。画面は `search(options)` から結果配列を受け取り、Workerの要求・応答形式を扱わない。SearchViewとSearchPreferencesStore・CompositionActions・SoundPreviewServiceは段階2以降の分割用の型契約であり、既存のDOM処理・保存・再生への接続はまだ置き換えていない。
+
+| 入出力・操作 | 現在の処理と分割時の所有者 |
+| --- | --- |
+| 文字列・類似検索の基準・タグ・複数候補除外 | Viewが値を通知し、Presenterが条件と120msの待機を管理する |
+| 読み込み・検索・再試行 | SearchServiceがデータを取得。Presenterが処理中状態・要求番号を管理する |
+| 結果・基準サウンド・ページ移動 | Presenterが50件単位のページを作り、Viewが一覧とページ表示を描画する |
+| missing・検索失敗・不正な基準サウンド | Presenterが状態を決め、Viewが辞書から表示文言を選ぶ |
+| 入力消去・全条件リセット・類似検索 | Viewから値を通知し、Presenterが条件更新・検索を調整する |
+| タグ・候補一覧・波形・フォーカス | 表示処理はView。候補のプレビューだけ値で通知する |
+| 検索条件の保存・復元 | SearchPreferencesStoreで検索条件だけを扱う。既存version・tabはアダプター側で保持する |
+| 組み合わせ追加・イベント供給 | CompositionActionsへ名前・イベントデータを渡す |
+| プレビュー | SoundPreviewServiceへ名前・候補・設定を渡す。組み合わせ停止とコマンド出力を調整し、選択ボタンの表示はView内に残す |
+| お気に入り操作 | Viewから名前を通知。確認・保存失敗通知・保存との分離は段階2と5で進める |
+| 検索・お気に入りタブへの遷移 | App側で画面の有効化とPresenterへの通知を接続する |
+
+Model・ContractsをDOMなしで検査する `tsconfig.model.json` を前倒しで追加し、通常のtypecheckにも組み込んだ。現時点の契約は純粋なSoundCommand型を既存ファイルから参照する。これは後続のCommandモデル移動時に参照先を変更する。
+
+変更後は36件のテスト、DOMなしの型検査を含む本番ビルドに成功。実データ検証では1,984イベント・4,941音源の検索、タグ、類似度、チェックサムを確認した。ブラウザでの表示・実音の確認は未実施。CSSと画面のDOM構造は変更していない。
+
+## 命名の見直し
+
+検索対象をSearchSound、Minecraftの元定義をSoundEventDefinitionsと呼び分け、参照展開をresolveSoundEventReferences、Worker実装をWorkerSearchServiceへ改名した。接続用の契約は役割ごとのファイルへ分割した。検索条件のreferenceSoundName・excludeMultipleCandidatesは保存境界で従来のbase・excludeMultipleへ変換し、保存済みデータとの互換性を維持する。候補数はcandidateCount、ベクトル行はvectorRow、表示ページの番号と総数はpageIndex・pageCountに統一した。

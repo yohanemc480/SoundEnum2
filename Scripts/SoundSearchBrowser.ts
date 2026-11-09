@@ -6,7 +6,7 @@ import type { OutputArea } from './OutputArea.ts';
 import type { ResourcePathProvider } from './ResourcePathProvider.ts';
 import type { SoundComposition } from './SoundComposition.ts';
 import type { SoundCommand } from './FormatSoundCommand.ts';
-import type { SearchCandidate, SearchResult, SearchSourceIndex } from './SearchTypes.ts';
+import type { SearchCandidate, SearchResult, SearchSourceIndex } from './Model/Search/SearchTypes.ts';
 
 type BrowserResult = Omit<SearchResult, 'candidate'> & { candidate?: SearchCandidate };
 const searchElementTypes = {
@@ -31,12 +31,13 @@ function tagLabel(key: string | undefined): string {
 
 import { SoundAutocomplete } from './SoundAutocomplete.ts';
 import { confirmAction } from './ConfirmDialog.ts';
-import { readPreferences, savePreferences, restoreSearchPreferences } from './SearchPreferences.ts';
+import { readPreferences, saveSearchOptions, toSearchOptions, restoreSearchPreferences } from './SearchPreferences.ts';
 import { showToast } from './Toast.ts';
 import { Favorites } from './Favorites.ts';
 import { Text } from './Text.ts';
 import { SearchWaveforms } from './SearchWaveforms.ts';
-import { SoundSearchResource } from './SoundSearchResource.ts';
+import { WorkerSearchService } from './Infrastructure/Search/WorkerSearchService.ts';
+import type { SearchService } from './Contracts/Services/SearchService.ts';
 import { SoundManager } from './Singletons/SoundManager.ts';
 import { MCCommandSound } from './MCCommandSound.ts';
 import { MCCommandSelector } from './Constants/MCCommandSelector.ts';
@@ -47,7 +48,7 @@ export class SoundSearchBrowser
     readonly outputArea: OutputArea;
     readonly composition: SoundComposition;
     readonly favorites: Favorites | null;
-    readonly resource: SoundSearchResource;
+    readonly resource: SearchService;
     requestId: number;
     page: number;
     results: BrowserResult[];
@@ -74,7 +75,7 @@ export class SoundSearchBrowser
         try { this.favorites = new Favorites(); }
         catch (error) { console.error(error); this.favorites = null; }
 
-        this.resource = new SoundSearchResource(paths);
+        this.resource = new WorkerSearchService(paths);
         this.requestId = 0;
         this.page = 0;
         this.results = [];
@@ -161,10 +162,10 @@ export class SoundSearchBrowser
                 label.append(checkbox, document.createTextNode(tagLabel(tag.textKey)));
                 tags.append(label);
             }
-            const saved = restoreSearchPreferences(readPreferences(), index);
+            const saved = toSearchOptions(restoreSearchPreferences(readPreferences(), index));
             this.element('query').value = saved.query;
-            this.element('base').value = saved.base;
-            this.element('exclude-multiple').checked = saved.excludeMultiple;
+            this.element('base').value = saved.referenceSoundName;
+            this.element('exclude-multiple').checked = saved.excludeMultipleCandidates;
             tags.querySelectorAll('input').forEach(input => { input.checked = saved.tags.includes(input.value); });
             this.form.disabled = false;
             await this.search();
@@ -180,9 +181,9 @@ export class SoundSearchBrowser
 
     saveSearchPreferences()
     {
-        savePreferences({ query: this.element('query').value, base: this.element('base').value.trim(),
+        saveSearchOptions({ query: this.element('query').value, referenceSoundName: this.element('base').value.trim(),
             tags: [...this.element('tags').querySelectorAll<HTMLInputElement>('input:checked')].map(input => input.value),
-            excludeMultiple: this.element('exclude-multiple').checked });
+            excludeMultipleCandidates: this.element('exclude-multiple').checked });
     }
 
     async search()
@@ -202,11 +203,11 @@ export class SoundSearchBrowser
         }
         this.element('status').textContent = Text.searchRunning;
         try {
-            const { results } = await this.resource.request({ type: 'search', options: {
-                query: this.element('query').value, base,
-                excludeMultiple: this.element('exclude-multiple').checked,
+            const results = await this.resource.search({
+                query: this.element('query').value, referenceSoundName: base,
+                excludeMultipleCandidates: this.element('exclude-multiple').checked,
                 tags: [...this.element('tags').querySelectorAll<HTMLInputElement>('input:checked')].map(input => input.value)
-            } });
+            });
             if (id !== this.requestId) return;
             this.results = results.filter(entry => entry.name !== base); this.resultBase = base; this.page = 0; this.render();
         } catch (error) {
@@ -260,7 +261,7 @@ export class SoundSearchBrowser
         if (baseline) {
             const candidate = baseline.candidates[0];
             entries.unshift({ name: baseline.name, candidate, score: null, sameAudio: false,
-                tags: this.index.audioTags[candidate.hash], count: baseline.candidates.length });
+                tags: this.index.audioTags[candidate.hash], candidateCount: baseline.candidates.length });
         }
         for (const entry of entries) {
             this.appendRow(entry, entry.name === this.resultBase ? basePreview : list);
@@ -286,7 +287,7 @@ export class SoundSearchBrowser
         for (const name of this.favorites.names) {
             const event = this.index.events.find(event => event.name === name);
             const candidate = event?.candidates[0];
-            this.appendRow({ name, candidate, count: event?.candidates.length ?? 0,
+            this.appendRow({ name, candidate, candidateCount: event?.candidates.length ?? 0,
                 score: null, sameAudio: false, tags: candidate ? this.index.audioTags[candidate.hash] : [] }, list);
         }
     }
@@ -368,11 +369,11 @@ export class SoundSearchBrowser
             waveform.className = styles.searchRowWaveform;
             waveform.setAttribute('aria-hidden', 'true');
             main.append(content, waveform, actions); row.append(main);
-            if (entry.count > 1) {
+            if (entry.candidateCount > 1) {
                 const trigger = document.createElement('button'); trigger.type = 'button';
-                trigger.textContent = Text.searchCandidate(entry.count);
-                trigger.setAttribute('aria-label', Text.searchCandidateTags(entry.count));
-                trigger.title = Text.searchCandidateTags(entry.count);
+                trigger.textContent = Text.searchCandidate(entry.candidateCount);
+                trigger.setAttribute('aria-label', Text.searchCandidateTags(entry.candidateCount));
+                trigger.title = Text.searchCandidateTags(entry.candidateCount);
                 trigger.popoverTargetElement = this.candidatePopover;
                 trigger.popoverTargetAction = 'show';
                 trigger.addEventListener('click', () => {

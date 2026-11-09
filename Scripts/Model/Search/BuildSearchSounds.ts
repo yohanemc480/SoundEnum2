@@ -1,14 +1,14 @@
-import type { SoundEvents, SearchEvent } from './SearchTypes.ts';
-import { resolveSoundEvents } from './ResolveSoundEvents.ts';
+import type { SoundEventDefinitions, SearchSound } from './SearchTypes.ts';
+import { resolveSoundEventReferences } from './ResolveSoundEventReferences.ts';
 
 /** 保存済みの定義と共通データから検索用候補を組み立てる。 */
-export function buildSearchEvents(
-    sounds: SoundEvents,
+export function buildSearchSounds(
+    sounds: SoundEventDefinitions,
     hashes: Record<string, string>,
     durations: Record<string, number>,
-): SearchEvent[]
+): SearchSound[]
 {
-    return Object.entries(resolveSoundEvents(sounds)).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
+    return Object.entries(resolveSoundEventReferences(sounds)).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
         .filter(([, candidates]) => candidates.length)
         .map(([name, candidates]) => ({ name, candidates: candidates.map(c => {
             const hash = hashes[`minecraft/sounds/${c.name}.ogg`];

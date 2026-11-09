@@ -22,6 +22,6 @@
     "Scripts/**/*.ts"
   ],
   "exclude": [
-    "Scripts/SoundSearchWorker.ts"
+    "Scripts/Infrastructure/Search/SoundSearchWorker.ts"
   ]
 }

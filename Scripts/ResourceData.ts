@@ -1,4 +1,4 @@
-import type { SoundEntry, SoundEvents, SearchTagData } from './SearchTypes.ts';
+import type { SoundEntry, SoundEventDefinitions, SearchTagData } from './Model/Search/SearchTypes.ts';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -12,9 +12,9 @@ function isSoundEntry(value: unknown): value is SoundEntry {
         && ['pitch', 'volume', 'weight'].every(key => value[key] === undefined || typeof value[key] === 'number');
 }
 
-export function parseSoundEvents(value: unknown): SoundEvents {
+export function parseSoundEvents(value: unknown): SoundEventDefinitions {
     if (!isRecord(value)) throw new Error('Invalid sound events');
-    const events: SoundEvents = Object.create(null);
+    const events: SoundEventDefinitions = Object.create(null);
     for (const [name, event] of Object.entries(value)) {
         if (!isRecord(event)) throw new Error('Invalid sound event');
         const sounds: unknown = event.sounds;

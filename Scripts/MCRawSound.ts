@@ -1,4 +1,4 @@
-import type { SoundEntry } from './SearchTypes.ts';
+import type { SoundEntry } from './Model/Search/SearchTypes.ts';
 import type { MCSoundHashResource } from './MCSoundHashResource.ts';
 import { SharedAudioPaths } from "./ResourcePathProvider.ts";
 

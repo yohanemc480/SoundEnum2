@@ -4,10 +4,10 @@ import { readFile } from 'node:fs/promises';
 import { Worker as NodeWorker } from 'node:worker_threads';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
-import { SoundSearchResource } from '../Scripts/SoundSearchResource.ts';
+import { WorkerSearchService } from '../Scripts/Infrastructure/Search/WorkerSearchService.ts';
 import { ResourcePathProvider } from '../Scripts/ResourcePathProvider.ts';
 import { Text } from '../Scripts/Text.ts';
-import { resolveSoundEvents } from '../Scripts/ResolveSoundEvents.ts';
+import { resolveSoundEventReferences } from '../Scripts/Model/Search/ResolveSoundEventReferences.ts';
 
 // HTTPの代わりに同じURLをローカルファイルへ対応付ける。推論やデータは偽装しない。
 const root = new URL('../', import.meta.url);
@@ -34,40 +34,40 @@ globalThis.Worker = class {
 };
 
 const paths = new ResourcePathProvider(JSON.parse(await readFile(new URL('resource/available-versions.json', root)))[0]);
-const resource = new SoundSearchResource(paths);
+const resource = new WorkerSearchService(paths);
 try {
     const start = performance.now();
     const index = await resource.load();
     const loadMs = performance.now() - start;
     const hashes = JSON.parse(await readFile(new URL(`resource/${paths.Version}/audio-file-hashes.json`, root)));
     const sounds = JSON.parse(await readFile(new URL(`resource/${paths.Version}/sound-events.json`, root)));
-    const resolved = resolveSoundEvents(sounds);
+    const resolved = resolveSoundEventReferences(sounds);
     for (const event of index.events) {
         assert.ok(event.name in sounds, event.name);
         assert.deepEqual(event.candidates.map(c => [c.name, c.pitch, c.volume]),
             resolved[event.name].map(c => [c.name, c.pitch ?? 1, c.volume ?? 1]), event.name);
         for (const c of event.candidates) assert.equal(hashes[`minecraft/sounds/${c.name}.ogg`], c.hash);
     }
-    const all = await resource.request({ type: 'search', options: {} });
-    assert.equal(all.results.length, index.events.length);
+    const all = await resource.search({});
+    assert.equal(all.length, index.events.length);
     const tagCounts = {};
     for (const tag of index.tags) {
         assert.equal(typeof Text[tag.textKey], 'string');
-        const result = await resource.request({ type: 'search', options: { tags: [tag.id] } });
-        assert.equal(result.results.length, index.events.filter(e => e.candidates.some(c => index.audioTags[c.hash].includes(tag.id))).length);
-        assert.ok(result.results.every(row => row.tags.includes(tag.id)));
-        tagCounts[tag.id] = result.results.length;
+        const result = await resource.search({ tags: [tag.id] });
+        assert.equal(result.length, index.events.filter(e => e.candidates.some(c => index.audioTags[c.hash].includes(tag.id))).length);
+        assert.ok(result.every(row => row.tags.includes(tag.id)));
+        tagCounts[tag.id] = result.length;
     }
     const representatives = ['block.anvil.land', 'block.glass.break', 'entity.generic.explode', 'block.water.ambient', 'block.wood.break', 'entity.player.hurt'];
     const reports = [];
     for (const base of representatives.filter(name => name in sounds)) {
         const started = performance.now();
-        const result = await resource.request({ type: 'search', options: { base } });
-        assert.equal(result.results[0].name, base);
-        assert.ok(result.results.every(row => Number.isFinite(row.score)));
-        for (let i = 1; i < result.results.length; i++) assert.ok(result.results[i - 1].score >= result.results[i].score);
+        const result = await resource.search({ referenceSoundName: base });
+        assert.equal(result[0].name, base);
+        assert.ok(result.every(row => Number.isFinite(row.score)));
+        for (let i = 1; i < result.length; i++) assert.ok(result[i - 1].score >= result[i].score);
         reports.push({ base, milliseconds: Math.round(performance.now() - started),
-            top: result.results.slice(0, 5).map(row => ({ name: row.name, score: +row.score.toFixed(3) })) });
+            top: result.slice(0, 5).map(row => ({ name: row.name, score: +row.score.toFixed(3) })) });
     }
     const binary = await readFile(new URL(paths.SearchVectors, root));
     assert.equal(createHash('sha256').update(binary).digest('hex'), index.vectorHash);

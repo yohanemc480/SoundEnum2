@@ -1,7 +1,7 @@
-import type { SoundEntry, SoundEvents } from './SearchTypes.ts';
+import type { SoundEntry, SoundEventDefinitions } from './SearchTypes.ts';
 
 /** event参照を再帰的に展開し、参照元と参照先の再生設定を合成する。 */
-export function resolveSoundEvents(events: SoundEvents): Record<string, SoundEntry[]>
+export function resolveSoundEventReferences(events: SoundEventDefinitions): Record<string, SoundEntry[]>
 {
     const result: Record<string, SoundEntry[]> = Object.create(null);
     const resolve = (name: string, stack = new Set<string>()): SoundEntry[] => {

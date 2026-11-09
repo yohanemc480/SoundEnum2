@@ -8,7 +8,7 @@
     "types": []
   },
   "include": [
-    "Scripts/SoundSearchWorker.ts"
+    "Scripts/Infrastructure/Search/SoundSearchWorker.ts"
   ],
   "exclude": []
 }

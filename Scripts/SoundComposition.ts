@@ -3,7 +3,7 @@ import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
 import { playing as playingClass } from './Playback.css.ts';
 import type { SoundCommand } from './FormatSoundCommand.ts';
-import type { SearchEvent } from './SearchTypes.ts';
+import type { SearchSound } from './Model/Search/SearchTypes.ts';
 import { revealAddedItem } from './RevealAddedItem.ts';
 import { OutputArea } from './OutputArea.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
@@ -38,7 +38,7 @@ export class SoundComposition {
     readonly onPreview: CompositionOptions['onPreview'];
     readonly onSimilar: CompositionOptions['onSimilar'];
     onChange?: () => void;
-    events: Map<string, SearchEvent> | null;
+    events: Map<string, SearchSound> | null;
     rows: SoundCommand[];
     nodes: Set<PreviewSource>;
     generation: number;
@@ -82,7 +82,7 @@ export class SoundComposition {
         SoundManager.Instance.GetAudio().addEventListener('play', () => this.stop());
         this.render();
     }
-    setEvents(events: readonly SearchEvent[]): void {
+    setEvents(events: readonly SearchSound[]): void {
         this.events = new Map(events.map(event => [event.name, event]));
         this.render();
         this.onChange?.();
