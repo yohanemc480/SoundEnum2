@@ -27,7 +27,7 @@ export function createCompositionScreen(previewPlayback: AudioPlayback, settings
         const lifecycle = new AbortController();
         scope.defer(() => lifecycle.abort());
         window.addEventListener('pagehide', () => presenter.stop(), { signal: lifecycle.signal });
-        return { presenter, view, dispose: () => scope.dispose() };
+        return { presenter, dispose: () => scope.dispose() };
     } catch (error) {
         try { scope.dispose(); } catch (cleanupError) { console.error(cleanupError); }
         throw error;

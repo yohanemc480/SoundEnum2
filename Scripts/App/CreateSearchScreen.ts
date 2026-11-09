@@ -27,7 +27,7 @@ export function createSearchScreen(paths: ResourcePathProvider, composition: Com
             confirmFavoriteRemoval: name => confirmAction(Text.favoritesRemoveConfirm(name), { acceptLabel: Text.confirmRemove }),
             notifyFailure: operation => showToast(operation === 'favorites' ? Text.favoritesFailure : Text.searchFailure),
         }));
-        return { presenter, view, dispose: () => scope.dispose() };
+        return { presenter, dispose: () => scope.dispose() };
     } catch (error) {
         try { scope.dispose(); } catch (cleanupError) { console.error(cleanupError); }
         throw error;

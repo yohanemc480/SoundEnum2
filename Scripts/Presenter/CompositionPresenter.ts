@@ -1,3 +1,4 @@
+import type { CompositionEditor, CompositionEditorState } from '../Contracts/Services/CompositionEditor.ts';
 import { CompositionModel } from '../Model/Composition/CompositionModel.ts';
 import { normalizeComposition } from '../Model/Composition/CompositionData.ts';
 import { normalizeCommandSettings } from '../Model/Command/CommandSettings.ts';
@@ -20,8 +21,8 @@ export interface CompositionConnections {
 }
 
 /** 行編集・保存・再生・波形取得を調整する。DOMと音声APIには依存しない。 */
-export class CompositionPresenter {
-    readonly model = new CompositionModel();
+export class CompositionPresenter implements CompositionEditor {
+    private readonly model = new CompositionModel();
     private readonly view: CompositionView;
     private readonly store: CompositionStore;
     private readonly playback: CompositionPlayback;
@@ -36,7 +37,7 @@ export class CompositionPresenter {
     private writable = true;
     private failed = false;
     private playbackState: CompositionPlaybackState;
-    events: Map<string, SearchSound> | null = null;
+    private events: Map<string, SearchSound> | null = null;
     private readonly changeListeners = new Set<() => void>();
 
     constructor(view: CompositionView, store: CompositionStore, playback: CompositionPlayback,
@@ -66,6 +67,15 @@ export class CompositionPresenter {
         }));
         this.render();
     }
+    /** 保存一覧へ独立した編集状態を渡す。未読込のサウンド一覧はnullで表す。 */
+    read(): CompositionEditorState {
+        return { rows: this.rows, soundNames: this.events ? [...this.events.keys()] : null };
+    }
+    /** 保存に成功した場合だけ行を置き換え、一覧を再描画する。 */
+    replace(rows: SoundCommand[]): boolean {
+        if (!this.save(rows)) return false;
+        this.render(); return true;
+    }
     /** 行または利用可能なサウンドの変更を購読する。 */
     subscribeChanges(listener: () => void): () => void {
         this.changeListeners.add(listener); return () => { this.changeListeners.delete(listener); };
@@ -81,7 +91,7 @@ export class CompositionPresenter {
         this.events = new Map(events.map(sound => [sound.name, sound])); this.render(); this.notifyChange();
     }
     /** 保存が成功した場合だけModelを確定する。読み込み失敗後の上書きは禁止する。 */
-    save(rows: SoundCommand[]): boolean {
+    private save(rows: SoundCommand[]): boolean {
         if (this.disposed) return false;
         try {
             if (!this.writable) throw new Error('Composition storage unavailable');
@@ -98,7 +108,7 @@ export class CompositionPresenter {
         }
     }
     /** 行が増減したときだけ一覧を作り直す。設定編集では入力中の要素を保持する。 */
-    render(): void {
+    private render(): void {
         if (this.disposed) return;
         this.view.showRows(this.rows.map(command => ({ command, available: !!this.events?.get(command.name)?.candidates.length,
             missing: !!this.events && !this.events.has(command.name) })));

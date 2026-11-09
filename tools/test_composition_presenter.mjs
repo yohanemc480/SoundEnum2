@@ -116,3 +116,24 @@ test('editor change subscriptions notify successful edits and resource loading, 
     f.presenter.subscribeChanges(() => changes++); f.presenter.dispose();
     f.presenter.setEvents([]); assert.equal(changes, 2);
 });
+
+
+test('editor snapshots are isolated and replacement renders only after successful persistence', () => {
+    const f = fixture();
+    assert.equal(f.presenter.read().soundNames, null);
+    f.presenter.setEvents([{ name: 'a', candidates: [candidate] }]);
+    const snapshot = f.presenter.read();
+    snapshot.rows[0].pitch = 2; snapshot.soundNames.length = 0;
+    assert.equal(f.presenter.read().rows[0].pitch, row.pitch);
+    assert.deepEqual(f.presenter.read().soundNames, ['a']);
+    const renders = f.rowRenders;
+    assert.equal(f.presenter.replace([{ ...row, pitch: 1.5 }]), true);
+    assert.equal(f.rowRenders, renders + 1);
+    assert.equal(f.rows[0].command.pitch, 1.5);
+    f.options.writeFailure = true;
+    assert.equal(f.presenter.replace([]), false);
+    assert.equal(f.rowRenders, renders + 1);
+    assert.equal(f.presenter.read().rows.length, 1);
+    f.presenter.dispose();
+    assert.equal(f.presenter.replace([]), false);
+});

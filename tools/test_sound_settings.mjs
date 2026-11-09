@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mountSoundSettings } from '../Scripts/App/MountSoundSettings.ts';
+import { CommandSettings } from '../Scripts/Model/Command/CommandSettings.ts';
+import { CommandSettingsPresenter } from '../Scripts/Presenter/CommandSettingsPresenter.ts';
+import { createCommandSettingsView } from '../Scripts/View/Settings/CommandSettingsView.ts';
 import { LocalStorageSchema } from '../Scripts/Infrastructure/Storage/LocalStorageSchema.ts';
 
 test('shared settings preserve precision and reset only their own saved values', () => {
@@ -20,8 +22,10 @@ test('shared settings preserve precision and reset only their own saved values',
         let first = { ...defaults, source: 'block', volume: 2.35, pitch: .75, minVolume: .35 };
         let second = { ...defaults, source: 'music', pitch: 1.5 };
         const panel = new Element(), other = new Element();
-        mountSoundSettings(panel, { read: () => first, save: value => { first = value; } });
-        mountSoundSettings(other, { read: () => second, save: value => { second = value; } });
+        new CommandSettingsPresenter(new CommandSettings(), createCommandSettingsView(panel),
+            { read: () => first, save: value => { first = value; } }, () => assert.fail('Unexpected settings failure'));
+        new CommandSettingsPresenter(new CommandSettings(), createCommandSettingsView(other),
+            { read: () => second, save: value => { second = value; } }, () => assert.fail('Unexpected settings failure'));
         const volumeInput = panel.children[1].children[1].children[2];
         volumeInput.value = '3.25';
         volumeInput.listeners.change();

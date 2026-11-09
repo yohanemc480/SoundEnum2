@@ -15,7 +15,7 @@ export function createSavedCompositionsScreen(editor: CompositionEditor, version
     const scope = new DisposalScope();
     try {
         const view = scope.own(new HtmlSavedCompositionsView(copyText));
-        const presenter = scope.own(new SavedCompositionsPresenter(view, new LocalSavedCompositionsStore(), editor, version, {
+        scope.own(new SavedCompositionsPresenter(view, new LocalSavedCompositionsStore(), editor, version, {
             createId: () => crypto.randomUUID(), defaultName: Text.savedCompositionDefaultName,
             rename: name => promptText(Text.savedCompositionRename, { value: name, maxLength: 20, acceptLabel: Text.savedCompositionRenameAccept,
                 validate: value => { try { return normalizeCompositionName(value); } catch { throw new Error(Text.savedCompositionNameInvalid); } } }),

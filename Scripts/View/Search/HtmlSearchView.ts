@@ -1,7 +1,7 @@
 import type { WaveformSource } from '../../Contracts/Services/PlaybackResources.ts';
 import * as layout from '../Layout/Layout.css.ts';
 import * as settingsStyles from '../Components/SoundSettings.css.ts';
-import { row as previewRow, selected } from '../Components/SoundPreviewRow.css.ts';
+import { selectSoundPreview } from '../Components/SelectSoundPreview.ts';
 import * as styles from './SearchResults.css.ts';
 import { SoundAutocomplete } from './SoundAutocomplete.ts';
 import { SearchWaveforms } from './SearchWaveforms.ts';
@@ -186,12 +186,6 @@ export class HtmlSearchView implements SearchView {
 
     activateSearchTab(): void { requireElement('search-tab').click(); }
 
-    /** 検索結果と組み合わせ行の試聴選択を共通クラスで切り替える。ボタンをPresenterへ渡さない。 */
-    selectPreviewButton(button: HTMLButtonElement): void {
-        document.querySelectorAll(`.${layout.browserPanel} .${selected}, .${previewRow} .${selected}`).forEach(element => element.classList.remove(selected));
-        this.candidatePopover.querySelectorAll(`.${selected}`).forEach(element => element.classList.remove(selected));
-        button.classList.add(selected);
-    }
 
     /** グローバル購読、補完UI、波形監視をまとめて解放する。 */
     dispose(): void {
@@ -239,7 +233,7 @@ export class HtmlSearchView implements SearchView {
             preview.append(name);
             preview.disabled = !candidates.length;
             const playCandidate = (candidate: SearchCandidate | null, button: HTMLButtonElement) => {
-                this.selectPreviewButton(button);
+                selectSoundPreview(button);
                 this.actions?.preview({ name: entry.name, candidate });
             };
             preview.addEventListener('click', () => playCandidate(null, preview));

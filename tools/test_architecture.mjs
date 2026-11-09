@@ -90,4 +90,15 @@ test('application imports follow MVP boundaries and have no cycles including typ
         completed.add(file);
     }
     for (const file of files) visit(file);
+
+    const reachable = new Set();
+    /** 起動入口から型・CSS・Workerも含めて辿り、孤立した移行残骸を検出する。 */
+    function markReachable(file) {
+        if (reachable.has(file)) return;
+        reachable.add(file);
+        for (const target of graph.get(file)) markReachable(target);
+    }
+    markReachable(resolve(root, 'App/Bootstrap.ts'));
+    assert.deepEqual(files.filter(file => !reachable.has(file)).map(file => relative(root, file)), [],
+        '起動入口から参照されていないファイル');
 });

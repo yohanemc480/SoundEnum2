@@ -13,7 +13,9 @@ import { applyPlaybackStyles } from '../View/Playback/ApplyPlaybackStyles.ts';
 import { applySettingsStyles } from '../View/Settings/ApplySettingsStyles.ts';
 import { createSavedCompositionsScreen } from './CreateSavedCompositionsScreen.ts';
 import { createCompositionScreen } from './CreateCompositionScreen.ts';
-import { mountSoundSettings } from './MountSoundSettings.ts';
+import { CommandSettingsPresenter } from '../Presenter/CommandSettingsPresenter.ts';
+import { createCommandSettingsView } from '../View/Settings/CommandSettingsView.ts';
+import { selectSoundPreview } from '../View/Components/SelectSoundPreview.ts';
 import { confirmAction } from '../View/Components/ConfirmDialog/ConfirmDialog.ts';
 import { localStorageStore } from '../Infrastructure/Storage/LocalStorage.ts';
 import { createResourceVersionSelector } from './CreateResourceVersionSelector.ts';
@@ -75,28 +77,22 @@ try {
     const playbackView = scope.own(new HtmlPlaybackView());
     const copyText = createCommandCopier();
     const outputArea = scope.own(new OutputArea('#preview-output', copyText));
-    mountSoundSettings(requireElement('command-settings'), {
-        model: commandSettings,
-        read: () => settingsStore.read(), save: value => settingsStore.save(value),
-    });
+    new CommandSettingsPresenter(commandSettings, createCommandSettingsView(requireElement('command-settings')),
+        settingsStore, () => console.warn('Cannot save or load command settings'));
     const playbackPresenter = scope.own(new PlaybackPresenter(playback, playbackView,
         playbackResources, { load: getWaveform },
         commandSettings, command => outputArea.SetText(command)));
-    const masterVolumeControl = scope.own(new SelectMasterVolumeArea('#select-master-volume', {
+    scope.own(new SelectMasterVolumeArea('#select-master-volume', {
         value: playback.read().masterVolume, onChange: value => playbackPresenter.setMasterVolume(value),
     }));
-    const browserTabs = scope.own(createBrowserTabs(browserPreferences));
+    scope.own(createBrowserTabs(browserPreferences));
     const compositionScreen: ReturnType<typeof createCompositionScreen> = scope.own(createCompositionScreen(playback, commandSettings,
-        button => searchScreen.view.selectPreviewButton(button),
+        selectSoundPreview,
         row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
         name => { void searchScreen.presenter.searchSimilar(name); }, copyText));
     const composition = compositionScreen.presenter;
     const searchScreen = scope.own(createSearchScreen(paths, composition, playbackPresenter, browserPreferences));
-    const savedCompositionsScreen = scope.own(createSavedCompositionsScreen({
-        read: () => ({ rows: composition.rows, soundNames: composition.events ? [...composition.events.keys()] : null }),
-        subscribeChanges: listener => composition.subscribeChanges(listener),
-        replace: rows => { if (!composition.save(rows)) return false; composition.render(); return true; },
-    }, paths.Version, copyText));
+    scope.own(createSavedCompositionsScreen(composition, paths.Version, copyText));
     void searchScreen.presenter.load();
 
 } catch (error) {
