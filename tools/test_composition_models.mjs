@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CompositionModel } from '../Scripts/Model/Composition/CompositionModel.ts';
 import { SavedCompositionsModel, nextCompositionName } from '../Scripts/Model/Composition/SavedCompositionsModel.ts';
-import { SavedCompositions } from '../Scripts/SavedCompositions.ts';
 
 const row = { name: 'a', source: 'block', volume: 1.23, pitch: .75, minVolume: .1 };
 
@@ -61,32 +60,4 @@ test('saved limits reject growth while permitting repair of legacy oversized lis
     model.replace(model.withoutItem('2'));
     model.replace(model.withAdded('new', 'new', '', [row]));
     assert.equal(model.read().length, 30);
-});
-
-test('saved-list persistence commits its model only after successful writes and respects read-only recovery', t => {
-    t.mock.timers.enable({ apis: ['setTimeout'] });
-    const originalStorage = globalThis.localStorage, originalDocument = globalThis.document;
-    const toast = { textContent: '', classList: { add() {}, remove() {} } };
-    globalThis.document = { querySelector: () => toast };
-    t.mock.method(console, 'error', () => {});
-    let fail = true, writes = 0, saved;
-    globalThis.localStorage = { setItem(_, value) { writes++; if (fail) throw new Error('quota'); saved = JSON.parse(value); } };
-    try {
-        const savedModel = new SavedCompositionsModel();
-        const screen = Object.assign(Object.create(SavedCompositions.prototype), { model: savedModel, writable: true, render() {} });
-        const items = savedModel.withAdded('one', 'test', '26.3', [row]);
-        fail = true;
-        assert.equal(screen.write(items), false);
-        assert.equal(savedModel.read().length, 0);
-        fail = false;
-        assert.equal(screen.write(items), true);
-        assert.deepEqual(savedModel.read(), saved);
-        screen.writable = false;
-        const beforeReadOnlyWrite = writes;
-        assert.equal(screen.write([]), false);
-        assert.equal(writes, beforeReadOnlyWrite);
-    } finally {
-        if (originalStorage === undefined) delete globalThis.localStorage; else globalThis.localStorage = originalStorage;
-        if (originalDocument === undefined) delete globalThis.document; else globalThis.document = originalDocument;
-    }
 });

@@ -1,4 +1,7 @@
-import { nextCompositionName } from '../Scripts/SavedCompositions.ts';
+import { nextCompositionName as findNextCompositionName } from '../Scripts/Model/Composition/SavedCompositionsModel.ts';
+import { Text } from '../Scripts/Text.ts';
+/** 画面の日本語文言で採番する。 */
+const nextCompositionName = items => findNextCompositionName(items, Text.savedCompositionDefaultName);
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeSavedCompositions, normalizePreferences, normalizeCompositionName } from '../Scripts/LocalStorageSchema.ts';

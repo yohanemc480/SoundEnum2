@@ -105,3 +105,14 @@ test('out-of-order waveforms and disposal cannot overwrite the current compositi
     pending[2].resolve(new Float32Array([1])); await new Promise(resolve => setImmediate(resolve));
     assert.equal(f.waveforms, current);
 });
+
+test('editor change subscriptions notify successful edits and resource loading, and can be detached', () => {
+    const f = fixture(); let changes = 0;
+    const unsubscribe = f.presenter.subscribeChanges(() => changes++);
+    f.presenter.setEvents([{ name: 'a', candidates: [candidate] }]); assert.equal(changes, 1);
+    f.presenter.save([{ ...row, pitch: 1.5 }]); assert.equal(changes, 2);
+    f.options.writeFailure = true; f.presenter.save([]); assert.equal(changes, 2);
+    unsubscribe(); f.presenter.setEvents([]); assert.equal(changes, 2);
+    f.presenter.subscribeChanges(() => changes++); f.presenter.dispose();
+    f.presenter.setEvents([]); assert.equal(changes, 2);
+});

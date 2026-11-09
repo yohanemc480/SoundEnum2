@@ -9,7 +9,7 @@ import { applyLayoutStyles } from './ApplyLayoutStyles.ts';
 import { applySearchStyles } from './View/Search/ApplySearchStyles.ts';
 import { applyPlaybackStyles } from './ApplyPlaybackStyles.ts';
 import { applySettingsStyles } from './ApplySettingsStyles.ts';
-import { SavedCompositions } from './SavedCompositions.ts';
+import { createSavedCompositionsScreen } from './App/CreateSavedCompositionsScreen.ts';
 import { createCompositionScreen } from './App/CreateCompositionScreen.ts';
 import { mountSoundSettings } from './App/MountSoundSettings.ts';
 import { confirmAction } from './ConfirmDialog.ts';
@@ -83,9 +83,13 @@ const compositionScreen = createCompositionScreen(playback, commandSettings,
     name => { void searchScreen.presenter.searchSimilar(name); });
 const composition = compositionScreen.presenter;
 const searchScreen = createSearchScreen(paths, composition, playbackPresenter);
-new SavedCompositions(composition, paths.Version);
+const savedCompositionsScreen = createSavedCompositionsScreen({
+    read: () => ({ rows: composition.rows, soundNames: composition.events ? [...composition.events.keys()] : null }),
+    subscribeChanges: listener => composition.subscribeChanges(listener),
+    replace: rows => { if (!composition.save(rows)) return false; composition.render(); return true; },
+}, paths.Version);
 void searchScreen.presenter.load();
 /** アプリ終了時に購読・通信・音声の所有者を順に破棄する。 */
-const dispose = () => { searchScreen.dispose(); compositionScreen.dispose(); playbackPresenter.dispose(); playbackView.dispose(); masterVolumeControl.dispose(); playback.dispose(); };
+const dispose = () => { searchScreen.dispose(); savedCompositionsScreen.dispose(); compositionScreen.dispose(); playbackPresenter.dispose(); playbackView.dispose(); masterVolumeControl.dispose(); playback.dispose(); };
 window.addEventListener('pagehide', event => { if (!event.persisted) dispose(); });
 if (import.meta.hot) import.meta.hot.dispose(dispose);

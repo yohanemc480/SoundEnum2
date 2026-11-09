@@ -37,7 +37,7 @@ export class CompositionPresenter {
     private failed = false;
     private playbackState: CompositionPlaybackState;
     events: Map<string, SearchSound> | null = null;
-    onChange?: () => void;
+    private readonly changeListeners = new Set<() => void>();
 
     constructor(view: CompositionView, store: CompositionStore, playback: CompositionPlayback,
         previewPlayback: AudioPlayback, settings: CommandSettings, waveforms: WaveformSource, connections: CompositionConnections) {
@@ -66,13 +66,19 @@ export class CompositionPresenter {
         }));
         this.render();
     }
+    /** 行または利用可能なサウンドの変更を購読する。 */
+    subscribeChanges(listener: () => void): () => void {
+        this.changeListeners.add(listener); return () => { this.changeListeners.delete(listener); };
+    }
+    /** 編集画面と保存一覧の同期を値の変更として通知する。 */
+    private notifyChange(): void { this.changeListeners.forEach(listener => listener()); }
     /** 保存一覧との接続用に独立した行のコピーを返す。 */
     get rows(): SoundCommand[] { return this.model.read(); }
     /** 準備中も停止操作を受け付ける。 */
     private get busy(): boolean { return this.playbackState.phase === 'loading' || this.playbackState.phase === 'playing'; }
     setEvents(events: readonly SearchSound[]): void {
         if (this.disposed) return;
-        this.events = new Map(events.map(sound => [sound.name, sound])); this.render(); this.onChange?.();
+        this.events = new Map(events.map(sound => [sound.name, sound])); this.render(); this.notifyChange();
     }
     /** 保存が成功した場合だけModelを確定する。読み込み失敗後の上書きは禁止する。 */
     save(rows: SoundCommand[]): boolean {
@@ -81,7 +87,7 @@ export class CompositionPresenter {
             if (!this.writable) throw new Error('Composition storage unavailable');
             const validated = normalizeComposition(rows);
             this.store.save(validated); this.model.replace(validated); this.failed = false;
-            this.stop(); this.refreshWaveform(); this.showState(); this.onChange?.(); return true;
+            this.stop(); this.refreshWaveform(); this.showState(); this.notifyChange(); return true;
         } catch { this.connections.notify('failure'); return false; }
     }
     add(name: string): void {
@@ -156,6 +162,6 @@ export class CompositionPresenter {
     dispose(): void {
         if (this.disposed) return;
         this.stop(); this.disposed = true; ++this.waveformRevision;
-        this.cleanup.forEach(dispose => dispose()); this.onChange = undefined;
+        this.cleanup.forEach(dispose => dispose()); this.changeListeners.clear();
     }
 }
