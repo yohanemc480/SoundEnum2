@@ -1,3 +1,4 @@
+import * as styles from './Compositions.css.ts';
 import { playing as playingClass } from './Playback.css.ts';
 import type { SoundCommand } from './FormatSoundCommand.ts';
 import type { SearchEvent } from './SearchTypes.ts';
@@ -129,9 +130,9 @@ export class SoundComposition {
             unavailable ? Text.compositionUnavailable : '';
         this.element('loading').hidden = !!this.events || !this.rows.length;
         this.rows.forEach((row, index) => {
-            const item = document.createElement('div'); item.className = 'composition-row';
+            const item = document.createElement('div'); item.className = styles.compositionRow;
             const heading = document.createElement('div'); heading.className = 'section-heading';
-            const name = document.createElement('button'); name.type = 'button'; name.className = 'composition-name'; name.textContent = row.name; name.title = row.name;
+            const name = document.createElement('button'); name.type = 'button'; name.className = styles.compositionName; name.textContent = row.name; name.title = row.name;
             name.disabled = !this.events?.get(row.name)?.candidates.length;
             name.addEventListener('click', () => this.onPreview(this.rows[index], name));
             item.addEventListener('click', event => {
@@ -155,7 +156,7 @@ export class SoundComposition {
             panel.className = 'settings-popover sound-settings';
             panel.setAttribute('aria-label', `${Text.settings}: ${row.name}`);
             settings.popoverTargetElement = panel;
-            const actions = document.createElement('div'); actions.className = 'composition-actions';
+            const actions = document.createElement('div'); actions.className = styles.compositionActions;
             actions.append(similar, settings, remove);
             heading.append(name, actions); item.append(heading);
             this.disposePopovers.push(bindSettingsPopover(settings, panel));

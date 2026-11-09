@@ -1,3 +1,4 @@
+import { compositionRow, compositionName } from './Compositions.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const selected = style({});
@@ -122,7 +123,7 @@ globalStyle(`.${searchRow} .${searchCandidateTrigger}`, {
     "fontSize": "12px",
     "flexShrink": "0"
 });
-globalStyle(`.${searchRowMain}:hover, .${searchRowMain}:has(.${searchPreview}.${selected}), .composition-row:has(.composition-name:not(:disabled)):hover, .composition-row:has(.composition-name.${selected})`, {
+globalStyle(`.${searchRowMain}:hover, .${searchRowMain}:has(.${searchPreview}.${selected}), .${compositionRow}:has(.${compositionName}:not(:disabled)):hover, .${compositionRow}:has(.${compositionName}.${selected})`, {
     "background": "#283f33",
     "borderColor": "var(--row-highlight-border, #42634d)"
 });
@@ -192,6 +193,6 @@ globalStyle(`.${searchRow} button.composition-add`, {
     "width": "34px",
     "padding": "6px"
 });
-globalStyle(`.composition-row .composition-name:hover:not(:disabled), .composition-row .composition-name.${selected}`, {
+globalStyle(`.${compositionRow} .${compositionName}:hover:not(:disabled), .${compositionRow} .${compositionName}.${selected}`, {
     "color": "var(--accent)"
 });

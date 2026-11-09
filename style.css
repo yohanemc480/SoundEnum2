@@ -187,9 +187,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .clearable-input:has(input:placeholder-shown) .input-clear { visibility: hidden; }
 
 .composition-toolbar { margin-bottom: 12px; }
-.composition-row { padding: 4px 8px; margin: 4px 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
-.composition-row > .section-heading { flex-wrap: nowrap; margin-bottom: 0; }
-.composition-row .composition-name { font: 12px/1.5 Consolas, monospace; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #composition-count { font-size: 12px; }
 .composition-panel { display: flex; flex-direction: column; min-height: 0; }
 .composition-panel .section-note { margin-bottom: 8px; }
@@ -200,7 +197,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
   #composition-list { min-height: 0; max-height: none; }
 }
 
-.composition-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
 
 .composition-heading-status { display: flex; align-items: center; gap: 8px; }
 #composition-status:empty { display: none; }
@@ -208,9 +204,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .composition-title { display: flex; align-items: baseline; gap: 8px; }
 .composition-title #composition-count { color: var(--muted); font-size: 12px; }
 
-.composition-name { padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
-.composition-row button:disabled { opacity: .45; cursor: default; }
-.composition-actions { margin-left: auto; white-space: nowrap; }
 
 #composition-waveform { display: block; width: 100%; min-width: 0; height: 36px; border-radius: 4px; }
 
@@ -222,8 +215,6 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .composition-command .section-heading { margin-bottom: 8px; }
 #composition-output .output-text { height: 88px; overflow-y: auto; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: #4c6059 transparent; }
 
-.composition-actions > .settings-button:not(.close-button) { padding: 3px 8px; min-height: 28px; }
-.composition-row .composition-name { min-height: 28px; }
 
 @media (max-width: 400px) {
   .preview-transport { grid-template-columns: 40px auto minmax(0, 1fr); }
@@ -233,33 +224,16 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .output > .copy-button { position: static; width: 42px; height: auto; align-self: stretch; border: 0; border-left: 1px solid #3b5748; border-radius: 0; }
 .output > .copy-button:focus-visible { outline-offset: -3px; }
 
-.saved-composition { padding: 12px; margin-bottom: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
-.saved-composition .section-heading { margin-bottom: 8px; overflow-wrap: anywhere; }
-.saved-composition-sounds { font: 12px/1.7 Consolas, monospace; color: var(--muted); margin-bottom: 8px; }
-.saved-composition-sounds > div { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (min-width: 1100px) and (min-height: 700px) {
   #compositions-panel:not([hidden]) { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   #compositions-panel > :not(.search-list) { flex-shrink: 0; }
 }
 
-.saved-composition > .composition-actions { justify-content: flex-end; gap: 8px; }
-.saved-composition .composition-actions > .saved-composition-delete { display: grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; padding: 0; color: #e69a91; }
-.saved-composition-delete:hover:not(:disabled) { color: #ffb4aa; border-color: #a55c55; background: #3a2525; }
-.saved-composition-delete svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.saved-composition .settings-button:disabled { opacity: .45; cursor: default; }
 
-.saved-composition-copy { position: static; width: 32px; height: 32px; border-color: var(--line); background: var(--surface); }
 
-.saved-composition > .composition-actions > .saved-composition-delete { margin-right: 12px; }
 
-.saved-composition-load { color: var(--accent); background: #283f33; border-color: #42634d; }
 
-.saved-composition-heading { display: flex; align-items: baseline; justify-content: flex-end; flex-wrap: wrap; gap: 4px 16px; min-width: 0; margin-left: auto; color: var(--muted); font-size: 11px; }
-.saved-composition-version { color: var(--muted); font-size: 11px; font-weight: normal; white-space: nowrap; }
 
-.saved-composition-title { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.saved-composition-edit { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 5px; border-color: transparent; color: var(--muted); }
-.saved-composition-edit svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 .dialog-text-input { width: 100%; margin-top: 12px; }
 
 .composition-save-actions { display: flex; justify-content: flex-end; margin-top: 8px; }

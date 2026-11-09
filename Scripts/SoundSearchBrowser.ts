@@ -1,3 +1,4 @@
+import { compositionRow } from './Compositions.css.ts';
 import * as styles from './SearchResults.css.ts';
 import type { OutputArea } from './OutputArea.ts';
 import type { ResourcePathProvider } from './ResourcePathProvider.ts';
@@ -302,7 +303,7 @@ export class SoundSearchBrowser
                 const command = new MCCommandSound(name, settings?.source ?? manager.GetSource(), MCCommandSelector.All, settings?.volume ?? manager.GetVolume(), settings?.pitch ?? manager.GetPitch(), settings?.minVolume ?? manager.GetMinVolume());
                 manager.Play(command, candidate ? new MCRawSound({ ...candidate }) : null);
                 this.outputArea.SetText(command.ToString());
-                document.querySelectorAll(`.browser-panel .${styles.selected}, .composition-row .${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
+                document.querySelectorAll(`.browser-panel .${styles.selected}, .${compositionRow} .${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
                 this.candidatePopover.querySelectorAll(`.${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
                 button.classList.add(styles.selected);
     }
