@@ -1,3 +1,4 @@
+import { button as copyButton } from './CopyButton.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const compositionRow = style({
@@ -36,6 +37,7 @@ export const savedCompositionSounds = style({
 });
 export const savedCompositionDelete = style({});
 export const savedCompositionCopy = style({
+    selectors: { [`&.${copyButton}`]: { position: 'static', width: 32, height: 32, borderColor: 'var(--line)', background: 'var(--surface)' } },
     "position": "static",
     "width": "32px",
     "height": "32px",

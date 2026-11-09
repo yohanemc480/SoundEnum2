@@ -1,3 +1,4 @@
+import * as styles from './SoundAutocomplete.css.ts';
 import { Text } from './Text.ts';
 
 /** 基準音入力専用の候補リスト。フォーカスは入力欄に保持する。 */
@@ -15,7 +16,7 @@ export class SoundAutocomplete {
         this.active = -1;
         this.list = document.createElement('div');
         this.list.id = 'search-choices';
-        this.list.className = 'sound-autocomplete';
+        this.list.className = styles.list;
         this.list.setAttribute('role', 'listbox');
         this.list.setAttribute('aria-label', Text.searchBaseSuggestions);
         this.list.hidden = true;
@@ -61,6 +62,7 @@ export class SoundAutocomplete {
         this.list.replaceChildren();
         this.matches.forEach((name, index) => {
             const option = document.createElement('div');
+            option.className = styles.option;
             option.id = `sound-suggestion-${index}`;
             option.setAttribute('role', 'option');
             option.setAttribute('aria-selected', 'false');

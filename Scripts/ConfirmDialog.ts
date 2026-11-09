@@ -1,3 +1,4 @@
+import * as styles from './ConfirmDialog.css.ts';
 import { Text } from './Text.ts';
 
 interface ConfirmOptions { acceptLabel?: string }
@@ -36,17 +37,19 @@ function openDialog(message: string, acceptLabel: string, textOptions?: TextOpti
     return new Promise<boolean | string | null>(resolve => {
         const previousFocus = document.activeElement;
         const dialog = document.createElement('dialog');
-        dialog.className = 'confirm-dialog';
+        dialog.className = styles.dialog;
         dialog.setAttribute('aria-labelledby', 'confirm-dialog-title');
         dialog.setAttribute('aria-describedby', 'confirm-dialog-message');
         const title = document.createElement('h2');
+        title.className = styles.title;
         title.id = 'confirm-dialog-title';
         title.textContent = Text.confirmTitle;
         const description = document.createElement('p');
+        description.className = styles.description;
         description.id = 'confirm-dialog-message';
         description.textContent = message;
         const actions = document.createElement('div');
-        actions.className = 'confirm-dialog-actions';
+        actions.className = styles.actions;
         const cancel = document.createElement('button');
         cancel.type = 'button';
         cancel.className = 'settings-button';
@@ -54,7 +57,7 @@ function openDialog(message: string, acceptLabel: string, textOptions?: TextOpti
         cancel.autofocus = true;
         const confirm = document.createElement('button');
         confirm.type = 'button';
-        confirm.className = 'settings-button confirm-dialog-accept';
+        confirm.className = `settings-button ${styles.accept}`;
         confirm.textContent = acceptLabel;
         let input: HTMLInputElement | undefined;
         let resultValue = '';
@@ -62,7 +65,7 @@ function openDialog(message: string, acceptLabel: string, textOptions?: TextOpti
             input = document.createElement('input');
             input.type = 'text'; input.value = textOptions.value;
             input.maxLength = textOptions.maxLength; input.required = true;
-            input.className = 'dialog-text-input';
+            input.className = styles.input;
             input.setAttribute('aria-label', message);
             input.addEventListener('input', () => input?.setCustomValidity(''));
             input.addEventListener('keydown', event => {
@@ -79,7 +82,7 @@ function openDialog(message: string, acceptLabel: string, textOptions?: TextOpti
                 dialog.close(accepted ? 'confirmed' : '');
                 return;
             }
-            dialog.classList.add('is-closing');
+            dialog.classList.add(styles.closing);
             setTimeout(() => dialog.close(accepted ? 'confirmed' : ''), 120);
         };
         cancel.addEventListener('click', () => close());
