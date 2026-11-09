@@ -7,11 +7,11 @@ import { confirmAction } from '../ConfirmDialog.ts';
 import { showToast } from '../Toast.ts';
 import { Text } from '../Text.ts';
 import type { ResourcePathProvider } from '../ResourcePathProvider.ts';
-import type { SoundComposition } from '../SoundComposition.ts';
+import type { CompositionActions } from '../Contracts/Services/CompositionActions.ts';
 import type { SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
 
 /** 検索のMVPを生成する。再生サービスはAppから注入し、検索側では実装を知らない。 */
-export function createSearchScreen(paths: ResourcePathProvider, composition: SoundComposition, preview: SoundPreviewService) {
+export function createSearchScreen(paths: ResourcePathProvider, composition: CompositionActions, preview: SoundPreviewService) {
     const view = new HtmlSearchView();
     let favorites: Favorites | null;
     try { favorites = new Favorites(); }

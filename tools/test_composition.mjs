@@ -1,8 +1,104 @@
-import { CompositionModel } from '../Scripts/Model/Composition/CompositionModel.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
-import { SoundComposition } from '../Scripts/SoundComposition.ts';
+import { BrowserCompositionPlayback } from '../Scripts/Infrastructure/Audio/BrowserCompositionPlayback.ts';
+
+/** 音声時計と音源の記録だけを持つブラウザAPIの代替。 */
+function audioFixture(t) {
+    const sources = [], gains = [], frames = new Map();
+    let nextFrame = 0, requests = 0, closed = 0;
+    const originalFrame = globalThis.requestAnimationFrame, originalCancel = globalThis.cancelAnimationFrame;
+    globalThis.requestAnimationFrame = callback => { frames.set(++nextFrame, callback); return nextFrame; };
+    globalThis.cancelAnimationFrame = id => frames.delete(id);
+    t.after(() => {
+        playback.dispose();
+        if (originalFrame === undefined) delete globalThis.requestAnimationFrame; else globalThis.requestAnimationFrame = originalFrame;
+        if (originalCancel === undefined) delete globalThis.cancelAnimationFrame; else globalThis.cancelAnimationFrame = originalCancel;
+    });
+    const context = {
+        currentTime: 10, async resume() {}, async close() { closed++; }, async decodeAudioData() { return { duration: 3 }; },
+        createBufferSource() {
+            const source = { playbackRate: {}, connect() {}, disconnect() { this.disconnected = true; },
+                start(time) { this.time = time; }, stop() { this.stopped = true; } };
+            sources.push(source); return source;
+        },
+        createGain() { const gain = { gain: {}, connect() {}, disconnect() { this.disconnected = true; } }; gains.push(gain); return gain; },
+    };
+    const fetchMock = t.mock.method(globalThis, 'fetch', async () => { requests++; return { ok: true, arrayBuffer: async () => new ArrayBuffer(0) }; });
+    const playback = new BrowserCompositionPlayback(hash => `audio/${hash}`, .8, () => context);
+    const row = { name: 'a', source: 'master', minVolume: 0, volume: 1, pitch: 1,
+        candidate: { hash: 'hash', weight: 1, pitch: .75, volume: .5, duration: 4 } };
+    return { playback, context, sources, gains, frames, fetchMock, rows: [row, { ...row, volume: .5, pitch: 2 }],
+        requests: () => requests, closed: () => closed };
+}
+
+test('all buffers prepare before aligned playback; volume, duration and cleanup remain correct', async t => {
+    const f = audioFixture(t);
+    await f.playback.play(f.rows);
+    assert.equal(f.requests(), 1);
+    assert.deepEqual(f.sources.map(source => source.time), [10.05, 10.05]);
+    assert.deepEqual(f.sources.map(source => source.playbackRate.value), [.75, 1.5]);
+    assert.deepEqual(f.gains.map(gain => gain.gain.value), [.4, .2]);
+    assert.equal(f.playback.read().duration, 4);
+    f.playback.setVolume(.4);
+    assert.deepEqual(f.gains.map(gain => gain.gain.value), [.2, .1]);
+    f.context.currentTime = 11.05;
+    const [id, tick] = f.frames.entries().next().value; f.frames.delete(id); tick();
+    assert.equal(f.playback.read().currentTime, 1);
+    f.playback.stop();
+    assert.equal(f.playback.read().phase, 'idle');
+    assert.ok(f.sources.every(source => source.stopped && source.disconnected));
+    assert.ok(f.gains.every(gain => gain.disconnected));
+    assert.equal(f.frames.size, 0);
+    f.playback.dispose(); f.playback.dispose(); assert.equal(f.closed(), 1);
+});
+
+test('stopping or disposing during download prevents late sources and unsubscribes notifications', async t => {
+    const f = audioFixture(t); let finish;
+    f.fetchMock.mock.mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+    let notifications = 0; const unsubscribe = f.playback.subscribe(() => notifications++);
+    const pending = f.playback.play(f.rows); await Promise.resolve();
+    f.playback.stop();
+    finish({ ok: true, arrayBuffer: async () => new ArrayBuffer(0) }); await pending;
+    assert.equal(f.sources.length, 0); assert.equal(f.playback.read().phase, 'idle');
+    const pendingAgain = f.playback.play(f.rows); await Promise.resolve();
+    unsubscribe(); const before = notifications; f.playback.dispose();
+    finish({ ok: true, arrayBuffer: async () => new ArrayBuffer(0) }); await pendingAgain;
+    assert.equal(f.sources.length, 0); assert.equal(notifications, before); assert.equal(f.frames.size, 0);
+});
+
+test('failed fetch and decode report errors; completion releases gains and frame callbacks', async t => {
+    const f = audioFixture(t);
+    f.fetchMock.mock.mockImplementation(async () => ({ ok: false, status: 404 }));
+    await f.playback.play(f.rows); assert.equal(f.playback.read().phase, 'error'); assert.equal(f.sources.length, 0);
+    f.fetchMock.mock.mockImplementation(async () => ({ ok: true, arrayBuffer: async () => new ArrayBuffer(0) }));
+    const decode = t.mock.method(f.context, 'decodeAudioData', async () => { throw new Error('decode'); });
+    await f.playback.play(f.rows); assert.equal(f.playback.read().phase, 'error');
+    decode.mock.restore(); await f.playback.play(f.rows);
+    f.sources[0].onended(); assert.equal(f.playback.read().phase, 'playing');
+    f.sources[1].onended(); assert.equal(f.playback.read().phase, 'idle');
+    assert.equal(f.playback.read().currentTime, 4); assert.equal(f.frames.size, 0);
+    assert.ok(f.gains.every(gain => gain.disconnected));
+});
+
+test('superseded decoding cannot start old sources after the new composition is playing', async t => {
+    const f = audioFixture(t); let finishDecode;
+    const decode = t.mock.method(f.context, 'decodeAudioData', () => new Promise(resolve => { finishDecode = resolve; }));
+    const oldPlay = f.playback.play(f.rows);
+    await new Promise(resolve => setImmediate(resolve));
+    decode.mock.restore();
+    await f.playback.play([{ ...f.rows[0], name: 'new' }]);
+    finishDecode({ duration: 100 }); await oldPlay;
+    assert.equal(f.sources.length, 1);
+    assert.equal(f.playback.read().rows[0].name, 'new'); assert.equal(f.playback.read().duration, 4);
+});
+
+test('stopping during context resume prevents even the first fetch', async t => {
+    const f = audioFixture(t); let finishResume;
+    t.mock.method(f.context, 'resume', () => new Promise(resolve => { finishResume = resolve; }));
+    const pending = f.playback.play(f.rows); f.playback.stop(); finishResume(); await pending;
+    assert.equal(f.requests(), 0); assert.equal(f.sources.length, 0);
+});
 
 test('composition keeps duplicates and precision, rejecting invalid settings', () => {
     const row = { name: 'a', source: 'block', volume: 2.3, pitch: .75, minVolume: .35 };
@@ -13,55 +109,4 @@ test('composition keeps duplicates and precision, rejecting invalid settings', (
     const { source, minVolume, ...legacy } = row;
     assert.deepEqual(normalizeComposition([legacy]), [{ ...legacy, source: 'master', minVolume: 0 }]);
     assert.equal(normalizePreferences({ tab: 'composition-tab' }).tab, 'search-tab');
-});
-
-function fixture() {
-    const ui = { play: { disabled: false, classList: { toggle() {} }, setAttribute() {} }, status: {}, loading: { hidden: true }, list: { querySelectorAll: () => [] } };
-    const composition = Object.create(SoundComposition.prototype);
-    const model = new CompositionModel();
-    model.replace([{ name: 'a', volume: 1, pitch: 1 }, { name: 'a', volume: .5, pitch: 2 }]);
-    Object.assign(composition, { model,
-        events: new Map([['a', { candidates: [{ hash: 'hash', weight: 1, pitch: .75, volume: .5 }] }]]),
-        playback: { pause() {}, read: () => ({ masterVolume: .8 }) },
-        generation: 0, nodes: new Set(), busy: false, element: id => ui[id] });
-    return composition;
-}
-
-test('all buffers prepare before aligned playback; stop cancels scheduled sources', async () => {
-    const oldAudio = globalThis.AudioContext, oldFetch = globalThis.fetch;
-    const sources = [], gains = [];
-    let requests = 0;
-    globalThis.AudioContext = class {
-        currentTime = 10;
-        async resume() {}
-        async decodeAudioData() { return {}; }
-        createBufferSource() { const source = { playbackRate: {}, connect() {}, disconnect() {}, start(time) { this.time = time; }, stop() { this.stopped = true; } }; sources.push(source); return source; }
-        createGain() { const gain = { gain: {}, connect() {}, disconnect() {} }; gains.push(gain); return gain; }
-    };
-    globalThis.fetch = async () => { requests++; return { ok: true, arrayBuffer: async () => new ArrayBuffer(0) }; };
-
-    try {
-        const composition = fixture();
-        await composition.play();
-        assert.equal(requests, 1);
-        assert.equal(composition.element('loading').hidden, true);
-        assert.deepEqual(sources.map(s => s.time), [10.05, 10.05]);
-        assert.deepEqual(sources.map(s => s.playbackRate.value), [.75, 1.5]);
-        assert.deepEqual(gains.map(g => g.gain.value), [.4, .2]);
-        composition.stop();
-        assert.ok(sources.every(s => s.stopped));
-        assert.equal(composition.busy, false);
-        // 停止された読み込みは後から完了しても音を鳴らさない。
-        let finish;
-        globalThis.fetch = () => new Promise(resolve => { finish = resolve; });
-        const loading = composition.play();
-        await Promise.resolve();
-        assert.equal(composition.element('loading').hidden, false);
-        assert.equal(composition.element('status').textContent, '');
-        composition.stop();
-        assert.equal(composition.element('loading').hidden, true);
-        finish({ ok: true, arrayBuffer: async () => new ArrayBuffer(0) });
-        await loading;
-        assert.equal(sources.length, 2);
-    } finally { globalThis.AudioContext = oldAudio; globalThis.fetch = oldFetch;  }
 });

@@ -10,7 +10,7 @@ import { applySearchStyles } from './View/Search/ApplySearchStyles.ts';
 import { applyPlaybackStyles } from './ApplyPlaybackStyles.ts';
 import { applySettingsStyles } from './ApplySettingsStyles.ts';
 import { SavedCompositions } from './SavedCompositions.ts';
-import { SoundComposition } from './SoundComposition.ts';
+import { createCompositionScreen } from './App/CreateCompositionScreen.ts';
 import { mountSoundSettings } from './App/MountSoundSettings.ts';
 import { confirmAction } from './ConfirmDialog.ts';
 import { localStorageStore } from './LocalStorage.ts';
@@ -77,18 +77,15 @@ const masterVolumeControl = new SelectMasterVolumeArea('#select-master-volume', 
     value: playback.read().masterVolume, onChange: value => playbackPresenter.setMasterVolume(value),
 });
 initializeBrowserTabs();
-const composition: SoundComposition = new SoundComposition({
-    playback, settings: commandSettings,
-    onPreview: (row, button) => {
-        searchScreen.view.selectPreviewButton(button);
-        return searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row });
-    },
-    onSimilar: name => { void searchScreen.presenter.searchSimilar(name); },
-});
+const compositionScreen = createCompositionScreen(playback, commandSettings,
+    button => searchScreen.view.selectPreviewButton(button),
+    row => searchScreen.presenter.preview({ name: row.name, candidate: null, settings: row }),
+    name => { void searchScreen.presenter.searchSimilar(name); });
+const composition = compositionScreen.presenter;
 const searchScreen = createSearchScreen(paths, composition, playbackPresenter);
 new SavedCompositions(composition, paths.Version);
 void searchScreen.presenter.load();
 /** アプリ終了時に購読・通信・音声の所有者を順に破棄する。 */
-const dispose = () => { searchScreen.dispose(); composition.dispose(); playbackPresenter.dispose(); playbackView.dispose(); masterVolumeControl.dispose(); playback.dispose(); };
+const dispose = () => { searchScreen.dispose(); compositionScreen.dispose(); playbackPresenter.dispose(); playbackView.dispose(); masterVolumeControl.dispose(); playback.dispose(); };
 window.addEventListener('pagehide', event => { if (!event.persisted) dispose(); });
 if (import.meta.hot) import.meta.hot.dispose(dispose);

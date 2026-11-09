@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CompositionModel } from '../Scripts/Model/Composition/CompositionModel.ts';
 import { SavedCompositionsModel, nextCompositionName } from '../Scripts/Model/Composition/SavedCompositionsModel.ts';
-import { SoundComposition } from '../Scripts/SoundComposition.ts';
 import { SavedCompositions } from '../Scripts/SavedCompositions.ts';
 
 const row = { name: 'a', source: 'block', volume: 1.23, pitch: .75, minVolume: .1 };
@@ -64,7 +63,7 @@ test('saved limits reject growth while permitting repair of legacy oversized lis
     assert.equal(model.read().length, 30);
 });
 
-test('screen persistence commits models only after successful writes and respects read-only recovery', t => {
+test('saved-list persistence commits its model only after successful writes and respects read-only recovery', t => {
     t.mock.timers.enable({ apis: ['setTimeout'] });
     const originalStorage = globalThis.localStorage, originalDocument = globalThis.document;
     const toast = { textContent: '', classList: { add() {}, remove() {} } };
@@ -73,21 +72,6 @@ test('screen persistence commits models only after successful writes and respect
     let fail = true, writes = 0, saved;
     globalThis.localStorage = { setItem(_, value) { writes++; if (fail) throw new Error('quota'); saved = JSON.parse(value); } };
     try {
-        const model = new CompositionModel(); model.replace([row]);
-        const composition = Object.assign(Object.create(SoundComposition.prototype), {
-            model, writable: true, refreshWaveform() {}, updateOutput() {},
-        });
-        const changed = model.withSettings(0, { ...row, pitch: 1.5 });
-        assert.equal(composition.save(changed), false);
-        assert.equal(model.read()[0].pitch, .75);
-        fail = false;
-        assert.equal(composition.save(changed), true);
-        assert.deepEqual(model.read(), saved);
-        composition.writable = false;
-        const previousWrites = writes;
-        assert.equal(composition.save([]), false);
-        assert.equal(writes, previousWrites);
-
         const savedModel = new SavedCompositionsModel();
         const screen = Object.assign(Object.create(SavedCompositions.prototype), { model: savedModel, writable: true, render() {} });
         const items = savedModel.withAdded('one', 'test', '26.3', [row]);

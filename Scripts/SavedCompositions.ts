@@ -2,7 +2,7 @@ import { SavedCompositionsModel, nextCompositionName as findNextCompositionName 
 import * as layout from './Layout.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
-import type { SoundComposition } from './SoundComposition.ts';
+import type { CompositionPresenter } from './Presenter/CompositionPresenter.ts';
 import type { SavedCompositionsValue } from './LocalStorageSchema.ts';
 import { revealAddedItem } from './RevealAddedItem.ts';
 import { createCopyButton } from './CopyButton.ts';
@@ -21,7 +21,7 @@ export function nextCompositionName(items: readonly { name: string }[]): string 
 /** 保存一覧の画面。値と編集ルールはModelに委譲する。 */
 export class SavedCompositions {
     readonly version: string;
-    readonly composition: SoundComposition;
+    readonly composition: CompositionPresenter;
     readonly model = new SavedCompositionsModel();
     /** 表示用に行まで複製した保存一覧を返す。 */
     get items(): SavedCompositionsValue { return this.model.read(); }
@@ -31,7 +31,7 @@ export class SavedCompositions {
     readonly status: HTMLElement;
     readonly tab: HTMLElement;
     static MaxItems = SavedCompositionsModel.MaxItems;
-    constructor(composition: SoundComposition, version: string) {
+    constructor(composition: CompositionPresenter, version: string) {
         this.version = version;
         this.composition = composition;
         this.writable = true;

@@ -2,7 +2,7 @@
 
 ## 目的と範囲
 
-Model・View・Presenterを分離し、HTMLを用意しなくても状態管理と操作の流れを検証できる構成にする。既存の表示、機能、保存データ、リソース形式を維持する。段階3まで実装済み（ブラウザでの操作確認は未完了）。段階4はModel分離まで実装済みで、View・Presenter・同時再生の分離は未着手。
+Model・View・Presenterを分離し、HTMLを用意しなくても状態管理と操作の流れを検証できる構成にする。既存の表示、機能、保存データ、リソース形式を維持する。段階3まで実装済み（ブラウザでの操作確認は未完了）。段階4は組み合わせ画面のMVP・同時再生・保存の分離まで実装済み。保存一覧のView・Presenter・保存サービスの分離は未着手。
 
 Vite・TypeScript・vanilla-extractを継続する。公開容量の調査、デプロイ、新機能、UIの再設計は対象外。既存のTypeScript移行計画とは別の作業として扱う。
 
@@ -118,11 +118,11 @@ Vite・TypeScript・vanilla-extractを継続する。公開容量の調査、デ
 ### 4. 組み合わせと保存一覧をMVPに分割
 
 - [x] CompositionModelに行データ、最大件数、追加・削除・編集のルールを移す。
-- [ ] CompositionViewとPresenterを分離し、段階3の再生サービスを利用する。
-- [ ] 同時再生の音声処理をInfrastructureへ移す。
+- [x] CompositionViewとPresenterを分離し、段階3の再生サービスを利用する。
+- [x] 同時再生の音声処理をInfrastructureへ移す。
 - [ ] SavedCompositionsをModel・View・Presenter・保存サービスに分離する。
 - [ ] 保存形式・キー・バージョンの扱いを維持する。破損データを読み込んだ際の書き込み抑止も引き継ぐ。
-- [ ] 検索との連携を値のイベントとAppでの接続に統一する。
+- [x] 検索との連携を値のイベントとAppでの接続に統一する。
 
 完了条件：追加・編集・削除・保存・復元・組み合わせ再生が維持される。上限、コピー時の独立性、保存失敗時の状態をDOMなしで検証できる。
 
@@ -169,7 +169,7 @@ npm run verify:data
 - イベント購読、Worker、タイマー、音声の破棄責任を決め、再初期化時の二重登録を防ぐ。
 - コミットは自動で行わない。対応後は毎回、ステージ済み・未ステージ・未追跡を確認し、変更全体に合う日本語のコミットメッセージ案を提示する。
 
-次の実装対象は段階4のView・Presenter・同時再生の分離。段階2以降のブラウザ確認は接続可能な環境で実施する。
+次の実装対象は段階4の保存一覧のView・Presenter・保存サービスの分離。段階2以降のブラウザ確認は接続可能な環境で実施する。
 
 ## 段階1の実施記録（2026-11-09）
 
@@ -228,3 +228,14 @@ Model・ContractsをDOMなしで検査する `tsconfig.model.json` を前倒し�
 - クラス・公開型・非公開の名前付き関数にdocコメントを追加。ModelはDOMとlocalStorageへ依存しない。
 - 53件のテストと、DOMなしのModel型検査を含む本番ビルドに成功。編集候補と確定状態の分離、重複行の個別操作、コピーの独立性、名前・バージョン・件数制限、保存失敗と上書き抑止を検証した。
 - 次はCompositionViewとCompositionPresenter、同時再生サービス、続いて保存一覧のView・Presenter・保存サービスを分離する。ブラウザの表示・操作確認は未実施。
+
+## 段階4の実施記録：組み合わせ画面と同時再生の分離（2026-11-09）
+
+- SoundCompositionをCompositionPresenterとView/Composition/HtmlCompositionViewへ分離した。Presenterは行編集・保存・候補選択・画面間操作を調整し、HTML要素を受け取らない。
+- CompositionView契約は行番号・設定値・入力の妥当性を通知する。設定の編集中は入力要素を保持し、保存失敗時は確定済みの値を再表示する。試聴ボタンの選択表示はAppでView同士を接続する。
+- BrowserCompositionPlaybackがAudioContext、取得・デコード、音源とゲイン、時刻通知を所有する。同一ハッシュは一度だけ取得し、全音源を同じ時刻に予約する。停止・切り替え・破棄後の応答を無効化し、終了時に接続と描画予約を解放する。
+- 波形取得はPresenterからWaveformSource経由で行い、CompositionWaveformは取得済みのピークと時刻だけを描画する。遅い応答が新しい行や破棄済みの画面を上書きしない。
+- LocalCompositionStoreが既存キーと検証を使って保存する。App/CreateCompositionScreenで各部品を組み立て、画面終了時の破棄をまとめた。
+- 検索側はCompositionActionsに接続。旧SoundCompositionと旧CompositionWaveformは削除。保存一覧は移行途中の接続としてCompositionPresenterを参照し、次の作業で自身のView・Presenter・保存サービスを分離する。
+- 62件のテストと、DOMなしのModel・Presenter・Contracts型検査を含む本番ビルドが成功。入力要素の維持、保存失敗と上書き抑止、停止・デコード・波形応答の競合、同期再生、音量・ピッチ、購読と音源の解放を検証した。
+- 実データ検証は1,984イベント・4,941音源で成功。ブラウザでの表示と実際の音声再生は未確認。
