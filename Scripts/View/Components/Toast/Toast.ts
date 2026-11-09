@@ -12,7 +12,6 @@ export function showToast(message: string, duration = 2000): void
 {
     const toast = document.querySelector<HTMLElement>('#toast');
     if (!toast) throw new Error('Missing toast element');
-    toast.classList.add(styles.toast);
     clearTimeout(timer);
     clearTimeout(redisplayTimer);
     /** 最新の通知を表示し、非表示に戻す時刻を設定する。 */
