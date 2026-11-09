@@ -1,5 +1,5 @@
 import type { SearchCandidate } from '../../Model/Search/SearchTypes.ts';
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import type { SoundCommand } from '../../Model/Command/FormatSoundCommand.ts';
 
 /** プレビューする音と任意の設定。candidateがnullなら再生側で候補を選ぶ。 */
 export interface SoundPreviewRequest {

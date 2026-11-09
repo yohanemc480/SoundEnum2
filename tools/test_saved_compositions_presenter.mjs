@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SavedCompositionsPresenter } from '../Scripts/Presenter/SavedCompositionsPresenter.ts';
 import { LocalSavedCompositionsStore } from '../Scripts/Infrastructure/Storage/LocalSavedCompositionsStore.ts';
-import { LocalStorageKey } from '../Scripts/Constants/LocalStorageKey.ts';
+import { LocalStorageKey } from '../Scripts/Infrastructure/Storage/LocalStorageKey.ts';
 
 const row = { name: 'a', source: 'block', volume: 1.25, pitch: .75, minVolume: .1 };
 const item = { id: 'one', name: '効果音', version: '26.2', sounds: [row, row] };

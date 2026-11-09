@@ -1,4 +1,4 @@
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import type { SoundCommand } from '../../Model/Command/FormatSoundCommand.ts';
 import type { SearchCandidate } from '../../Model/Search/SearchTypes.ts';
 
 /** 重みに従って候補を選択済みの同時再生行。 */

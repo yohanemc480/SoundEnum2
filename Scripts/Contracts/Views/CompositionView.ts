@@ -1,4 +1,4 @@
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import type { SoundCommand } from '../../Model/Command/FormatSoundCommand.ts';
 import type { CommandSettingsValue } from '../../Model/Command/CommandSettings.ts';
 import type { CompositionPlaybackState } from '../Services/CompositionPlayback.ts';
 

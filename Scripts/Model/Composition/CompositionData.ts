@@ -1,6 +1,6 @@
-import { MCCommandSoundSource } from '../../Constants/MCCommandSoundSource.ts';
-import type { SoundSource } from '../../Constants/MCCommandSoundSource.ts';
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import { MCCommandSoundSource } from '../Command/MCCommandSoundSource.ts';
+import type { SoundSource } from '../Command/MCCommandSoundSource.ts';
+import type { SoundCommand } from '../Command/FormatSoundCommand.ts';
 
 /** 組み合わせの各行。重複するサウンドも順番どおり保持する。 */
 export type CompositionValue = SoundCommand[];

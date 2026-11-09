@@ -1,6 +1,6 @@
-import { localStorageStore } from '../../LocalStorage.ts';
-import type { LocalStorage } from '../../LocalStorage.ts';
-import { LocalStorageSchema } from '../../LocalStorageSchema.ts';
+import { localStorageStore } from './LocalStorage.ts';
+import type { LocalStorage } from './LocalStorage.ts';
+import { LocalStorageSchema } from './LocalStorageSchema.ts';
 import type { FavoriteSoundsStore } from '../../Contracts/Services/FavoriteSoundsStore.ts';
 
 /** 既存のキー・配列形式を維持してお気に入りを永続化する。 */

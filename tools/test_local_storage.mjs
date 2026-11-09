@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LocalStorage } from '../Scripts/LocalStorage.ts';
+import { LocalStorage } from '../Scripts/Infrastructure/Storage/LocalStorage.ts';
 
 test('JSON round trip, missing values and full clear', () => {
     const data = new Map();
@@ -25,7 +25,7 @@ test('malformed JSON and storage failures propagate to the caller', () => {
 
 
 test('schema validates both reads and writes without replacing valid data on failure', async () => {
-    const { LocalStorageSchema } = await import('../Scripts/LocalStorageSchema.ts');
+    const { LocalStorageSchema } = await import('../Scripts/Infrastructure/Storage/LocalStorageSchema.ts');
     let value = null;
     const store = new LocalStorage({ getItem: () => value, setItem: (_, next) => { value = next; } });
     assert.deepEqual(store.readEntry(LocalStorageSchema.Favorites), []);

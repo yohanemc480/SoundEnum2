@@ -14,4 +14,5 @@ export const MCCommandSoundSource = Object.freeze(
     Ambient: "ambient",
     Voice: "voice",
 } as const);
+/** playsoundで指定できる音源カテゴリ。 */
 export type SoundSource = typeof MCCommandSoundSource[keyof typeof MCCommandSoundSource];

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { selectWeightedCandidate } from '../Scripts/SelectWeightedCandidate.ts';
+import { selectWeightedCandidate } from '../Scripts/Model/Playback/SelectWeightedCandidate.ts';
 import { MCRawSound } from '../Scripts/MCRawSound.ts';
 
 test('selection respects weights and default weight including boundaries', () => {

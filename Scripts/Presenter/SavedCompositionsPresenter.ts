@@ -4,7 +4,7 @@ import type { SavedComposition, SavedCompositionsValue } from '../Model/Composit
 import type { CompositionEditor, CompositionEditorState } from '../Contracts/Services/CompositionEditor.ts';
 import type { SavedCompositionsStore } from '../Contracts/Services/SavedCompositionsStore.ts';
 import type { SavedCompositionsView } from '../Contracts/Views/SavedCompositionsView.ts';
-import { formatSoundCommand } from '../FormatSoundCommand.ts';
+import { formatSoundCommand } from '../Model/Command/FormatSoundCommand.ts';
 
 /** 確認・名前入力・ID生成・通知をAppから注入する。 */
 export interface SavedCompositionsInteractions {

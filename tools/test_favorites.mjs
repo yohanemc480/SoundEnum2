@@ -1,7 +1,7 @@
-import { LocalStorage } from '../Scripts/LocalStorage.ts';
+import { LocalStorage } from '../Scripts/Infrastructure/Storage/LocalStorage.ts';
 import { LocalFavoriteSoundsStore } from '../Scripts/Infrastructure/Storage/LocalFavoriteSoundsStore.ts';
 import { FavoriteSounds } from '../Scripts/Model/Favorites/FavoriteSounds.ts';
-import { LocalStorageKey } from '../Scripts/Constants/LocalStorageKey.ts';
+import { LocalStorageKey } from '../Scripts/Infrastructure/Storage/LocalStorageKey.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 

@@ -3,8 +3,8 @@ import type { PlaybackResources, WaveformSource } from '../Contracts/Services/Pl
 import type { PlaybackView } from '../Contracts/Views/PlaybackView.ts';
 import type { SoundPreviewRequest, SoundPreviewService } from '../Contracts/Services/SoundPreviewService.ts';
 import { CommandSettings } from '../Model/Command/CommandSettings.ts';
-import { selectWeightedCandidate } from '../SelectWeightedCandidate.ts';
-import { formatSoundCommand } from '../FormatSoundCommand.ts';
+import { selectWeightedCandidate } from '../Model/Playback/SelectWeightedCandidate.ts';
+import { formatSoundCommand } from '../Model/Command/FormatSoundCommand.ts';
 
 /** 試聴候補・コマンド出力・再生操作・波形取得を調整し、音声要素は扱わない。 */
 export class PlaybackPresenter implements SoundPreviewService {

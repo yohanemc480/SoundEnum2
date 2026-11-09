@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
+import { normalizeComposition } from '../Scripts/Model/Composition/CompositionData.ts';
+import { normalizePreferences } from '../Scripts/Model/Search/SearchPreferences.ts';
 import { BrowserCompositionPlayback } from '../Scripts/Infrastructure/Audio/BrowserCompositionPlayback.ts';
 
 /** 音声時計と音源の記録だけを持つブラウザAPIの代替。 */

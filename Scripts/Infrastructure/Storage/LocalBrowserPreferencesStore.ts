@@ -1,6 +1,6 @@
-import { localStorageStore } from '../../LocalStorage.ts';
-import type { LocalStorage } from '../../LocalStorage.ts';
-import { LocalStorageSchema } from '../../LocalStorageSchema.ts';
+import { localStorageStore } from './LocalStorage.ts';
+import type { LocalStorage } from './LocalStorage.ts';
+import { LocalStorageSchema } from './LocalStorageSchema.ts';
 import { normalizePreferences } from '../../Model/Search/SearchPreferences.ts';
 import type { SearchPreferencesValue } from '../../Model/Search/SearchPreferences.ts';
 import type { BrowserPreferencesStore } from '../../Contracts/Services/BrowserPreferencesStore.ts';

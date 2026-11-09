@@ -1,4 +1,4 @@
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import type { SoundCommand } from '../Command/FormatSoundCommand.ts';
 import { normalizeComposition } from './CompositionData.ts';
 
 /** 組み合わせの行と編集ルールを所有する。保存が成功してからreplaceで確定する。 */

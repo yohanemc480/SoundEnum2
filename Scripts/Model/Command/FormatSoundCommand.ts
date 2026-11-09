@@ -1,6 +1,7 @@
-import { MCCommandSelector } from './Constants/MCCommandSelector.ts';
-import type { SoundSource } from './Constants/MCCommandSoundSource.ts';
+import { MCCommandSelector } from './MCCommandSelector.ts';
+import type { SoundSource } from './MCCommandSoundSource.ts';
 
+/** playsoundコマンドを構成するサウンド名と再生設定。 */
 export interface SoundCommand {
     name: string;
     source: SoundSource;

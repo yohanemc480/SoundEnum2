@@ -1,5 +1,5 @@
-import { MCCommandSoundSource } from '../../Constants/MCCommandSoundSource.ts';
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import { MCCommandSoundSource } from './MCCommandSoundSource.ts';
+import type { SoundCommand } from './FormatSoundCommand.ts';
 
 /** playsoundの設定値。サウンド名や保存形式を含まない。 */
 export type CommandSettingsValue = Omit<SoundCommand, 'name'>;

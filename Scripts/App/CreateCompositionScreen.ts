@@ -11,7 +11,7 @@ import { Text } from '../I18n/Text.ts';
 import { showToast } from '../View/Components/Toast/Toast.ts';
 import type { AudioPlayback } from '../Contracts/Services/AudioPlayback.ts';
 import type { CommandSettings } from '../Model/Command/CommandSettings.ts';
-import type { SoundCommand } from '../FormatSoundCommand.ts';
+import type { SoundCommand } from '../Model/Command/FormatSoundCommand.ts';
 
 /** 組み合わせのView・Presenter・音声・保存を組み立て、画面間の接続を受け取る。 */
 export function createCompositionScreen(previewPlayback: AudioPlayback, settings: CommandSettings,

@@ -4,7 +4,9 @@ import { Text } from '../Scripts/I18n/Text.ts';
 const nextCompositionName = items => findNextCompositionName(items, Text.savedCompositionDefaultName);
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeSavedCompositions, normalizePreferences, normalizeCompositionName } from '../Scripts/LocalStorageSchema.ts';
+import { normalizeSavedCompositions } from '../Scripts/Model/Composition/CompositionData.ts';
+import { normalizePreferences } from '../Scripts/Model/Search/SearchPreferences.ts';
+import { normalizeCompositionName } from '../Scripts/Model/Composition/CompositionData.ts';
 
 test('saved compositions copy settings, retain duplicate sounds and validate limits', () => {
     const row = { name: 'block.anvil.destroy', source: 'block', volume: .35, pitch: 1.2, minVolume: .1 };

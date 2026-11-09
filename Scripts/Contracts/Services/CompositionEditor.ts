@@ -1,4 +1,4 @@
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import type { SoundCommand } from '../../Model/Command/FormatSoundCommand.ts';
 
 /** 編集中の行と、現在のバージョンで利用できるサウンド名。nullは読込前を示す。 */
 export interface CompositionEditorState {

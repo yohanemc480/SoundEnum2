@@ -15,7 +15,7 @@ import { createSavedCompositionsScreen } from './CreateSavedCompositionsScreen.t
 import { createCompositionScreen } from './CreateCompositionScreen.ts';
 import { mountSoundSettings } from './MountSoundSettings.ts';
 import { confirmAction } from '../View/Components/ConfirmDialog/ConfirmDialog.ts';
-import { localStorageStore } from '../LocalStorage.ts';
+import { localStorageStore } from '../Infrastructure/Storage/LocalStorage.ts';
 import { createResourceVersionSelector } from './CreateResourceVersionSelector.ts';
 import { applyText } from "../View/ApplyText.ts";
 import { Text } from "../I18n/Text.ts";

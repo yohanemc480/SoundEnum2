@@ -323,3 +323,11 @@ Model・ContractsをDOMなしで検査する `tsconfig.model.json` を前倒し�
 - 起動前の最小CSS、失敗表示と再読み込みボタンは維持した。クラス・内部処理に日本語のdocコメントを追加した。
 - 86件のテスト、本番ビルド、実データ検証を実施。ブラウザでの起動表示・白いちらつき・実操作の確認は未実施。
 - 段階5は継続中。残った依存関係・旧実装・履歴の確認と、ブラウザでの検証を進める。
+
+## 段階5の実施記録：純粋関数と保存処理の配置整理（2026-11-09）
+
+- FormatSoundCommandとMinecraftのセレクター・音源カテゴリ定数をModel/Commandへ、SelectWeightedCandidateをModel/Playbackへ移した。
+- LocalStorage・LocalStorageSchema・LocalStorageKeyをInfrastructure/Storageへ集約した。保存キー、既定値、正規化規則、JSON形式は維持した。
+- LocalStorageSchemaからModelの型・関数を再公開する互換経路と未使用のFavoriteSoundIds型を削除した。利用側とテストはModelを直接参照する。
+- 全importとテストの参照先を更新し、公開型のdocコメントを補った。86件のテストとDOMなしの型検査を含む本番ビルドで確認した。ブラウザでの実操作は未確認。
+- 段階5は継続中。リソース関連の旧クラス、残った定数、履歴の実装状況、ブラウザでの回帰確認は引き続き整理する。

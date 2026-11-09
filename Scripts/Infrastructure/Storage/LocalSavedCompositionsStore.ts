@@ -1,5 +1,5 @@
-import { localStorageStore } from '../../LocalStorage.ts';
-import { LocalStorageSchema } from '../../LocalStorageSchema.ts';
+import { localStorageStore } from './LocalStorage.ts';
+import { LocalStorageSchema } from './LocalStorageSchema.ts';
 import type { SavedCompositionsValue } from '../../Model/Composition/CompositionData.ts';
 import type { SavedCompositionsStore } from '../../Contracts/Services/SavedCompositionsStore.ts';
 

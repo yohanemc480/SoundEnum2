@@ -1,4 +1,4 @@
-import type { SoundCommand } from '../../FormatSoundCommand.ts';
+import type { SoundCommand } from '../Command/FormatSoundCommand.ts';
 import { normalizeCompositionName, normalizeSavedCompositions } from './CompositionData.ts';
 import type { SavedCompositionsValue } from './CompositionData.ts';
 

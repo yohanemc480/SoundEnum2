@@ -1,9 +1,11 @@
+/** JSON保存先に必要な文字列の読み書き操作。 */
 export interface StorageBackend {
     getItem(key: string): string | null;
     setItem(key: string, value: string): void;
     clear(): void;
 }
 
+/** 保存キー・既定値・読み書き時の正規化規則。 */
 export interface StorageEntry<T> {
     readonly key: string;
     createDefault(): T;

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LocalStorage } from '../Scripts/LocalStorage.ts';
-import { normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
+import { LocalStorage } from '../Scripts/Infrastructure/Storage/LocalStorage.ts';
+import { normalizePreferences } from '../Scripts/Model/Search/SearchPreferences.ts';
 import { LocalBrowserPreferencesStore } from '../Scripts/Infrastructure/Storage/LocalBrowserPreferencesStore.ts';
 import { StoredSearchPreferences } from '../Scripts/Infrastructure/Storage/StoredSearchPreferences.ts';
 import { restoreSearchOptions, toSearchOptions } from '../Scripts/Model/Search/SearchPreferences.ts';
