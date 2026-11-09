@@ -1,3 +1,4 @@
+import * as layout from './Layout.css.ts';
 import * as fieldStyles from './InputFields.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import type { CommandSettingsValue } from './LocalStorageSchema.ts';
@@ -15,7 +16,7 @@ type NumericSetting = 'volume' | 'pitch' | 'minVolume';
 /** 単音・組み合わせ共通の設定UI。保存先は呼び出し側から渡す。 */
 export function mountSoundSettings(panel: HTMLElement | null, { read, save, onInput = () => {} }: SoundSettingsOptions): void {
     if (!panel) throw new Error('Missing sound settings panel');
-    const heading = document.createElement('div'); heading.className = 'section-heading';
+    const heading = document.createElement('div'); heading.className = layout.sectionHeading;
     const title = document.createElement('h2'); title.textContent = Text.commandSettings;
     const close = document.createElement('button'); close.type = 'button';
     close.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`; close.setAttribute('aria-label', Text.closeCommandSettings);

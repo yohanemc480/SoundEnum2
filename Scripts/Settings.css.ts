@@ -1,3 +1,4 @@
+import * as layout from './Layout.css.ts';
 import * as fields from './InputFields.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 export const settingsButton = style({
@@ -85,7 +86,7 @@ globalStyle(`.${settingsButton}.${closeButton}:hover`, {
 globalStyle(`.${settingsPopover} .${fields.fields}`, {
     "gridTemplateColumns": "minmax(0, 1fr)"
 });
-globalStyle(`.${soundSettings} .section-heading`, {
+globalStyle(`.${soundSettings} .${layout.sectionHeading}`, {
     "marginBottom": "12px"
 });
 globalStyle(`.${soundSettings} .${fields.fields}`, {

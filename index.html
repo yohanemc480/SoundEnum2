@@ -6,16 +6,15 @@
   <title data-i18n="appTitle">Minecraft Sound Browser</title>
   <link rel="icon" href="favicon.ico?v=waveform" sizes="16x16 32x32 48x48 64x64 128x128 256x256">
   <link rel="icon" type="image/png" sizes="256x256" href="favicon.png">
-  <link rel="stylesheet" href="style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-  <header class="app-header">
-    <div class="app-header-identity">
-      <h1 class="app-brand" data-i18n-aria-label="appTitle"><span class="eyebrow" data-i18n="appEyebrow">MINECRAFT</span><span class="brand-name" data-i18n="appName">Sound Browser</span></h1>
-      <label class="version-selector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label>
+  <header data-layout-style="appHeader">
+    <div data-layout-style="appHeaderIdentity">
+      <h1 data-layout-style="appBrand" data-i18n-aria-label="appTitle"><span data-layout-style="eyebrow" data-i18n="appEyebrow">MINECRAFT</span><span data-layout-style="brandName" data-i18n="appName">Sound Browser</span></h1>
+      <label data-layout-style="versionSelector"><span data-i18n="version"></span><select id="resource-version" disabled></select></label>
     </div>
-    <div class="app-header-actions">
+    <div data-layout-style="appHeaderActions">
       <p data-i18n="appTagline"></p>
       <button type="button" data-settings-style="settingsButton appSettingsButton" popovertarget="app-settings" data-i18n-aria-label="settings" data-i18n-title="settings">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 2h4l.5 3 1.4.8 2.8-1 2 3.4-2.3 2v1.6l2.3 2-2 3.4-2.8-1-1.4.8-.5 3h-4l-.5-3-1.4-.8-2.8 1-2-3.4 2.3-2v-1.6l-2.3-2 2-3.4 2.8 1 1.4-.8Z" transform="translate(0 1)"/><circle cx="12" cy="12" r="3"/></svg>
@@ -23,12 +22,12 @@
     </div>
   </header>
   <section id="app-settings" data-settings-style="settingsPopover appSettingsPopover" popover="auto" aria-labelledby="app-settings-title">
-    <div class="section-heading"><h2 id="app-settings-title" data-i18n="settings"></h2><button type="button" data-settings-style="settingsButton closeButton" popovertarget="app-settings" popovertargetaction="hide" data-i18n-aria-label="close"></button></div>
+    <div data-layout-style="sectionHeading"><h2 id="app-settings-title" data-i18n="settings"></h2><button type="button" data-settings-style="settingsButton closeButton" popovertarget="app-settings" popovertargetaction="hide" data-i18n-aria-label="close"></button></div>
     <button id="clear-local-storage" type="button" data-settings-style="settingsButton" data-i18n="clearLocalStorage"></button>
   </section>
-  <main class="workspace">
-    <section class="main" data-i18n-aria-label="soundSelection">
-      <section class="panel browser-panel">
+  <main data-layout-style="workspace">
+    <section data-layout-style="main" data-i18n-aria-label="soundSelection">
+      <section data-layout-style="panel browserPanel">
         <div data-search-style="browserHeader">
           <div data-search-style="browserTabs" role="tablist" data-i18n-aria-label="browserTabs">
             <button type="button" id="search-tab" data-browser-tab role="tab" aria-selected="true" aria-controls="search-panel" data-i18n="searchTitle"></button>
@@ -53,24 +52,24 @@
           <div id="search-base-preview" data-i18n-aria-label="searchBase" role="region" hidden></div>
           <p id="search-status" role="status"></p>
           <button id="search-retry" type="button" hidden data-i18n="retry"></button>
-          <div id="search-list" class="search-list"></div>
+          <div id="search-list" data-layout-style="searchList"></div>
           <nav id="search-pagination" data-search-style="searchPagination" hidden data-i18n-aria-label="selectPage">
             <button id="search-previous" type="button" data-i18n="previous"></button><span id="search-page"></span><button id="search-next" type="button" data-i18n="next"></button>
           </nav>
         </div>
         <div id="favorites-panel" role="tabpanel" aria-labelledby="favorites-tab" hidden>
           <p id="favorites-status" role="status"></p>
-          <div id="favorites-list" class="search-list"></div>
+          <div id="favorites-list" data-layout-style="searchList"></div>
         </div>
         <div id="compositions-panel" role="tabpanel" aria-labelledby="compositions-tab" hidden>
           <p id="saved-compositions-status" role="status"></p>
-          <div id="saved-compositions-list" class="search-list"></div>
+          <div id="saved-compositions-list" data-layout-style="searchList"></div>
         </div>
       </section>
     </section>
-    <aside class="sub" data-i18n-aria-label="previewAndComposition">
-      <section class="panel preview-panel">
-        <div class="section-heading" data-playback-style="heading"><h2 data-i18n="preview"></h2><span id="preview-sound-id" aria-live="polite"></span><span data-playback-style="indicator"><span id="preview-loading" role="status" data-i18n-aria-label="loading" hidden></span></span></div>
+    <aside data-layout-style="sub" data-i18n-aria-label="previewAndComposition">
+      <section class="preview-panel" data-layout-style="panel">
+        <div data-layout-style="sectionHeading" data-playback-style="heading"><h2 data-i18n="preview"></h2><span id="preview-sound-id" aria-live="polite"></span><span data-playback-style="indicator"><span id="preview-loading" role="status" data-i18n-aria-label="loading" hidden></span></span></div>
         <div data-playback-style="transport">
           <button id="preview-toggle" type="button" data-playback-style="button" data-i18n-aria-label="play" data-i18n-title="play" disabled>
             <svg data-playback-style="playIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
@@ -90,13 +89,13 @@
         </div>
         <p id="preview-status" role="status"></p>
         <div data-playback-style="command">
-          <div class="section-heading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" data-settings-style="settingsButton" popovertarget="command-settings" data-i18n="settings"></button></div>
+          <div data-layout-style="sectionHeading"><h2 data-i18n="command"></h2><button type="button" id="command-settings-button" data-settings-style="settingsButton" popovertarget="command-settings" data-i18n="settings"></button></div>
           <div id="preview-output" aria-live="polite"></div>
         </div>
       </section>
-      <section id="composition-panel" class="panel composition-panel" aria-labelledby="composition-title">
-        <div class="section-heading"><div class="composition-title"><h2 id="composition-title" data-i18n="compositionTitle"></h2><span id="composition-count"></span></div><span class="composition-heading-status"><span data-playback-style="indicator"><span id="composition-loading" role="status" data-i18n-aria-label="loading" hidden></span></span></span></div>
-        <div class="composition-toolbar" data-playback-style="transport">
+      <section id="composition-panel" data-layout-style="panel compositionPanel" aria-labelledby="composition-title">
+        <div data-layout-style="sectionHeading"><div data-layout-style="compositionTitle"><h2 id="composition-title" data-i18n="compositionTitle"></h2><span id="composition-count"></span></div><span data-layout-style="compositionHeadingStatus"><span data-playback-style="indicator"><span id="composition-loading" role="status" data-i18n-aria-label="loading" hidden></span></span></span></div>
+        <div data-layout-style="compositionToolbar" data-playback-style="transport">
           <button id="composition-play" type="button" data-playback-style="button" data-i18n-aria-label="compositionPlay" data-i18n-title="compositionPlay" disabled>
             <svg data-playback-style="compositionPlayIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7z"/></svg>
             <svg data-playback-style="stopIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6h12v12H6z"/></svg>
@@ -111,10 +110,10 @@
           <output id="composition-time">0:00.0 / 0:00.0</output>
         </div>
         <p id="composition-status" role="status"></p>
-        <div id="composition-list" class="search-list"></div>
-        <div class="composition-save-actions"><button id="save-composition" type="button" data-settings-style="settingsButton" data-i18n="savedCompositionSave" disabled></button></div>
-        <div class="composition-command">
-          <div class="section-heading"><h2 data-i18n="command"></h2></div>
+        <div id="composition-list" data-layout-style="searchList"></div>
+        <div data-layout-style="compositionSaveActions"><button id="save-composition" type="button" data-settings-style="settingsButton" data-i18n="savedCompositionSave" disabled></button></div>
+        <div data-layout-style="compositionCommand">
+          <div data-layout-style="sectionHeading"><h2 data-i18n="command"></h2></div>
           <div id="composition-output" aria-live="polite"></div>
         </div>
       </section>

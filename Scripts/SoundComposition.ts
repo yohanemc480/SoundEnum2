@@ -1,3 +1,4 @@
+import * as layout from './Layout.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
 import { playing as playingClass } from './Playback.css.ts';
@@ -132,7 +133,7 @@ export class SoundComposition {
         this.element('loading').hidden = !!this.events || !this.rows.length;
         this.rows.forEach((row, index) => {
             const item = document.createElement('div'); item.className = styles.compositionRow;
-            const heading = document.createElement('div'); heading.className = 'section-heading';
+            const heading = document.createElement('div'); heading.className = layout.sectionHeading;
             const name = document.createElement('button'); name.type = 'button'; name.className = styles.compositionName; name.textContent = row.name; name.title = row.name;
             name.disabled = !this.events?.get(row.name)?.candidates.length;
             name.addEventListener('click', () => this.onPreview(this.rows[index], name));
@@ -162,7 +163,7 @@ export class SoundComposition {
             heading.append(name, actions); item.append(heading);
             this.disposePopovers.push(bindSettingsPopover(settings, panel));
             if (this.events && !this.events?.has(row.name)) {
-                const note = document.createElement('p'); note.className = 'section-note'; note.textContent = Text.favoritesUnavailable; item.append(note);
+                const note = document.createElement('p'); note.className = layout.sectionNote; note.textContent = Text.favoritesUnavailable; item.append(note);
             }
             mountSoundSettings(panel, {
                 read: () => this.rows[index],

@@ -1,3 +1,4 @@
+import * as layout from './Layout.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import { compositionRow } from './Compositions.css.ts';
 import * as styles from './SearchResults.css.ts';
@@ -107,7 +108,7 @@ export class SoundSearchBrowser
                 this.autocomplete.hide();
             });
         }
-        const browserPanel = document.querySelector<HTMLElement>('.browser-panel');
+        const browserPanel = document.querySelector<HTMLElement>(`.${layout.browserPanel}`);
         if (!browserPanel) throw new Error('Missing browser panel');
         this.waveforms = new SearchWaveforms(browserPanel);
         this.element('form-container').addEventListener('submit', event => event.preventDefault());
@@ -304,7 +305,7 @@ export class SoundSearchBrowser
                 const command = new MCCommandSound(name, settings?.source ?? manager.GetSource(), MCCommandSelector.All, settings?.volume ?? manager.GetVolume(), settings?.pitch ?? manager.GetPitch(), settings?.minVolume ?? manager.GetMinVolume());
                 manager.Play(command, candidate ? new MCRawSound({ ...candidate }) : null);
                 this.outputArea.SetText(command.ToString());
-                document.querySelectorAll(`.browser-panel .${styles.selected}, .${compositionRow} .${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
+                document.querySelectorAll(`.${layout.browserPanel} .${styles.selected}, .${compositionRow} .${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
                 this.candidatePopover.querySelectorAll(`.${styles.selected}`).forEach(element => element.classList.remove(styles.selected));
                 button.classList.add(styles.selected);
     }
@@ -358,7 +359,7 @@ export class SoundSearchBrowser
                 } catch (error) { console.error(error); showToast(Text.favoritesFailure); }
             });
             const add = document.createElement('button'); add.type = 'button'; add.textContent = '+';
-            add.className = 'composition-add'; add.title = Text.compositionAdd;
+            add.className = styles.compositionAdd; add.title = Text.compositionAdd;
             add.setAttribute('aria-label', `${Text.compositionAdd}: ${entry.name}`);
             add.disabled = !candidates.length;
             add.addEventListener('click', () => this.composition.add(entry.name));
@@ -378,7 +379,7 @@ export class SoundSearchBrowser
                     this.candidateAnchor = trigger;
                     const panel = this.candidatePopover;
                     panel.replaceChildren();
-                    const heading = document.createElement('div'); heading.className = 'section-heading';
+                    const heading = document.createElement('div'); heading.className = layout.sectionHeading;
                     const title = document.createElement('h2'); title.textContent = entry.name;
                     const close = document.createElement('button'); close.type = 'button'; close.className = `${settingsStyles.settingsButton} ${settingsStyles.closeButton}`;
                     close.setAttribute('aria-label', Text.close);

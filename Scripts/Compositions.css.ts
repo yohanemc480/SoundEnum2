@@ -1,3 +1,4 @@
+import * as layout from './Layout.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import { button as copyButton } from './CopyButton.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
@@ -83,7 +84,7 @@ export const savedCompositionEdit = style({
     "borderColor": "transparent",
     "color": "var(--muted)"
 });
-globalStyle(`.${compositionRow} > .section-heading`, {
+globalStyle(`.${compositionRow} > .${layout.sectionHeading}`, {
     "flexWrap": "nowrap",
     "marginBottom": "0"
 });
@@ -107,7 +108,7 @@ globalStyle(`.${compositionActions} > .${settingsStyles.settingsButton}:not(.${s
 globalStyle(`.${compositionRow} .${compositionName}`, {
     "minHeight": "28px"
 });
-globalStyle(`.${savedComposition} .section-heading`, {
+globalStyle(`.${savedComposition} .${layout.sectionHeading}`, {
     "marginBottom": "8px",
     "overflowWrap": "anywhere"
 });

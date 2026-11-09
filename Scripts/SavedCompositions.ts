@@ -1,3 +1,4 @@
+import * as layout from './Layout.css.ts';
 import * as settingsStyles from './Settings.css.ts';
 import * as styles from './Compositions.css.ts';
 import type { SoundComposition } from './SoundComposition.ts';
@@ -78,7 +79,7 @@ export class SavedCompositions {
         list.replaceChildren();
         for (const item of this.items) {
             const card = document.createElement('div'); card.className = styles.savedComposition;
-            const heading = document.createElement('div'); heading.className = 'section-heading';
+            const heading = document.createElement('div'); heading.className = layout.sectionHeading;
             const title = document.createElement('strong'); title.textContent = item.name;
             const count = document.createElement('span'); count.textContent = Text.compositionCount(item.sounds.length);
 
@@ -107,7 +108,7 @@ export class SavedCompositions {
             titleGroup.append(title, edit);
             heading.append(titleGroup, nameGroup);
             const missing = this.composition.events ? item.sounds.filter(sound => !this.composition.events?.has(sound.name)) : [];
-            const warning = document.createElement('p'); warning.className = 'section-note';
+            const warning = document.createElement('p'); warning.className = layout.sectionNote;
             warning.textContent = missing.length ? Text.savedCompositionUnavailable : '';
             warning.hidden = !missing.length;
             const sounds = document.createElement('div'); sounds.className = styles.savedCompositionSounds;

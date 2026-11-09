@@ -1,6 +1,7 @@
 import { compositionRow, compositionName } from './Compositions.css.ts';
 import { globalStyle, style } from '@vanilla-extract/css';
 
+export const compositionAdd = style({});
 export const selected = style({});
 export const searchRow = style({
     "display": "flex",
@@ -187,7 +188,7 @@ globalStyle(`.${searchRow} button[data-favorite][aria-pressed="false"]`, {
 globalStyle(`.${searchRow} button[data-favorite][aria-pressed="true"]`, {
     "color": "#f5c451"
 });
-globalStyle(`.${searchRow} button.composition-add`, {
+globalStyle(`.${searchRow} button.${compositionAdd}`, {
     "fontSize": "20px",
     "lineHeight": "18px",
     "width": "34px",

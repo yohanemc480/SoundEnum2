@@ -1,3 +1,4 @@
+import * as layout from './Layout.css.ts';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 const spin = keyframes({ to: { transform: 'rotate(360deg)' } });
 export const transport = style({
@@ -108,7 +109,7 @@ globalStyle(`#preview-sound-id`, {
     "font": "12px/1.5 Consolas, monospace",
     "letterSpacing": "normal"
 });
-globalStyle(`.section-heading.${heading}`, {
+globalStyle(`.${layout.sectionHeading}.${heading}`, {
     "flexWrap": "nowrap"
 });
 globalStyle(`.${heading} h2, .${heading} .${indicator}`, {
@@ -127,7 +128,7 @@ globalStyle(`#preview-time`, {
     "textAlign": "right",
     "whiteSpace": "nowrap"
 });
-globalStyle(`.${command} .section-heading`, {
+globalStyle(`.${command} .${layout.sectionHeading}`, {
     "marginBottom": "8px"
 });
 globalStyle(`#composition-waveform`, {

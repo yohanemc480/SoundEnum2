@@ -1,3 +1,4 @@
+import { applyLayoutStyles } from './ApplyLayoutStyles.ts';
 import { applySearchStyles } from './ApplySearchStyles.ts';
 import { applyPlaybackStyles } from './ApplyPlaybackStyles.ts';
 import { applySettingsStyles } from './ApplySettingsStyles.ts';
@@ -27,6 +28,7 @@ function requireElement(id: string): HTMLElement {
     return element;
 }
 
+applyLayoutStyles();
 applySettingsStyles();
 applyPlaybackStyles();
 applySearchStyles();
