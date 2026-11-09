@@ -1,5 +1,5 @@
 import type { SearchCandidate } from './Model/Search/SearchTypes.ts';
-import { getWaveform } from './WaveformResource.ts';
+import { getWaveform } from './Infrastructure/Audio/WaveformResource.ts';
 
 interface WaveformRow { candidate: SearchCandidate; pitch: number; volume: number }
 interface WaveformLayer { peaks: Float32Array; duration: number; volume: number; index: number }

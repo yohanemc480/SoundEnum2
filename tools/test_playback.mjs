@@ -1,60 +1,59 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SoundManager } from '../Scripts/Singletons/SoundManager.ts';
-import { ResourceManager } from '../Scripts/Singletons/ResourceManager.ts';
+import { BrowserAudioPlayback } from '../Scripts/Infrastructure/Audio/BrowserAudioPlayback.ts';
 import { MCRawSound } from '../Scripts/MCRawSound.ts';
+class FakeAudio extends EventTarget {
+    paused = true; ended = false; duration = NaN; currentTime = 0; plays = 0; src = '';
+    pause() { this.paused = true; this.dispatchEvent(new Event('pause')); }
+    load() { this.duration = NaN; this.currentTime = 0; }
+    removeAttribute() { this.src = ''; }
+    play() { this.plays++; this.duration = 10; this.paused = false; this.dispatchEvent(new Event('play')); return Promise.resolve(); }
+}
+const request = { soundName: 'event', hash: 'a', url: '/audio', pitch: 1, volume: 1.5 };
 
-test('playback keeps pitch and volume and ignores superseded downloads', async () => {
-    const previous = { Audio: globalThis.Audio, localStorage: globalThis.localStorage,
-        fetch: globalThis.fetch, sound: SoundManager.Instance, resource: ResourceManager.Instance };
-    const requests = [];
-    globalThis.Audio = class extends EventTarget {
-        dataset = {};
-        plays = 0;
-        pause() {}
-        load() {}
-        removeAttribute() {}
-        play() { this.plays++; return Promise.resolve(); }
-    };
-    globalThis.localStorage = { getItem: () => null };
+test('playback keeps pitch and volume, ignores superseded downloads and reports errors', async () => {
+    const previous = { fetch: globalThis.fetch, requestAnimationFrame: globalThis.requestAnimationFrame, cancelAnimationFrame: globalThis.cancelAnimationFrame };
+    const requests = []; const audio = new FakeAudio();
+    globalThis.requestAnimationFrame = () => 1; globalThis.cancelAnimationFrame = () => {};
     globalThis.fetch = (url, options) => new Promise(resolve => requests.push({ url, options, resolve }));
-    ResourceManager.Instance = { GetSoundHashResouce: () => ({ NameToHash: () => 'a'.repeat(40) }) };
-    let manager;
+    const playback = new BrowserAudioPlayback(audio);
     try {
-        manager = new SoundManager();
-        manager.SetMasterVolume(.8);
-        const raw = new MCRawSound({ name: 'raw', pitch: .5, volume: .5 });
-        const command = { GetRawSoundRandomly: () => raw, GetSoundName: () => 'event',
-            GetPitch: () => 2, GetVolume: () => 3 };
-        const oldPlay = manager.Play(command);
-        const newPlay = manager.Play(command);
+        playback.setMasterVolume(.8);
+        const oldPlay = playback.play(request), newPlay = playback.play(request);
         assert.equal(requests[0].options.signal.aborted, true);
-        requests[1].resolve(new Response(new Blob(['audio'])));
-        await newPlay;
-        assert.equal(manager.GetAudio().playbackRate, 1);
-        assert.equal(manager.GetAudio().volume, 1);
-        assert.equal(manager.GetAudio().plays, 1);
-        const currentUrl = manager.GetAudio().src;
-        requests[0].resolve(new Response(new Blob(['old'])));
-        await oldPlay;
-        assert.equal(manager.GetAudio().src, currentUrl);
-        assert.equal(manager.GetAudio().plays, 1);
-        let errors = 0;
-        manager.GetAudio().addEventListener('previewerror', () => errors++);
-        const failedPlay = manager.Play(command);
-        requests[2].resolve(new Response('', { status: 404 }));
-        await failedPlay;
-        assert.equal(errors, 1);
-        assert.equal(manager.GetAudio().plays, 1);
-    } finally {
-        if (manager?._audioUrl) URL.revokeObjectURL(manager._audioUrl);
-        for (const name of ['Audio', 'localStorage', 'fetch']) {
-            if (previous[name] === undefined) delete globalThis[name];
-            else globalThis[name] = previous[name];
-        }
-        SoundManager.Instance = previous.sound;
-        ResourceManager.Instance = previous.resource;
-    }
+        requests[1].resolve(new Response(new Blob(['audio']))); await newPlay;
+        assert.equal(audio.playbackRate, 1); assert.equal(audio.volume, 1); assert.equal(audio.plays, 1);
+        const currentUrl = audio.src;
+        requests[0].resolve(new Response(new Blob(['old']))); await oldPlay;
+        assert.equal(audio.src, currentUrl); assert.equal(audio.plays, 1);
+        playback.pause(); playback.seek(4);
+        assert.equal(audio.currentTime, 4); assert.equal(audio.paused, true);
+        await playback.resume(); assert.equal(audio.plays, 2);
+        playback.stop(); assert.equal(audio.currentTime, 0); assert.equal(audio.paused, true);
+        const failed = playback.play(request); requests[2].resolve(new Response('', { status: 404 })); await failed;
+        assert.equal(playback.read().error, 'load'); assert.equal(playback.read().loading, false);
+    } finally { playback.dispose(); Object.assign(globalThis, previous); }
+});
+
+test('pause and disposal prevent late audio; allocated URLs are released', async () => {
+    const oldFetch = globalThis.fetch, oldRevoke = URL.revokeObjectURL;
+    let finish; const revoked = []; const audio = new FakeAudio();
+    globalThis.fetch = () => new Promise(resolve => { finish = resolve; });
+    URL.revokeObjectURL = url => { revoked.push(url); oldRevoke(url); };
+    const playback = new BrowserAudioPlayback(audio);
+    try {
+        const pending = playback.play(request); playback.pause(); finish(new Response(new Blob(['late']))); await pending;
+        assert.equal(audio.plays, 0);
+        audio.play = async () => { throw new Error('not allowed'); };
+        const next = playback.play(request); finish(new Response(new Blob(['audio']))); await next;
+        assert.equal(playback.read().error, 'play');
+        let updates = 0; const unsubscribe = playback.subscribe(() => updates++); unsubscribe();
+        playback.dispose(); playback.dispose(); audio.dispatchEvent(new Event('timeupdate'));
+        assert.equal(updates, 1); assert.equal(revoked.length, 1);
+        const other = new BrowserAudioPlayback(new FakeAudio());
+        const late = other.play(request); other.dispose(); finish(new Response(new Blob(['late']))); await late;
+        assert.equal(revoked.length, 1);
+    } finally { playback.dispose(); globalThis.fetch = oldFetch; URL.revokeObjectURL = oldRevoke; }
 });
 
 test('missing audio hashes fail before forming an invalid audio URL', () => {

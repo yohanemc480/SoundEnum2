@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeComposition, normalizePreferences } from '../Scripts/LocalStorageSchema.ts';
 import { SoundComposition } from '../Scripts/SoundComposition.ts';
-import { SoundManager } from '../Scripts/Singletons/SoundManager.ts';
 
 test('composition keeps duplicates and precision, rejecting invalid settings', () => {
     const row = { name: 'a', source: 'block', volume: 2.3, pitch: .75, minVolume: .35 };
@@ -20,12 +19,13 @@ function fixture() {
     const composition = Object.create(SoundComposition.prototype);
     Object.assign(composition, { rows: [{ name: 'a', volume: 1, pitch: 1 }, { name: 'a', volume: .5, pitch: 2 }],
         events: new Map([['a', { candidates: [{ hash: 'hash', weight: 1, pitch: .75, volume: .5 }] }]]),
+        playback: { pause() {}, read: () => ({ masterVolume: .8 }) },
         generation: 0, nodes: new Set(), busy: false, element: id => ui[id] });
     return composition;
 }
 
 test('all buffers prepare before aligned playback; stop cancels scheduled sources', async () => {
-    const oldAudio = globalThis.AudioContext, oldFetch = globalThis.fetch, oldManager = SoundManager.Instance;
+    const oldAudio = globalThis.AudioContext, oldFetch = globalThis.fetch;
     const sources = [], gains = [];
     let requests = 0;
     globalThis.AudioContext = class {
@@ -36,7 +36,7 @@ test('all buffers prepare before aligned playback; stop cancels scheduled source
         createGain() { const gain = { gain: {}, connect() {}, disconnect() {} }; gains.push(gain); return gain; }
     };
     globalThis.fetch = async () => { requests++; return { ok: true, arrayBuffer: async () => new ArrayBuffer(0) }; };
-    SoundManager.Instance = { GetAudio: () => ({ pause() {} }), GetMasterVolume: () => .8 };
+
     try {
         const composition = fixture();
         await composition.play();
@@ -60,5 +60,5 @@ test('all buffers prepare before aligned playback; stop cancels scheduled source
         finish({ ok: true, arrayBuffer: async () => new ArrayBuffer(0) });
         await loading;
         assert.equal(sources.length, 2);
-    } finally { globalThis.AudioContext = oldAudio; globalThis.fetch = oldFetch; SoundManager.Instance = oldManager; }
+    } finally { globalThis.AudioContext = oldAudio; globalThis.fetch = oldFetch;  }
 });

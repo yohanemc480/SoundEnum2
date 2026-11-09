@@ -1,4 +1,4 @@
-import { getWaveform } from '../../WaveformResource.ts';
+import { getWaveform } from '../../Infrastructure/Audio/WaveformResource.ts';
 
 /** 表示中の短冊に事前生成した波形を描画する。 */
 export class SearchWaveforms

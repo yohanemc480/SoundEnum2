@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mountSoundSettings } from '../Scripts/SoundSettings.ts';
+import { mountSoundSettings } from '../Scripts/App/MountSoundSettings.ts';
 import { LocalStorageSchema } from '../Scripts/LocalStorageSchema.ts';
 
 test('shared settings preserve precision and reset only their own saved values', () => {

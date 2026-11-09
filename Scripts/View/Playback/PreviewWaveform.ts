@@ -1,46 +1,28 @@
-import { getWaveform } from "./WaveformResource.ts";
+/** 波形ピークと進捗をCanvasへ描画する。音声要素や取得処理には依存しない。 */
 export class PreviewWaveform
 {
     readonly canvas: HTMLCanvasElement;
     peaks: Float32Array | null;
     progress: number;
-    generation: number;
+    private readonly resize: ResizeObserver;
 
-    constructor(audio: HTMLAudioElement, canvas: HTMLCanvasElement)
-    {
-        this.canvas = canvas;
-        this.peaks = null;
-        this.progress = 0;
-        this.generation = 0;
-        audio.addEventListener('previewreset', event => {
-            ++this.generation;
-            this.peaks = null;
-            this.setProgress(0);
-            if (event instanceof CustomEvent && typeof event.detail === 'string') this.load(event.detail);
-        });
-        new ResizeObserver(() => this.draw()).observe(canvas);
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas; this.peaks = null; this.progress = 0;
+        this.resize = new ResizeObserver(() => this.draw()); this.resize.observe(canvas);
     }
-
-    async load(hash: string): Promise<void>
-    {
-        const generation = this.generation;
-        try {
-            const peaks = await getWaveform(hash);
-            if (generation !== this.generation) return;
-            this.peaks = peaks;
-            this.draw();
-        } catch {
-            // 波形を取得できなくても試聴とシークは利用できる。
-        }
-    }
-
+    /** 取得済みピークを表示する。nullは未取得の表示に戻す。 */
+    setPeaks(peaks: Float32Array | null): void { this.peaks = peaks; this.draw(); }
+    /** リサイズ監視を終了する。 */
+    dispose(): void { this.resize.disconnect(); }
+    /** 再生位置の割合を表示範囲に収める。 */
     setProgress(progress: number): void
     {
         this.progress = Number.isFinite(progress) ? Math.max(0, Math.min(1, progress)) : 0;
         this.draw();
     }
 
-    draw()
+    /** ピークと進捗を現在のCanvasサイズで描画する。 */
+    private draw()
     {
         const canvas = this.canvas;
         const width = canvas.clientWidth;

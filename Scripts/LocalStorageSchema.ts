@@ -1,4 +1,7 @@
-import { MCCommandSound } from './MCCommandSound.ts';
+import { normalizeCommandSettings } from './Model/Command/CommandSettings.ts';
+import type { CommandSettingsValue } from './Model/Command/CommandSettings.ts';
+export { normalizeCommandSettings };
+export type { CommandSettingsValue };
 import { MCCommandSoundSource } from './Constants/MCCommandSoundSource.ts';
 import { LocalStorageKey } from './Constants/LocalStorageKey.ts';
 import type { SoundSource } from './Constants/MCCommandSoundSource.ts';
@@ -12,7 +15,7 @@ export interface SearchPreferencesValue {
     excludeMultiple: boolean;
     tab: 'search-tab' | 'favorites-tab' | 'compositions-tab';
 }
-export type CommandSettingsValue = Omit<SoundCommand, 'name'>;
+
 export type CompositionValue = SoundCommand[];
 export interface SavedComposition {
     id: string;
@@ -49,18 +52,6 @@ export function normalizePreferences(input: unknown = {}): SearchPreferencesValu
     };
 }
 
-export function normalizeCommandSettings(input: unknown = {}): CommandSettingsValue {
-    const value = isRecord(input) ? input : {};
-    const number = (input: unknown, fallback: number, min: number, max = Infinity) =>
-        isFiniteNumber(input) ? Math.min(max, Math.max(min, input)) : fallback;
-    return {
-        source: isSoundSource(value.source) ? value.source : MCCommandSoundSource.Master,
-        volume: number(value.volume, MCCommandSound.DefaultVolume, MCCommandSound.MinVolume),
-        pitch: number(value.pitch, MCCommandSound.DefaultPitch, MCCommandSound.MinPitch, MCCommandSound.MaxPitch),
-        minVolume: number(value.minVolume, MCCommandSound.DefaultMinVolume, MCCommandSound.MinMinVolume, MCCommandSound.MaxMinVolume),
-    };
-}
-
 export function normalizeComposition(value: unknown): CompositionValue {
     if (!Array.isArray(value)) throw new Error('Invalid composition');
     return value.map((row: unknown) => {
@@ -68,7 +59,7 @@ export function normalizeComposition(value: unknown): CompositionValue {
             !isFiniteNumber(row.volume) || row.volume < 0 ||
             !isFiniteNumber(row.pitch) || row.pitch < .5 || row.pitch > 2) throw new Error('Invalid composition row');
         const source = row.source === undefined ? MCCommandSoundSource.Master : row.source;
-        const minVolume = row.minVolume === undefined ? MCCommandSound.DefaultMinVolume : row.minVolume;
+        const minVolume = row.minVolume === undefined ? 0 : row.minVolume;
         if (!isSoundSource(source) ||
             !isFiniteNumber(minVolume) || minVolume < 0 || minVolume > 1) throw new Error('Invalid composition command settings');
         return { name: row.name, source, volume: row.volume, pitch: row.pitch, minVolume };

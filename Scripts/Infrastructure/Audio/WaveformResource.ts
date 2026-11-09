@@ -1,6 +1,7 @@
-import { SharedAudioPaths } from './ResourcePathProvider.ts';
+import { SharedAudioPaths } from '../../ResourcePathProvider.ts';
 
 let loading: Promise<Record<string, unknown>> | null = null;
+/** 波形ファイルを共有して取得し、指定音源の正規化済みピークを返す。失敗時は再試行できる。 */
 export async function getWaveform(hash: string): Promise<Float32Array>
 {
     loading ??= fetch(SharedAudioPaths.Waveforms, { cache: 'no-cache' }).then(async response => {
@@ -15,6 +16,7 @@ export async function getWaveform(hash: string): Promise<Float32Array>
     return Float32Array.from(values, value => value / 255);
 }
 
+/** 外部JSONが配列以外のオブジェクトかを判定する。 */
 function isRecord(value: unknown): value is Record<string, unknown> {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
 }

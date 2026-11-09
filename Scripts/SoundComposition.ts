@@ -9,17 +9,21 @@ import { OutputArea } from './OutputArea.ts';
 import { formatSoundCommand } from './FormatSoundCommand.ts';
 import { SelectMasterVolumeArea } from './SelectMasterVolumeArea.ts';
 import { CompositionWaveform } from './CompositionWaveform.ts';
-import { mountSoundSettings } from './SoundSettings.ts';
+import { mountSoundSettings } from './App/MountSoundSettings.ts';
 import { bindSettingsPopover } from './BindSettingsPopover.ts';
 import { Text } from './Text.ts';
 import { localStorageStore } from './LocalStorage.ts';
 import { LocalStorageSchema } from './LocalStorageSchema.ts';
 import { selectWeightedCandidate } from './SelectWeightedCandidate.ts';
 import { SharedAudioPaths } from './ResourcePathProvider.ts';
-import { SoundManager } from './Singletons/SoundManager.ts';
+import type { AudioPlayback } from './Contracts/Services/AudioPlayback.ts';
+import type { CommandSettings } from './Model/Command/CommandSettings.ts';
 import { showToast } from './Toast.ts';
 
+/** 組み合わせ画面が利用する操作と共有状態。再生要素は受け取らない。 */
 interface CompositionOptions {
+    playback: AudioPlayback;
+    settings: CommandSettings;
     onPreview: (row: SoundCommand, button: HTMLButtonElement) => void | Promise<void>;
     onSimilar: (name: string) => void;
 }
@@ -35,6 +39,12 @@ interface CompositionElements {
 type PreviewSource = AudioBufferSourceNode & { previewGain: GainNode; baseVolume: number };
 
 export class SoundComposition {
+    readonly playback: AudioPlayback;
+    readonly settings: CommandSettings;
+    private readonly volumeControl: SelectMasterVolumeArea;
+    private readonly lifecycle = new AbortController();
+    private disposed = false;
+    private readonly unsubscribePlayback: () => void;
     readonly onPreview: CompositionOptions['onPreview'];
     readonly onSimilar: CompositionOptions['onSimilar'];
     onChange?: () => void;
@@ -59,7 +69,8 @@ export class SoundComposition {
         return element as CompositionElements[K];
     }
     static MaxSounds = 10;
-    constructor({ onPreview, onSimilar }: CompositionOptions) {
+    constructor({ onPreview, onSimilar, playback, settings }: CompositionOptions) {
+        this.playback = playback; this.settings = settings;
         this.onPreview = onPreview;
         this.onSimilar = onSimilar;
         this.events = null;
@@ -72,15 +83,26 @@ export class SoundComposition {
         catch (error) { console.error(error); this.writable = false; showToast(Text.compositionFailure); }
         this.output = new OutputArea('#composition-output');
         this.waveform = new CompositionWaveform(this.element('waveform'), this.element('time'));
-        this.volume = SoundManager.Instance.GetMasterVolume();
-        new SelectMasterVolumeArea('#composition-volume', { value: this.volume, onChange: value => {
+        this.volume = this.playback.read().masterVolume;
+        this.volumeControl = new SelectMasterVolumeArea('#composition-volume', { value: this.volume, onChange: value => {
             this.volume = value;
             for (const source of this.nodes) source.previewGain.gain.value = Math.min(1, source.baseVolume * value);
         } });
         this.element('play').addEventListener('click', () => this.busy ? this.stop() : this.play());
-        window.addEventListener('pagehide', () => this.stop());
-        SoundManager.Instance.GetAudio().addEventListener('play', () => this.stop());
+        window.addEventListener('pagehide', () => this.stop(), { signal: this.lifecycle.signal });
+        let wasPlaying = false;
+        this.unsubscribePlayback = playback.subscribe(state => {
+            if (state.playing && !wasPlaying) this.stop();
+            wasPlaying = state.playing;
+        });
         this.render();
+    }
+    /** 再生の購読と進行中の音声を解放する。全面的なView分離は次段階で行う。 */
+    dispose(): void {
+        if (this.disposed) return;
+        this.disposed = true;
+        this.lifecycle.abort(); this.volumeControl.dispose(); this.unsubscribePlayback(); this.stop();
+        void this.context?.close();
     }
     setEvents(events: readonly SearchSound[]): void {
         this.events = new Map(events.map(event => [event.name, event]));
@@ -103,8 +125,8 @@ export class SoundComposition {
             showToast(Text.compositionLimit(SoundComposition.MaxSounds));
             return;
         }
-        const manager = SoundManager.Instance;
-        if (this.save([...this.rows, { name, source: manager.GetSource(), volume: manager.GetVolume(), pitch: manager.GetPitch(), minVolume: manager.GetMinVolume() }])) {
+        const settings = this.settings.read();
+        if (this.save([...this.rows, { name, ...settings }])) {
             this.stop(); this.render();
             revealAddedItem(this.element('list'));
             showToast(Text.compositionAdded);
@@ -231,7 +253,7 @@ export class SoundComposition {
             this.waveform?.setRows(prepared.map(row => ({ ...row, candidate: {
                 ...row.candidate, duration: getBuffer(row.candidate.hash).duration / row.candidate.pitch,
             } })));
-            SoundManager.Instance.GetAudio().pause();
+            this.playback.pause();
             const start = context.currentTime + .05;
             for (const row of prepared) {
                 const gain = context.createGain();
@@ -240,7 +262,7 @@ export class SoundComposition {
                 });
                 source.buffer = getBuffer(row.candidate.hash);
                 source.playbackRate.value = row.pitch * row.candidate.pitch;
-                gain.gain.value = Math.min(1, source.baseVolume * (this.volume ?? SoundManager.Instance.GetMasterVolume()));
+                gain.gain.value = Math.min(1, source.baseVolume * (this.volume ?? this.playback.read().masterVolume));
                 source.connect(gain); gain.connect(context.destination);
                 this.nodes.add(source);
                 source.onended = () => {
