@@ -1,9 +1,11 @@
 # TypeScript・Vite・vanilla-extract 移行計画
 
 作成日: 2026-11-09
-状態: 第1段階の設定・Worker対応を実装中。依存取得がネットワークの名前解決エラーで停止しており、Viteビルドは未検証。公開設定は未変更。
+状態: 既存JSのTS化、依存取得、静的型チェック、Viteビルドとリソースコピーが完了。ブラウザ動作確認・vanilla-extract移行・公開設定は未完了。
 
 ## 実施記録（2026-11-09）
+
+- 手元のnpm installが成功し、package-lock.jsonを生成。ブラウザ・Worker・Node設定の型チェック、Vite本番ビルドとresourceコピー、36テスト、実データ検証（1,984イベント・4,941音源）がすべて成功。以下の依存取得待ちの記録は当時の状況。
 
 - package.json、Nodeバージョン、Vite設定、JS混在のTypeScript設定を追加。
 - WorkerのURLをViteが検出できる直接記述へ変更し、手書きrevisionを除去。

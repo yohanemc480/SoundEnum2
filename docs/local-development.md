@@ -4,18 +4,18 @@
 
 ## Viteへの移行状況
 
-既存50ファイルすべてをTypeScriptへ移行し、共通型とJSON検証の2ファイルを追加しています。HTMLの起動先もMain.tsへ変更しました。依存パッケージ取得後に静的型チェックとViteビルドを検証する段階で、vanilla-extractへのCSS移行は未着手です。
+既存50ファイルすべてをTypeScriptへ移行し、共通型とJSON検証の2ファイルを追加しています。HTMLの起動先もMain.tsへ変更しました。依存取得・静的型チェック・Viteビルド（リソースコピーを含む）が成功しています。ブラウザ動作確認とvanilla-extractへのCSS移行は未完了です。
 
-Node.js 24.13.0を使用します（`.node-version`参照）。初回は次を実行します。
+Node.js 24.13.0を使用します（`.node-version`参照）。クローン後の初回は次を実行します。
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
 開発URLは <http://127.0.0.1:8000/SoundEnum2/> です。保存した変更はViteが反映します。停止はターミナルで`Ctrl+C`です。同じポートのPythonサーバーが起動している場合は先に停止してください。
 
-初回の依存解決が成功したら、生成された`package-lock.json`をコミットします。それ以降のクリーンインストール・CIでは`npm ci`を使います。現環境ではnpmレジストリの名前解決に失敗しており、lockfileは未生成です。
+`package-lock.json`で依存バージョンを固定しています。クリーンインストール・CIでは`npm ci`を使い、依存を更新する際は`npm install`を使います。
 
 ## 検証とビルド
 
@@ -43,6 +43,6 @@ npm run check:pages-size
 
 ## TypeScript移行後の注意
 
-ブラウザはTypeScriptを直接実行できないため、PythonのHTTPサーバーでソースを配信する方式は使えません。Viteの依存取得が完了するまでは、Node.jsによる`npm test`と`npm run verify:data`で処理を検証できます。
+ブラウザはTypeScriptを直接実行できないため、PythonのHTTPサーバーでソースを配信する方式は使えません。ローカル確認には`npm run dev`を使います。
 
-Node.jsは型を除去して実行するだけなので、テスト成功は型チェック成功を意味しません。依存取得後に`npm run typecheck`と`npm run build`を実行してください。
+Node.jsは型を除去して実行するだけなので、テスト成功は型チェック成功を意味しません。変更後は`npm run typecheck`と`npm run build`も実行してください。
